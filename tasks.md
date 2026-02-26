@@ -2042,7 +2042,6 @@ Each task follows this format:
 9. ML Infrastructure (14.1 → 14.5) - can start during Phase 1 if resources available
 10. Phase 2 Integration (16.1 → 16.7)
 11. Phase 2 Testing (17.1 → 17.4)
-12. I have long hair
 
 ---
 
