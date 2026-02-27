@@ -37,6 +37,8 @@ Each task follows this format:
 - Folder structure in place: `/src/screens`, `/src/components`, `/src/services`, `/src/utils`, `/src/types`, `/src/assets`, `/src/config`
 - `.gitignore` configured to exclude node_modules, build artifacts, env files
 - `app.json` configured with app name "Colorfind by ASARA" and portrait-only orientation lock
+**Current Status:** Complete
+**Notes:** Folder structure needs to be looked at again because empty folders are not getting pushed to Git (such as src folders that aren't screens).
 
 ---
 
@@ -91,6 +93,8 @@ Each task follows this format:
 - iOS `Info.plist` configured to disable landscape
 - Android `AndroidManifest.xml` configured to disable landscape
 - App cannot rotate to landscape on either platform when device is rotated
+**Current Status:** Complete
+**Notes:** Was done in the app.json file. Added requiresFullScreen to make it work.
 
 ---
 
