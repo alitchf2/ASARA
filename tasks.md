@@ -17,6 +17,8 @@ Each task follows this format:
 - **Dependencies**: Task IDs that must be completed first
 - **Acceptance Criteria**: Specific, testable outcomes
 - **Testing Notes**: Special testing considerations (if applicable)
+- **Current Status**: Status of the task such as in progress or complete
+- **Notes**: Any notes of what was done to the code in order to complete the task
 
 ---
 
@@ -80,7 +82,7 @@ Each task follows this format:
 ---
 
 ### 1.5 - Configure Portrait Orientation Lock
-**Assignee:** Full Stack Frontend - Alex  
+**Assignee:** Full Stack Frontend - Adam  
 **PDR Reference:** Section 3.1, Section 13.1  
 **Description:** Lock app to portrait orientation only on both iOS and Android.  
 **Dependencies:** 1.1  
