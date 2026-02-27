@@ -1,11 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
-<<<<<<< HEAD
 
-=======
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
->>>>>>> ca3e94a (Added sign in screen)
 import FindColorScreen from './src/screens/FindColorScreen';
 import SavedColorsScreen from './src/screens/SavedColorsScreen';
 import SignInScreen from './src/screens/SignInScreen';
