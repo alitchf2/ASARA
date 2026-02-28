@@ -17,6 +17,8 @@ Each task follows this format:
 - **Dependencies**: Task IDs that must be completed first
 - **Acceptance Criteria**: Specific, testable outcomes
 - **Testing Notes**: Special testing considerations (if applicable)
+- **Current Status**: Status of the task such as in progress or complete
+- **Notes**: Any notes of what was done to the code in order to complete the task
 
 ---
 
@@ -35,6 +37,8 @@ Each task follows this format:
 - Folder structure in place: `/src/screens`, `/src/components`, `/src/services`, `/src/utils`, `/src/types`, `/src/assets`, `/src/config`
 - `.gitignore` configured to exclude node_modules, build artifacts, env files
 - `app.json` configured with app name "Colorfind by ASARA" and portrait-only orientation lock
+**Current Status:** Complete
+**Notes:** Folder structure needs to be looked at again because empty folders are not getting pushed to Git (such as src folders that aren't screens).
 
 ---
 
@@ -48,6 +52,8 @@ Each task follows this format:
 - Environment switcher implemented to select correct config based on build type
 - Variables include: API base URL, DynamoDB table names with `-dev`/`-prod` suffix, S3 bucket names, Cognito pool IDs
 - No hardcoded environment-specific values in application code
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -62,6 +68,8 @@ Each task follows this format:
 - Amplify Analytics configured with Pinpoint
 - Amplify configured in application entry point (`App.tsx`)
 - `aws-exports.js` generated and gitignored (template version checked in)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -76,11 +84,13 @@ Each task follows this format:
 - Production branch connected and building on commit
 - Build settings configured correctly for React Native
 - Deployment notifications configured
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
 ### 1.5 - Configure Portrait Orientation Lock
-**Assignee:** Full Stack Frontend - Alex  
+**Assignee:** Full Stack Frontend - Adam  
 **PDR Reference:** Section 3.1, Section 13.1  
 **Description:** Lock app to portrait orientation only on both iOS and Android.  
 **Dependencies:** 1.1  
@@ -89,6 +99,8 @@ Each task follows this format:
 - iOS `Info.plist` configured to disable landscape
 - Android `AndroidManifest.xml` configured to disable landscape
 - App cannot rotate to landscape on either platform when device is rotated
+**Current Status:** Complete
+**Notes:** Was done in the app.json file. Added requiresFullScreen to make it work.
 
 ---
 
@@ -105,6 +117,8 @@ Each task follows this format:
 - GSI created: `username-index` with partition key `username` (String), projection type KEYS_ONLY
 - On-demand billing mode enabled
 - Server-side encryption enabled (default AWS managed key)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -119,6 +133,8 @@ Each task follows this format:
 - On-demand billing mode enabled
 - Server-side encryption enabled
 - Table is empty (seeding is a separate task)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -134,6 +150,8 @@ Each task follows this format:
 - GSI created: `userID-family-index` with partition key `userID`, sort key `familyColorName`, projection type ALL
 - On-demand billing mode enabled
 - Server-side encryption enabled
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -148,6 +166,8 @@ Each task follows this format:
 - Server-side encryption enabled (AES-256 / SSE-S3)
 - Versioning disabled
 - Folder structure plan documented: `users/{userID}/saved/{objectID}.jpg`, `models/segmentation_{version}.tflite`
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -164,6 +184,8 @@ Each task follows this format:
 - No email verification required (email field not collected)
 - User Pool app client created for the mobile app
 - Refresh token expiration set to 30 days
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -177,6 +199,8 @@ Each task follows this format:
 - Authenticated role IAM policy created with permissions to generate S3 pre-signed URLs (via Lambda - no direct S3 access)
 - Unauthenticated role has no permissions
 - Trust relationship configured correctly between Identity Pool and User Pool
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -192,6 +216,8 @@ Each task follows this format:
 - HTTPS enforced (HTTP rejected)
 - CORS enabled for mobile app origin
 - CloudWatch logging enabled
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -205,6 +231,8 @@ Each task follows this format:
 - Permissions include: DynamoDB read/write on all app tables, S3 read/write on app buckets, Cognito admin actions, CloudWatch Logs write
 - Least-privilege principle applied (no wildcard resource ARNs where specific resources can be specified)
 - Role assumable by Lambda service
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -222,6 +250,8 @@ Each task follows this format:
 - No internet banner placeholder (functionality added in task 3.7)
 - Navigation to Create Account screen functional
 - Navigation to Find Color screen in guest mode functional (auth logic added in task 3.4)
+**Status:** Complete
+**Notes:** Changed file structue of App.tsx to where there is a Stack Navigator. Completed the UI layout and added deterministic target-slot scroll behavior so fields slide exactly into place over the keyboard without breaking the 30/70 interface ratios. Replaced the deprecated `SafeAreaView` from `react-native` with `react-native-safe-area-context` and wrapped the NavigationContainer in a `SafeAreaProvider` inside `App.tsx`.
 
 ---
 
@@ -237,6 +267,8 @@ Each task follows this format:
 - Checkbox label: "I agree to the Terms of Service and Privacy Policy" with linked text
 - Tapping linked text opens Terms/Privacy screen (screen built in task 14.1)
 - Inline validation error messages display below respective fields
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -253,6 +285,8 @@ Each task follows this format:
 - No data submission required on this screen
 
 **Testing Notes:** Have a non-technical person read the policy text to confirm plain language clarity.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -267,6 +301,8 @@ Each task follows this format:
 - On failure: inline error message displays below password field: "Incorrect username or password."
 - Loading indicator shown during authentication
 - No plain text password logging
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -286,6 +322,8 @@ Each task follows this format:
 - Handle Cognito errors gracefully (e.g., username already exists in Cognito despite check)
 
 **Testing Notes:** Test race condition where two users try to register the same username simultaneously.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -299,6 +337,8 @@ Each task follows this format:
 - Navigation to Find Color screen occurs immediately without Cognito calls
 - Guest flag persists in memory only (cleared on app close)
 - No data written to any database for guest users
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -314,6 +354,8 @@ Each task follows this format:
 - Connectivity re-checked every 5 seconds while banner is visible
 - Banner auto-dismisses when connectivity restored
 - Sign In/Create Account buttons remain disabled while offline
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -331,6 +373,8 @@ Each task follows this format:
 - Return `available: false` if any record found, `available: true` if no records
 - Logs to CloudWatch
 - Response time <500ms
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -346,6 +390,8 @@ Each task follows this format:
 - Sign Out button tap triggers sign-out flow (logic in task 3.10)
 - Delete Account button tap triggers deletion flow (logic in task 3.13)
 - Screen inaccessible to guest users (redirect to Sign In with explanation - logic in task 3.11)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -360,6 +406,8 @@ Each task follows this format:
 - Navigation to Sign In screen
 - Recent photos remain on device if user was authenticated (per Section 3.5 - persist across sessions)
 - No server-side calls required (token invalidation handled by Cognito automatically)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -373,6 +421,8 @@ Each task follows this format:
 - If guest user taps Saved Colors tab: show modal "Sign in to view your saved colors." with Sign In button
 - If guest user taps Compare Color button: show modal "Sign in to compare colors." with Sign In button
 - Modals dismissible (user can tap outside or X button to close and stay on current screen)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -394,6 +444,8 @@ Each task follows this format:
 - Refresh User Settings screen with new username displayed
 
 **Testing Notes:** Test updating username only, password only, both simultaneously, and canceling edit mode.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -413,6 +465,8 @@ Each task follows this format:
 - On failure: show error banner with Retry option
 
 **Testing Notes:** Test account deletion with 0 saved colors, 1 saved color, and 10+ saved colors. Verify all S3 objects deleted.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -430,6 +484,8 @@ Each task follows this format:
 - Returns `{ userID, username, createdAt }`
 - Returns 404 if user record not found (should not happen for authenticated users, but handle gracefully)
 - Logs to CloudWatch
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -443,6 +499,8 @@ Each task follows this format:
 - Display username from response in username field
 - Show loading skeleton while API call in progress
 - Handle error gracefully (show error message if profile cannot be loaded)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -462,6 +520,8 @@ Each task follows this format:
 - Return `{ success: boolean, message: string }`
 - Handle errors: username taken, Cognito API failure, DynamoDB write failure
 - Logs to CloudWatch
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -487,6 +547,8 @@ Each task follows this format:
 - Logs to CloudWatch with detailed step-by-step logging
 
 **Testing Notes:** Critical - test rollback scenarios where S3 delete fails but DynamoDB succeeds, etc.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -503,6 +565,8 @@ Each task follows this format:
 - Android `AndroidManifest.xml` includes camera permission
 - Permission request shown on first access to camera
 - Permission handling logic implemented per task 4.3
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -520,6 +584,8 @@ Each task follows this format:
 - Top right: circular user icon button
 - Bottom navigation bar: color dropper icon (left, active/highlighted), bookmark icon (right, inactive)
 - Camera preview resumes when user navigates back from Object Selection screen
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -537,6 +603,8 @@ Each task follows this format:
 - Permission status re-checked when app returns from background (user may have changed settings)
 
 **Testing Notes:** Test on both iOS and Android. Test app behavior when user denies permission twice (iOS shows system-level "Don't Ask Again").
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -556,6 +624,8 @@ Each task follows this format:
 - Navigation to Object Selection screen after successful capture
 
 **Testing Notes:** Test FIFO deletion logic. Test guest vs authenticated persistence.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -576,6 +646,8 @@ Each task follows this format:
 - Tapping Select: closes popup, loads selected image as if just captured, navigates to Object Selection screen
 
 **Testing Notes:** Test with 0, 3, and 6 recent images.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -589,6 +661,8 @@ Each task follows this format:
 - Compression function created that accepts image URI and returns compressed URI
 - Compression settings: max 2048px on longest side, JPEG format, quality 0.9 (90%)
 - EXIF data stripped during compression
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -604,6 +678,8 @@ Each task follows this format:
 - Original captured image in Recent Photos remains uncompressed
 
 **Testing Notes:** Test with images >4000px and images <2048px. Verify 2048px images are not upscaled.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -618,6 +694,8 @@ Each task follows this format:
 - Instructional text below image: "Tap the object or area whose color you want to identify."
 - Tapping anywhere on image places selection marker (Phase 1 logic in task 5.1)
 - Screen displays loading indicator during color detection processing (Phase 1 and Phase 2)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -634,6 +712,8 @@ Each task follows this format:
 - Visible marker placed at tapped coordinate: small circle (~16px diameter), brand-blue border, semi-transparent fill
 - Marker position stored in state along with tap coordinates
 - Navigation to Selection Confirmation screen after marker placement
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -650,6 +730,8 @@ Each task follows this format:
 - Phase 2 addition (task 17.4): 'Use exact point instead' tertiary button (not shown in Phase 1)
 - Tapping Confirm Selection triggers color extraction (task 5.3)
 - Tapping Reselect returns to Object Selection screen with image still displayed, no marker
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -667,6 +749,8 @@ Each task follows this format:
 - Function runs fast enough for real-time use (<100ms)
 
 **Testing Notes:** Test corner and edge taps. Test with solid color image and gradient image.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -683,6 +767,8 @@ Each task follows this format:
 - Unit tests cover at least 10 known RGB-to-LAB conversions (test against colorimetry reference data)
 
 **Testing Notes:** Use online RGB-to-LAB converter to verify several test cases.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -706,6 +792,8 @@ Each task follows this format:
 - Response time <2 seconds per Section 13.2
 
 **Testing Notes:** Test with various image sizes and tap positions. Verify LAB matching accuracy.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -722,6 +810,8 @@ Each task follows this format:
 - On failure: show error banner "Could not identify a color. Please try again." with Retry button (task 12.1)
 - Retry button re-triggers DetectColor call
 - Loading indicator dismisses on success or failure
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -738,6 +828,8 @@ Each task follows this format:
 - Selected dataset contains 20,000+ named colors with good perceptual distribution
 - Dataset includes or can be augmented with familyColorName classification (Red, Yellow, Blue, etc.)
 - Decision documented with rationale in project docs
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -754,6 +846,8 @@ Each task follows this format:
 - Output JSON array of objects: `{ colorID, hex, rgb: {r,g,b}, lab: {l,a,b}, detailedColorName, familyColorName }`
 - Script is idempotent and deterministic (same input produces same output)
 - Output saved to file: `colors-master-dataset.json`
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -768,6 +862,8 @@ Each task follows this format:
 - All records successfully imported (verify count matches source dataset)
 - Random sampling of 10 colors verified in DynamoDB Console
 - GSI `familyColorName` populated correctly
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -784,6 +880,8 @@ Each task follows this format:
 - Function optimized for performance (will be called thousands of times per color detection)
 
 **Testing Notes:** Use online DeltaE calculator or published test vectors to verify implementation.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -802,6 +900,8 @@ Each task follows this format:
 - Lambda caches Colors Master dataset in memory between invocations to avoid repeated DynamoDB queries
 
 **Testing Notes:** Test with several known colors (pure red, pure blue, mid-gray) and verify intuitive matches.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -826,6 +926,8 @@ Each task follows this format:
 - 'Compare Color' button (functionality in task 10.1)
 - Color Themes section placeholder (populated in task 7.5)
 - Save Color button disabled state after color is saved (set in task 8.2)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -843,6 +945,8 @@ Each task follows this format:
 - Function runs client-side (no backend call)
 
 **Testing Notes:** Verify complementary colors visually appear opposite on color wheel.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -859,6 +963,8 @@ Each task follows this format:
 - Function runs client-side
 
 **Testing Notes:** Verify analogous colors appear adjacent on color wheel (harmonious palette).
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -876,6 +982,8 @@ Each task follows this format:
 - Function runs client-side
 
 **Testing Notes:** Verify triadic colors are evenly spaced and create balanced palette.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -892,6 +1000,8 @@ Each task follows this format:
 - Themes generated client-side when Color Results screen loads
 - Swatches are non-interactive (no tap behavior) in MVP
 - All three themes always visible (not collapsible or selectable)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -904,6 +1014,8 @@ Each task follows this format:
 - Saved Color Detail screen includes identical Color Themes section as Color Results screen
 - Themes generated from saved color's hex value when screen loads
 - Layout and behavior identical to task 7.5
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -922,6 +1034,8 @@ Each task follows this format:
 - 'Save' primary button
 - Save button disabled if input field is empty
 - Empty field validation: if empty and Save tapped → inline error "Please enter a name for this color."
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -940,6 +1054,8 @@ Each task follows this format:
 - URL expires in 5 minutes
 - Returns `{ uploadUrl: string, s3Key: string }`
 - Logs to CloudWatch
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -959,6 +1075,8 @@ Each task follows this format:
 - Returns `{ success: boolean, objectID }`
 - Handles DynamoDB write failures with retry logic (Section 12.1)
 - Logs to CloudWatch
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -981,6 +1099,8 @@ Each task follows this format:
 - Handle failures at each step: if S3 upload fails → show error banner with Retry (Section 12.2), if DB write fails → show error banner with Retry
 
 **Testing Notes:** Test with slow/unreliable network. Test retry logic for S3 and DB failures.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1001,6 +1121,8 @@ Each task follows this format:
 - Empty state (if no saved colors): illustration placeholder and text "No saved colors yet. Capture a color to get started!"
 - Bottom navigation bar: right = bookmark icon (active/highlighted), left = color dropper icon (inactive)
 - Guest users redirected to Sign In per task 3.11
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1023,6 +1145,8 @@ Each task follows this format:
 - Response time <1 second for 100 saved colors
 
 **Testing Notes:** Test with 0, 1, 10, 100 saved colors. Test family filter and search combinations.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1040,6 +1164,8 @@ Each task follows this format:
 - URL expires in 1 hour
 - Returns `{ viewUrl: string }`
 - Logs to CloudWatch
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1055,6 +1181,8 @@ Each task follows this format:
 - For each card, display saved image thumbnail (fetched via pre-signed URL from task 9.5), userAssignedName, familyColorName
 - If response array empty: show empty state
 - Handle API errors gracefully (show error message)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1072,6 +1200,8 @@ Each task follows this format:
 - Pre-signed URLs refresh after 1 hour (re-fetch if needed)
 
 **Testing Notes:** Test with many saved colors (50+) to verify performance and caching.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1089,6 +1219,8 @@ Each task follows this format:
 - Clearing search bar restores full list
 
 **Testing Notes:** Partial match is implemented. Fuzzy match can be added as future feature if time permits.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1104,6 +1236,10 @@ Each task follows this format:
 - Only one family filter active at a time
 - Filter can be combined with search (apply both filters)
 - Call `GET /colors/saved?familyFilter={family}` when family chip tapped (backend filtering via GSI)
+
+**Testing Notes:** Test filter combinations with search. Verify GSI usage for efficient filtering.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1123,6 +1259,8 @@ Each task follows this format:
 - 'Compare Color' button
 - 'Delete Color' button (red/destructive styling)
 - Color Themes section (populated in task 7.6)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1136,6 +1274,8 @@ Each task follows this format:
 - Pass full color object (including imageS3Key) to detail screen via navigation params
 - Detail screen loads image using pre-signed URL (same logic as task 9.5)
 - All color metadata displayed on detail screen
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1154,6 +1294,8 @@ Each task follows this format:
 - Returns `{ success: boolean }`
 - Handles DynamoDB update failures with retry logic
 - Logs to CloudWatch
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1171,6 +1313,8 @@ Each task follows this format:
 - On success: update displayed name on detail screen, show success toast "Name updated!"
 - On failure: show error banner with Retry
 - Modal dismisses on successful update
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1192,6 +1336,8 @@ Each task follows this format:
 - Logs to CloudWatch
 
 **Testing Notes:** Test S3 delete failure scenario (e.g., image already deleted). Verify orphaned S3 objects don't accumulate.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1210,6 +1356,8 @@ Each task follows this format:
 - Deleted color immediately removed from Saved Colors grid when user returns
 
 **Testing Notes:** Test deleting the only saved color. Test deleting while offline.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1229,6 +1377,8 @@ Each task follows this format:
 - Similarity score section (hidden until comparison color selected)
 - Text summary section (hidden until comparison color selected)
 - Tapping right panel after selection re-opens color selection popup
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1248,6 +1398,8 @@ Each task follows this format:
 - Tapping Select: closes popup, loads selected color into right panel, triggers comparison calculations (task 10.3)
 
 **Testing Notes:** Reuses saved colors display logic from task 9.1.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1266,6 +1418,8 @@ Each task follows this format:
   - Chroma for each color: √(A² + B²)
 - Calculate similarity percentage: `max(0, 100 - (deltaE * 2))`
 - Return object: `{ deltaE, lightnessSource, lightnessCompare, aSource, aCompare, bSource, bCompare, chromaSource, chromaCompare, similarityPercent }`
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1284,6 +1438,8 @@ Each task follows this format:
 - Each slider labeled with metric name
 - Indicator marks clearly distinguished (different colors or shapes for source vs compare)
 - Sliders are non-interactive (display only, user cannot drag)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1297,6 +1453,8 @@ Each task follows this format:
 - Label "Match" or "Similarity" below percentage
 - Calculation per Section 6.3: `max(0, 100 - (deltaE * 2))`
 - Score updates when different comparison color selected
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1314,6 +1472,8 @@ Each task follows this format:
 - Each threshold has descriptive constant name (e.g., `LIGHTNESS_SLIGHT_MIN = 3`, `LIGHTNESS_NOTICEABLE_MIN = 10`)
 - Constants exported and imported by comparison text generation function (task 10.7)
 - No hardcoded threshold values in business logic
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1335,6 +1495,8 @@ Each task follows this format:
 - Returns summary string
 
 **Testing Notes:** Test with several color pairs (similar colors, very different colors, complementary colors).
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1348,6 +1510,8 @@ Each task follows this format:
 - Summary generated using task 10.7 function
 - Text rendered in readable paragraph format
 - Summary updates when different comparison color selected
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1361,6 +1525,8 @@ Each task follows this format:
 - Source color (left panel) populated with detected color data
 - Right panel shows "Select a color to compare" placeholder
 - Guest users redirected to Sign In per task 3.11
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1373,6 +1539,8 @@ Each task follows this format:
 - Tapping Compare Color button on Saved Color Detail screen navigates to Compare Screen
 - Source color (left panel) populated with saved color data
 - Right panel shows "Select a color to compare" placeholder
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1390,6 +1558,8 @@ Each task follows this format:
 - Does not retry 4xx client errors (validation failures, authentication errors)
 - Returns promise that resolves with successful response or rejects after max retries
 - All API calls in app (tasks 3.4, 3.5, 5.6, 8.4, 9.4, etc.) wrapped with this function
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1406,6 +1576,8 @@ Each task follows this format:
 - Tapping Retry button calls `onRetry` function
 - Banner dismissible with X button on right
 - Component reusable across all screens
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1418,6 +1590,8 @@ Each task follows this format:
 - Verify modal message matches Section 12.2: "Camera access is required to use Colorfind. Please enable camera access in your device settings."
 - Verify "Open Settings" button deep-links to device settings via `Linking.openSettings()`
 - Modal non-dismissible until permission granted
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1432,6 +1606,8 @@ Each task follows this format:
 - Retry button re-triggers save flow from image compression step (task 8.4)
 - Image retained in local temp storage for retry (do not re-compress if retry)
 - DB record not written until S3 upload succeeds
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1446,6 +1622,8 @@ Each task follows this format:
 - Delete DB write failure (task 9.13): show error banner "Could not delete this color. Please try again." with Retry
 - Each Retry button re-triggers respective operation
 - No partial state shown to user (e.g., don't add color to saved list until DB write confirmed)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1459,6 +1637,8 @@ Each task follows this format:
 - Banner message: "Could not identify a color. Please try again."
 - Retry button re-triggers DetectColor API call with same image and tap coordinates
 - User can also tap Reselect to return to Object Selection screen
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1473,6 +1653,8 @@ Each task follows this format:
 - On successful refresh: retry original API call transparently (user unaware)
 - On refresh failure (refresh token expired): clear session, navigate to Sign In screen, show message "Your session has expired. Please sign in again."
 - Session expiration does not cause data loss (unsaved work should be preserved where possible)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1488,6 +1670,8 @@ Each task follows this format:
 - Errors display immediately after validation failure
 - Errors clear when user edits respective field
 - No exponential backoff for authentication errors (user must correct input)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1504,6 +1688,8 @@ Each task follows this format:
 - Analytics configuration set to send events to Pinpoint
 - No PII attached to any events (no userID, username, or image content)
 - Events include only: event name, anonymous session ID, timestamp, device platform (iOS/Android)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1527,6 +1713,8 @@ Each task follows this format:
 - No PII in any event attributes
 
 **Testing Notes:** Verify events appear in Pinpoint console for both dev and prod environments.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1550,6 +1738,8 @@ Each task follows this format:
   - ASARA may update Terms at any time, continued use = acceptance
 - Text written in plain language, readable by general audience (no legal jargon)
 - Text provided to task 3.3 for UI implementation
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1563,6 +1753,8 @@ Each task follows this format:
 - When app state changes to 'background' or 'inactive' AND user is in guest mode: delete all Recent Photos files from filesystem and clear Recent Photos index from AsyncStorage
 - Cleanup runs silently (no user notification)
 - Cleanup does NOT run for authenticated users (their Recent Photos persist)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1586,6 +1778,8 @@ Each task follows this format:
 - Known minor bugs documented in issue tracker
 
 **Testing Notes:** This is a manual QA pass. Automated E2E tests can be added post-MVP.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1600,6 +1794,8 @@ Each task follows this format:
 - Colors Master dataset cached in Lambda memory between invocations (loaded once per Lambda instance)
 - Image processing optimized (consider using smaller image resolution for color extraction if needed)
 - Load testing performed with 10 concurrent requests to verify performance under load
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1614,6 +1810,8 @@ Each task follows this format:
 - Amplify configured for lazy loading where possible
 - Splash screen displayed during initialization
 - No blocking operations on main thread during startup
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1630,6 +1828,8 @@ Each task follows this format:
 - Rounded corner radii consistent (8px for cards/swatches)
 - Icons consistent style (outlined or filled, not mixed)
 - Design QA pass on all screens
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1645,6 +1845,8 @@ Each task follows this format:
 - Loading spinner shown during sign in/sign up (tasks 3.4, 3.5)
 - Loading spinner shown during delete operations (task 9.13)
 - No "flash of empty content" (skeleton shown immediately)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1658,6 +1860,8 @@ Each task follows this format:
 - Search no results: "No colors match your search." (task 9.6)
 - Empty states use friendly, encouraging tone
 - Empty states include suggested next action (e.g., button to capture color)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1674,6 +1878,8 @@ Each task follows this format:
 - Test with iOS VoiceOver and Android TalkBack on at least 2 screens
 
 **Testing Notes:** Basic accessibility implementation. Full WCAG compliance is out of scope for MVP per PDR.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1692,6 +1898,8 @@ Each task follows this format:
   - How to deploy to dev/prod via Amplify
 - Code comments added to complex logic (color detection, comparison calculations)
 - API endpoint documentation (can be auto-generated from OpenAPI spec if created)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1713,6 +1921,8 @@ Each task follows this format:
 - Model must be compatible with TensorFlow Lite for on-device inference
 - Model license allows commercial use
 - Decision documented with model source, version, and benchmarks
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1730,6 +1940,8 @@ Each task follows this format:
 - Conversion script documented and repeatable
 
 **Testing Notes:** Test quantized model inference on sample images to verify segmentation quality.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1742,6 +1954,8 @@ Each task follows this format:
 - Model uploaded to S3 at key: `models/segmentation_v1.tflite` in both dev and prod buckets
 - File permissions set to authenticated-read (accessible via pre-signed URLs)
 - S3 object metadata includes version tag (e.g., `version=v1`)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1757,6 +1971,8 @@ Each task follows this format:
 - Returns `{ latestVersion: "v1", s3Key: "models/segmentation_v1.tflite" }`
 - Version string hardcoded in Lambda (can be environment variable for easy updates)
 - Logs to CloudWatch
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1772,6 +1988,8 @@ Each task follows this format:
 - If no Expo-compatible library exists, document decision to eject to bare workflow
 
 **Testing Notes:** Research library options carefully. TFLite support in Expo is limited; may require custom native modules.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1788,6 +2006,8 @@ Each task follows this format:
 - If versions match: proceed to Sign In screen
 - If versions don't match or no local version: download new model (task 15.2)
 - If version check API call fails: use last successfully downloaded model if available, otherwise block app launch with error message
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1805,6 +2025,8 @@ Each task follows this format:
 - First-time install: model download is required, block app usage until complete
 
 **Testing Notes:** Test download on slow network. Test first install vs. update scenario.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1818,6 +2040,8 @@ Each task follows this format:
 - Model loaded once and kept in memory for app session (not reloaded on every inference)
 - Model loading time <2 seconds
 - Handle model loading errors gracefully (corrupted file, incompatible format)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1839,6 +2063,8 @@ Each task follows this format:
 - Inference completes in <2 seconds per Section 13.2
 
 **Testing Notes:** Test inference speed on target devices (iPhone 11, Pixel 5). Optimize input size if needed.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1852,6 +2078,8 @@ Each task follows this format:
 - Overlay: semi-transparent white outline (3px border, slight drop shadow) following object boundary from mask
 - Overlay drawn using Canvas or SVG (performant rendering)
 - Navigation to Selection Confirmation screen with overlay visible
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1867,6 +2095,8 @@ Each task follows this format:
 - "Try Again" returns to Object Selection screen for re-tap
 - "Use Exact Point" places Phase 1 marker at original tap coordinate and navigates to Selection Confirmation screen
 - User can proceed with color detection using exact point method
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1880,6 +2110,8 @@ Each task follows this format:
 - Tapping button: removes segmentation overlay, places Phase 1 marker at original tap coordinate, shows Confirm Selection button
 - User can then confirm selection with exact point method instead of segmented area
 - If reached via Phase 1 (no ML), button not shown
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1897,6 +2129,8 @@ Each task follows this format:
 - Function handles edge case where too many pixels removed (e.g., <5 pixels remain → use original average without outlier removal)
 
 **Testing Notes:** Test with image containing noise or highlights (e.g., shiny object with specular reflections).
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1917,6 +2151,8 @@ Each task follows this format:
 - Backward compatible with Phase 1 requests
 
 **Testing Notes:** Test both Phase 1 and Phase 2 request formats. Verify color accuracy improvement with outlier removal.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1930,6 +2166,8 @@ Each task follows this format:
 - Phase 1 detections log `"exact_point"`
 - Phase 2 detections (successful segmentation) log `"ml_segment"`
 - Phase 2 detections that fall back to exact point log `"exact_point"` with additional attribute `"ml_fallback": true`
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1951,6 +2189,8 @@ Each task follows this format:
 - No critical bugs related to ML features
 
 **Testing Notes:** Test with challenging images (low contrast, busy background, reflections).
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1965,6 +2205,8 @@ Each task follows this format:
 - Model input size tuned for speed/accuracy tradeoff (e.g., 512×512 vs. 256×256)
 - Consider using GPU acceleration if available on device
 - Inference time measured and logged for various device types
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1981,6 +2223,8 @@ Each task follows this format:
 - Document model performance: accuracy, inference time, failure cases
 
 **Testing Notes:** Use publicly available segmentation datasets (COCO, Pascal VOC) or create custom test set with representative objects.
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
@@ -1994,6 +2238,8 @@ Each task follows this format:
 - ML model update process documented (how to convert, quantize, upload new version)
 - Known limitations documented (object types that segment poorly, lighting conditions, etc.)
 - Performance benchmarks documented (inference time on various devices)
+**Current Status:** Not Started
+**Notes:** 
 
 ---
 
