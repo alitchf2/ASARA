@@ -4,9 +4,22 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
+
+    "start:dev": "EXPO_PUBLIC_APP_ENV=dev expo start",
+    "start:prod": "EXPO_PUBLIC_APP_ENV=prod expo start",
+
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+
+    "android:dev": "EXPO_PUBLIC_APP_ENV=dev expo start --android",
+    "android:prod": "EXPO_PUBLIC_APP_ENV=prod expo start --android",
+
+    "ios:dev": "EXPO_PUBLIC_APP_ENV=dev expo start --ios",
+    "ios:prod": "EXPO_PUBLIC_APP_ENV=prod expo start --ios",
+
+    "web:dev": "EXPO_PUBLIC_APP_ENV=dev expo start --web",
+    "web:prod": "EXPO_PUBLIC_APP_ENV=prod expo start --web"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
