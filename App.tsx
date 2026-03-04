@@ -9,6 +9,10 @@ import SavedColorsScreen from './src/screens/SavedColorsScreen';
 import { ENV } from './src/config';
 import { validateEnvOrThrow } from './src/config/validateEnv';
 
+//Task1.3: Amplify setup
+import { configureAmplify } from './src/config/amplify';
+configureAmplify();
+
 const Tab = createBottomTabNavigator();
 
 // Fail fast if config is missing
