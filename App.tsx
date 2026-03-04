@@ -49,14 +49,33 @@ function MainTabs() {
   );
 }
 
-// Fail fast if config is missing
-  validateEnvOrThrow();
-
-  // Helpful in dev to confirm which env is active
-  if (__DEV__) {
-    console.log(`[Colorfind] Running env: ${ENV.env}`);
-    console.log(`[Colorfind] API base: ${ENV.apiBaseUrl}`);
-  }
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: '#007AFF', // brand-blue placeholder
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen
+        name="FindColor"
+        component={FindColorScreen}
+        options={{
+          tabBarLabel: 'Find Color',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>💧</Text>,
+        }}
+      />
+      <Tab.Screen
+        name="SavedColors"
+        component={SavedColorsScreen}
+        options={{
+          tabBarLabel: 'Saved',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🔖</Text>,
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
   return (
