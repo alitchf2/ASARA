@@ -49,34 +49,6 @@ function MainTabs() {
   );
 }
 
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#007AFF', // brand-blue placeholder
-        headerShown: false,
-      }}
-    >
-      <Tab.Screen
-        name="FindColor"
-        component={FindColorScreen}
-        options={{
-          tabBarLabel: 'Find Color',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>💧</Text>,
-        }}
-      />
-      <Tab.Screen
-        name="SavedColors"
-        component={SavedColorsScreen}
-        options={{
-          tabBarLabel: 'Saved',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🔖</Text>,
-        }}
-      />
-    </Tab.Navigator>
-  );
-}
-
 export default function App() {
   return (
     <SafeAreaProvider>
