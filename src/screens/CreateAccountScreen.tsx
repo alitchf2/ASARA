@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
-    View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard,
-    TouchableWithoutFeedback, Image, Dimensions, Animated, Platform
+    View, Text, StyleSheet, TouchableOpacity, Keyboard,
+    TouchableWithoutFeedback, Image, Animated
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-const { width } = Dimensions.get('window');
+import { useKeyboardScroll } from '../hooks/useKeyboardScroll';
+import { authStyles } from '../styles/authStyles';
+import { AuthInput } from '../components/AuthInput';
 
 export default function CreateAccountScreen({ navigation }: any) {
-    const translateY = useRef(new Animated.Value(0)).current;
+    const { translateY, setFocusedField } = useKeyboardScroll(65);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     // NEW: Password Validation State
@@ -28,52 +29,8 @@ export default function CreateAccountScreen({ navigation }: any) {
     // Form logic: Everything must be filled and agreed to before submission is allowed.
     const isFormValid = username.trim().length > 0 && isPasswordValid && agreedToTerms;
 
-    // Deterministic state management
-    const [focusedField, setFocusedField] = useState<'username' | 'password' | null>(null);
-    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-
-    const FIELD_DISTANCE = 65;
-
-    useEffect(() => {
-        const keyboardWillShowListener = Keyboard.addListener(
-            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-            () => setIsKeyboardVisible(true)
-        );
-
-        const keyboardWillHideListener = Keyboard.addListener(
-            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-            () => {
-                setIsKeyboardVisible(false);
-                setFocusedField(null);
-            }
-        );
-
-        return () => {
-            keyboardWillShowListener.remove();
-            keyboardWillHideListener.remove();
-        };
-    }, []);
-
-    useEffect(() => {
-        if (isKeyboardVisible && focusedField) {
-            const shiftAmount = focusedField === 'password' ? FIELD_DISTANCE : 0;
-
-            Animated.timing(translateY, {
-                toValue: -shiftAmount,
-                duration: 250,
-                useNativeDriver: true,
-            }).start();
-        } else if (!isKeyboardVisible) {
-            Animated.timing(translateY, {
-                toValue: 0,
-                duration: 250,
-                useNativeDriver: true,
-            }).start();
-        }
-    }, [isKeyboardVisible, focusedField, translateY]);
-
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={authStyles.container}>
             {/* Sticky Header Layer */}
             <View style={styles.header}>
                 <TouchableOpacity
@@ -87,46 +44,31 @@ export default function CreateAccountScreen({ navigation }: any) {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <Animated.View style={{ flex: 1, transform: [{ translateY }] }}>
                     {/* Logo Section (Upper Third) */}
-                    <View style={styles.logoContainer}>
+                    <View style={[authStyles.logoContainer, { marginTop: -60 }]}>
                         <Image source={require('../../assets/ColorfindByASARALogo(Transparent).png')}
-                            style={styles.logoImage} resizeMode="contain" />
+                            style={authStyles.logoImage} resizeMode="contain" />
                     </View>
                     {/* Form Section */}
-                    <View style={styles.formContainer}>
-                        <Text style={styles.screenTitle}>Create Account</Text>
-                        <TextInput
-                            style={styles.input}
+                    <View style={authStyles.formContainer}>
+                        <Text style={authStyles.screenTitle}>Create Account</Text>
+                        <AuthInput
                             placeholder="Username"
                             value={username}
                             onChangeText={setUsername}
-                            autoCapitalize="none"
                             onFocus={() => setFocusedField('username')}
                         />
-                        <View style={styles.passwordContainer}>
-                            <TextInput
-                                style={styles.passwordInput}
-                                placeholder="Password"
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry={!isPasswordVisible}
-                                autoCapitalize="none"
-                                onFocus={() => {
-                                    setFocusedField('password');
-                                    setIsPasswordFocused(true);
-                                }}
-                                onBlur={() => setIsPasswordFocused(false)}
-                            />
-                            <TouchableOpacity
-                                style={styles.eyeIcon}
-                                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                            >
-                                <Ionicons
-                                    name={isPasswordVisible ? "eye-off" : "eye"}
-                                    size={24}
-                                    color="gray"
-                                />
-                            </TouchableOpacity>
-                        </View>
+                        <AuthInput
+                            isPassword
+                            containerStyle={{ marginBottom: 8 }}
+                            placeholder="Password"
+                            value={password}
+                            onChangeText={setPassword}
+                            onFocus={() => {
+                                setFocusedField('password');
+                                setIsPasswordFocused(true);
+                            }}
+                            onBlur={() => setIsPasswordFocused(false)}
+                        />
 
                         {/* Password Validation Section */}
                         <View style={styles.validationContainer}>
@@ -202,10 +144,6 @@ export default function CreateAccountScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F5F2F2',
-    },
     header: {
         height: 60, // Gives enough vertical space for the arrow
         backgroundColor: '#F5F2F2', // Matches background so it blends normally but acts as a mask
@@ -215,47 +153,6 @@ const styles = StyleSheet.create({
     },
     backButton: {
         // Positioned inside the generic header layout
-    },
-    logoContainer: {
-        flex: 0.3, // Takes up upper third
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: -60, // visually offset the header's height to keep the 0.3 flex balanced perfectly like before
-    },
-    formContainer: {
-        flex: 0.7,
-        paddingHorizontal: 20,
-    },
-    screenTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#2B2A2A',
-        marginTop: -30, // Pulls the title upwards out of the 0.7 flex box closer to the logo
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    logoImage: {
-        width: width * 1,
-        height: width * 1,
-    },
-    input: {
-        height: 50,
-        borderWidth: 1,
-        borderColor: '#2B2A2A',
-        borderRadius: 8,
-        paddingHorizontal: 15,
-        marginBottom: 15,
-        fontSize: 16,
-    },
-    passwordContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 50,
-        borderWidth: 1,
-        borderColor: '#2B2A2A',
-        borderRadius: 8,
-        paddingHorizontal: 15,
-        marginBottom: 8,
     },
     validationContainer: {
         marginBottom: 20,
@@ -329,14 +226,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#767676',
     },
-    passwordInput: {
-        flex: 1,
-        fontSize: 16,
-        height: '100%',
-    },
-    eyeIcon: {
-        marginLeft: 10,
-    },
+
     checkboxContainer: {
         flexDirection: 'row',
         alignItems: 'center',
