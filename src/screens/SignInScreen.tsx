@@ -74,6 +74,7 @@ export default function SignInScreen({ navigation }: any) {
                     </View>
                     {/* Form Section */}
                     <View style={styles.formContainer}>
+                        <Text style={styles.screenTitle}>Sign In</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Username"
@@ -138,6 +139,14 @@ const styles = StyleSheet.create({
     formContainer: {
         flex: 0.7,
         paddingHorizontal: 20,
+    },
+    screenTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#2B2A2A',
+        marginTop: -30, // Pulls the title upwards out of the 0.7 flex box closer to the logo
+        marginBottom: 10,
+        textAlign: 'center',
     },
     input: {
         height: 50,
