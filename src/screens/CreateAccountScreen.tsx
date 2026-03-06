@@ -71,6 +71,7 @@ export default function CreateAccountScreen({ navigation }: any) {
                         />
 
                         {/* Password Validation Section */}
+                        {(isPasswordFocused || (password.length > 0 && !isPasswordValid) || isPasswordValid) && (
                         <View style={styles.validationContainer}>
                             <View style={styles.validationSummary}>
                                 <Ionicons
@@ -83,7 +84,7 @@ export default function CreateAccountScreen({ navigation }: any) {
                                 </Text>
                             </View>
 
-                            {isPasswordFocused && (
+                            {(!isPasswordValid || isPasswordFocused) && (
                                 <View style={styles.validationDetails}>
                                     <View style={styles.validationBranchLine} />
                                     <View style={styles.validationRows}>
@@ -115,7 +116,7 @@ export default function CreateAccountScreen({ navigation }: any) {
                                 </View>
                             )}
                         </View>
-
+                        )}
                         {/* Checkbox Section */}
                         <View style={styles.checkboxContainer}>
                             <TouchableOpacity
