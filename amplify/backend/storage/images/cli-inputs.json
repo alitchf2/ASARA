@@ -1,0 +1,14 @@
+{
+  "resourceName": "images",
+  "policyUUID": "b60ab580",
+  "bucketName": "colorfind-images-dev",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

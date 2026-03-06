@@ -68,8 +68,22 @@ Each task follows this format:
 - Amplify Analytics configured with Pinpoint
 - Amplify configured in application entry point (`App.tsx`)
 - `aws-exports.js` generated and gitignored (template version checked in)
+- **Testing Notes**: Installed Amplify CLI and created perms in IAM. Setup cognito pools, s3 storage, and Amazon Kinesis Streams(pivoted for analtyics becaue pinpoint is End of Life and no longer accepting new users)
+Region: US East 2
+Project Name: Colorfind
+Cognito Sign In Method: Username(requires Email for signup)
+S3 Bucket Name: colorfind-images-dev
+Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATION BECAUSE IT IS NOT AWS FREE TIER.
+
 **Current Status:** Not Started
 **Notes:** 
+- **Testing Notes**: Installed Amplify CLI and created perms in IAM. Setup cognito pools, s3 storage, and Amazon Kinesis Streams(pivoted for analtyics becaue pinpoint is End of Life and no longer accepting new users)
+Region: US East 2
+Project Name: Colorfind
+Cognito Sign In Method: Username(requires Email for signup)
+S3 Bucket Name: colorfind-images-dev
+Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATION BECAUSE IT IS NOT AWS FREE TIER.
+
 
 ---
 

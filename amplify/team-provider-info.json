@@ -1,0 +1,50 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-colorfind-dev-8b035-authRole",
+      "UnauthRoleArn": "arn:aws:iam::538780774280:role/amplify-colorfind-dev-8b035-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::538780774280:role/amplify-colorfind-dev-8b035-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
+      "UnauthRoleName": "amplify-colorfind-dev-8b035-unauthRole",
+      "StackName": "amplify-colorfind-dev-8b035",
+      "StackId": "arn:aws:cloudformation:us-east-2:538780774280:stack/amplify-colorfind-dev-8b035/dedd3d80-1401-11f1-9967-0657617b45fb",
+      "AmplifyAppId": "dfbv5wrnfzbnv"
+    },
+    "categories": {
+      "auth": {
+        "colorfind3baa86a4": {}
+      },
+      "storage": {
+        "images": {}
+      },
+      "analytics": {
+        "colorfindAnalytics": {}
+      }
+    }
+  },
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-colorfind-prod-ede92-authRole",
+      "UnauthRoleArn": "arn:aws:iam::538780774280:role/amplify-colorfind-prod-ede92-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::538780774280:role/amplify-colorfind-prod-ede92-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-colorfind-prod-ede92-deployment",
+      "UnauthRoleName": "amplify-colorfind-prod-ede92-unauthRole",
+      "StackName": "amplify-colorfind-prod-ede92",
+      "StackId": "arn:aws:cloudformation:us-east-2:538780774280:stack/amplify-colorfind-prod-ede92/a6113380-17e9-11f1-a8d4-0ac72e8e51a1",
+      "AmplifyAppId": "dfbv5wrnfzbnv"
+    },
+    "categories": {
+      "auth": {
+        "colorfind3baa86a4": {}
+      },
+      "analytics": {
+        "colorfindAnalytics": {}
+      },
+      "storage": {
+        "images": {}
+      }
+    }
+  }
+}

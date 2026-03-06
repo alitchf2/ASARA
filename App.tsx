@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
+
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import FindColorScreen from './src/screens/FindColorScreen';
@@ -12,6 +13,10 @@ import CreateAccountScreen from './src/screens/CreateAccountScreen';
 //Task 1.2: environment switcher + validation
 import { ENV } from './src/config';
 import { validateEnvOrThrow } from './src/config/validateEnv';
+
+//Task1.3: Amplify setup
+import { configureAmplify } from './src/config/amplify';
+configureAmplify();
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
