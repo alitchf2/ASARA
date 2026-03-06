@@ -68,22 +68,13 @@ Each task follows this format:
 - Amplify Analytics configured with Pinpoint
 - Amplify configured in application entry point (`App.tsx`)
 - `aws-exports.js` generated and gitignored (template version checked in)
-- **Testing Notes**: Installed Amplify CLI and created perms in IAM. Setup cognito pools, s3 storage, and Amazon Kinesis Streams(pivoted for analtyics becaue pinpoint is End of Life and no longer accepting new users)
-Region: US East 2
-Project Name: Colorfind
-Cognito Sign In Method: Username(requires Email for signup)
-S3 Bucket Name: colorfind-images-dev
-Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATION BECAUSE IT IS NOT AWS FREE TIER.
-
 **Current Status:** Not Started
-**Notes:** 
-- **Testing Notes**: Installed Amplify CLI and created perms in IAM. Setup cognito pools, s3 storage, and Amazon Kinesis Streams(pivoted for analtyics becaue pinpoint is End of Life and no longer accepting new users)
+**Notes:** Installed Amplify CLI and created perms in IAM. Setup cognito pools, s3 storage, and Amazon Kinesis Streams(pivoted for analtyics becaue pinpoint is End of Life and no longer accepting new users)
 Region: US East 2
 Project Name: Colorfind
 Cognito Sign In Method: Username(requires Email for signup)
 S3 Bucket Name: colorfind-images-dev
 Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATION BECAUSE IT IS NOT AWS FREE TIER.
-
 
 ---
 
@@ -282,7 +273,7 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Tapping linked text opens Terms/Privacy screen (screen built in task 14.1)
 - Inline validation error messages display below respective fields
 **Status:** Complete
-**Notes:** Created the UI for Create Account screen including deterministic dynamic keyboard scrolling. Implemented dynamic branch-tree password validation logic that evaluates requirements live and visually updates. Added a static sticky header to hold the back arrow so the logo can slide underneath securely.
+**Notes:** Created the UI for Create Account screen including deterministic dynamic keyboard scrolling. Implemented dynamic branch-tree password validation logic that evaluates requirements live and visually updates. Added a static sticky header to hold the back arrow so the logo can slide underneath securely. Also refactored the file structure of the auth screens to be more organized.
 
 ---
 

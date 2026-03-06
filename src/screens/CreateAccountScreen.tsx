@@ -125,13 +125,13 @@ export default function CreateAccountScreen({ navigation }: any) {
                                 {agreedToTerms && <Ionicons name="checkmark" size={16} color="#fff" />}
                             </TouchableOpacity>
                             <Text style={styles.checkboxText}>
-                                I agree to the <Text style={styles.linkText} onPress={() => console.log('Navigate to Terms')}>Terms of Service and Privacy Policy</Text>
+                                I agree to the <Text style={styles.linkText} onPress={() => navigation.navigate('TermsOfService')}>Terms of Service and Privacy Policy</Text>
                             </Text>
                         </View>
 
                         <TouchableOpacity
                             style={[styles.createButton, !isFormValid && styles.createButtonDisabled]}
-                            onPress={() => console.log('Create account action')}
+                            onPress={() => navigation.replace('MainTabs')}
                             disabled={!isFormValid}
                         >
                             <Text style={styles.createButtonText}>Create Account</Text>
