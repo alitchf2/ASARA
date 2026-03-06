@@ -8,6 +8,7 @@ import FindColorScreen from './src/screens/FindColorScreen';
 import SavedColorsScreen from './src/screens/SavedColorsScreen';
 import SignInScreen from './src/screens/SignInScreen';
 import CreateAccountScreen from './src/screens/CreateAccountScreen';
+import TermsOfServiceScreen from './src/screens/TermsOfServiceScreen';
 
 
 //Task 1.2: environment switcher + validation
@@ -53,9 +54,10 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
+          <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
           <Stack.Screen name="MainTabs" component={MainTabs} />
         </Stack.Navigator>
       </NavigationContainer>
