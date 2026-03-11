@@ -19,6 +19,8 @@ import { validateEnvOrThrow } from './src/config/validateEnv';
 import { configureAmplify } from './src/config/amplify';
 configureAmplify();
 
+import { GlobalOfflineModal } from './src/components/GlobalOfflineModal';
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -53,6 +55,7 @@ function MainTabs() {
 export default function App() {
   return (
     <SafeAreaProvider>
+      <GlobalOfflineModal />
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="SignIn" component={SignInScreen} />

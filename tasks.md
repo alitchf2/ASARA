@@ -359,8 +359,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Connectivity re-checked every 5 seconds while banner is visible
 - Banner auto-dismisses when connectivity restored
 - Sign In/Create Account buttons remain disabled while offline
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Built a Global Offline Modal (`GlobalOfflineModal.tsx`) that mounts on `App.tsx`. The modal completely freezes the UI with a native transparent overlay and offers a manual Retry button, while the `useNetworkStatus` hook continues to run the required 5-second automatic polling safely in the background across all screens universally.
 
 ---
 

@@ -72,50 +72,50 @@ export default function CreateAccountScreen({ navigation }: any) {
 
                         {/* Password Validation Section */}
                         {(isPasswordFocused || (password.length > 0 && !isPasswordValid) || isPasswordValid) && (
-                        <View style={styles.validationContainer}>
-                            <View style={styles.validationSummary}>
-                                <Ionicons
-                                    name={isPasswordValid ? "checkmark-circle" : "close-circle-outline"}
-                                    size={20}
-                                    color={isPasswordValid ? "#5A7ACD" : "#767676"}
-                                />
-                                <Text style={[styles.validationSummaryText, isPasswordValid && { color: "#5A7ACD" }]}>
-                                    {isPasswordValid ? "password is valid" : "password is not valid"}
-                                </Text>
-                            </View>
+                            <View style={styles.validationContainer}>
+                                <View style={styles.validationSummary}>
+                                    <Ionicons
+                                        name={isPasswordValid ? "checkmark-circle" : "close-circle-outline"}
+                                        size={20}
+                                        color={isPasswordValid ? "#5A7ACD" : "#767676"}
+                                    />
+                                    <Text style={[styles.validationSummaryText, isPasswordValid && { color: "#5A7ACD" }]}>
+                                        {isPasswordValid ? "password is valid" : "password is not valid"}
+                                    </Text>
+                                </View>
 
-                            {(!isPasswordValid || isPasswordFocused) && (
-                                <View style={styles.validationDetails}>
-                                    <View style={styles.validationBranchLine} />
-                                    <View style={styles.validationRows}>
-                                        <View style={styles.validationRow}>
-                                            {hasLength && <View style={styles.activeInitialTrunk} />}
-                                            <View style={[styles.curvedBranch, hasLength && { borderColor: "#5A7ACD" }]} />
-                                            {hasLength && hasUpperLower && <View style={styles.activeBottomTrunk} />}
-                                            <Ionicons name={hasLength ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasLength ? "#5A7ACD" : "#767676"} style={styles.validationIcon} />
-                                            <Text style={[styles.validationRowText, hasLength && { color: "#5A7ACD" }]}>Must be at least 8 characters long</Text>
-                                        </View>
-                                        <View style={styles.validationRow}>
-                                            <View style={[styles.curvedBranch, hasUpperLower && { borderColor: "#5A7ACD" }]} />
-                                            {hasUpperLower && hasNumber && <View style={styles.activeBottomTrunk} />}
-                                            <Ionicons name={hasUpperLower ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasUpperLower ? "#5A7ACD" : "#767676"} style={styles.validationIcon} />
-                                            <Text style={[styles.validationRowText, hasUpperLower && { color: "#5A7ACD" }]}>Must contain an uppercase and lowercase letter (A, z)</Text>
-                                        </View>
-                                        <View style={styles.validationRow}>
-                                            <View style={[styles.curvedBranch, hasNumber && { borderColor: "#5A7ACD" }]} />
-                                            {hasNumber && hasSpecial && <View style={styles.activeBottomTrunk} />}
-                                            <Ionicons name={hasNumber ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasNumber ? "#5A7ACD" : "#767676"} style={styles.validationIcon} />
-                                            <Text style={[styles.validationRowText, hasNumber && { color: "#5A7ACD" }]}>Must contain a number</Text>
-                                        </View>
-                                        <View style={styles.validationRow}>
-                                            <View style={[styles.curvedBranch, hasSpecial && { borderColor: "#5A7ACD" }]} />
-                                            <Ionicons name={hasSpecial ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasSpecial ? "#5A7ACD" : "#767676"} style={styles.validationIcon} />
-                                            <Text style={[styles.validationRowText, hasSpecial && { color: "#5A7ACD" }]}>Must contain a special character (!, %, @, #, etc.)</Text>
+                                {(!isPasswordValid || isPasswordFocused) && (
+                                    <View style={styles.validationDetails}>
+                                        <View style={styles.validationBranchLine} />
+                                        <View style={styles.validationRows}>
+                                            <View style={styles.validationRow}>
+                                                {hasLength && <View style={styles.activeInitialTrunk} />}
+                                                <View style={[styles.curvedBranch, hasLength && { borderColor: "#5A7ACD" }]} />
+                                                {hasLength && hasUpperLower && <View style={styles.activeBottomTrunk} />}
+                                                <Ionicons name={hasLength ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasLength ? "#5A7ACD" : "#767676"} style={styles.validationIcon} />
+                                                <Text style={[styles.validationRowText, hasLength && { color: "#5A7ACD" }]}>Must be at least 8 characters long</Text>
+                                            </View>
+                                            <View style={styles.validationRow}>
+                                                <View style={[styles.curvedBranch, hasUpperLower && { borderColor: "#5A7ACD" }]} />
+                                                {hasUpperLower && hasNumber && <View style={styles.activeBottomTrunk} />}
+                                                <Ionicons name={hasUpperLower ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasUpperLower ? "#5A7ACD" : "#767676"} style={styles.validationIcon} />
+                                                <Text style={[styles.validationRowText, hasUpperLower && { color: "#5A7ACD" }]}>Must contain an uppercase and lowercase letter (A, z)</Text>
+                                            </View>
+                                            <View style={styles.validationRow}>
+                                                <View style={[styles.curvedBranch, hasNumber && { borderColor: "#5A7ACD" }]} />
+                                                {hasNumber && hasSpecial && <View style={styles.activeBottomTrunk} />}
+                                                <Ionicons name={hasNumber ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasNumber ? "#5A7ACD" : "#767676"} style={styles.validationIcon} />
+                                                <Text style={[styles.validationRowText, hasNumber && { color: "#5A7ACD" }]}>Must contain a number</Text>
+                                            </View>
+                                            <View style={styles.validationRow}>
+                                                <View style={[styles.curvedBranch, hasSpecial && { borderColor: "#5A7ACD" }]} />
+                                                <Ionicons name={hasSpecial ? "checkmark-circle" : "ellipse-outline"} size={16} color={hasSpecial ? "#5A7ACD" : "#767676"} style={styles.validationIcon} />
+                                                <Text style={[styles.validationRowText, hasSpecial && { color: "#5A7ACD" }]}>Must contain a special character (!, %, @, #, etc.)</Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                            )}
-                        </View>
+                                )}
+                            </View>
                         )}
                         {/* Checkbox Section */}
                         <View style={styles.checkboxContainer}>
@@ -129,7 +129,7 @@ export default function CreateAccountScreen({ navigation }: any) {
                                 I agree to the <Text style={styles.linkText} onPress={() => navigation.navigate('TermsOfService')}>Terms of Service and Privacy Policy</Text>
                             </Text>
                         </View>
-
+                        {/* Create Account Button */}
                         <TouchableOpacity
                             style={[styles.createButton, !isFormValid && styles.createButtonDisabled]}
                             onPress={() => navigation.replace('MainTabs')}
