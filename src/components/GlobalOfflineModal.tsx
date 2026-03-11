@@ -1,10 +1,27 @@
-import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 export const GlobalOfflineModal: React.FC = () => {
     const { isOffline, checkConnection } = useNetworkStatus();
+    const [isLoading, setIsLoading] = useState(false);
+    const [showError, setShowError] = useState(false);
+
+    const handleRetry = async () => {
+        setIsLoading(true);
+        setShowError(false);
+
+        // Artificial delay for better UX feeling
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        const isOnlineNow = await checkConnection();
+
+        if (!isOnlineNow) {
+            setShowError(true);
+        }
+        setIsLoading(false);
+    };
 
     return (
         <Modal
@@ -15,14 +32,25 @@ export const GlobalOfflineModal: React.FC = () => {
         >
             <View style={styles.overlay}>
                 <View style={styles.box}>
-                    <Ionicons name="cloud-offline-outline" size={48} color="#D15858" style={styles.icon} />
+                    <Ionicons name="cloud-offline-outline" size={48} color="#FEB05D" style={styles.icon} />
                     <Text style={styles.title}>No Internet Connection</Text>
                     <Text style={styles.message}>
                         Colorfind requires an active internet connection to function. Please check your network settings and try again.
                     </Text>
-                    <TouchableOpacity style={styles.retryButton} onPress={checkConnection}>
-                        <Text style={styles.retryButtonText}>Retry</Text>
+                    <TouchableOpacity
+                        style={[styles.retryButton, isLoading && styles.retryButtonDisabled]}
+                        onPress={handleRetry}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text style={styles.retryButtonText}>Retry</Text>
+                        )}
                     </TouchableOpacity>
+                    {showError && !isLoading && (
+                        <Text style={styles.errorText}>Connection attempt failed.</Text>
+                    )}
                 </View>
             </View>
         </Modal>
@@ -73,6 +101,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         borderRadius: 8,
         width: '100%',
+        height: 48, // Fixed height to prevent Layout Jump when spinning
+        justifyContent: 'center',
     },
     retryButtonText: {
         color: 'white',
@@ -80,4 +110,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
+    retryButtonDisabled: {
+        backgroundColor: '#a0a0a0',
+    },
+    errorText: {
+        color: '#D15858',
+        fontSize: 14,
+        marginTop: 12,
+        textDecorationLine: 'underline',
+        textAlign: 'center',
+    }
 });

@@ -4,11 +4,11 @@ import NetInfo from '@react-native-community/netinfo';
 export const useNetworkStatus = () => {
     const [isOffline, setIsOffline] = useState(false);
 
-    const checkConnection = useCallback(() => {
-        NetInfo.fetch().then(state => {
-            const currentlyOffline = state.isConnected === false;
-            setIsOffline(currentlyOffline);
-        });
+    const checkConnection = useCallback(async (): Promise<boolean> => {
+        const state = await NetInfo.fetch();
+        const currentlyOffline = state.isConnected === false;
+        setIsOffline(currentlyOffline);
+        return !currentlyOffline; // Return true if we are online now
     }, []);
 
     useEffect(() => {
