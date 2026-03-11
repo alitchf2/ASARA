@@ -13,7 +13,6 @@ import SignInScreen from './src/screens/SignInScreen';
 import CreateAccountScreen from './src/screens/CreateAccountScreen';
 import TermsOfServiceScreen from './src/screens/TermsOfServiceScreen';
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { GlobalOfflineModal } from "./src/components/GlobalOfflineModal";
 import { CustomTabBar } from "./src/components/CustomTabBar";
 import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
 import { GlobalGuestModal } from "./src/components/GlobalGuestModal";
@@ -26,8 +25,10 @@ import { validateEnvOrThrow } from "./src/config/validateEnv";
 import { configureAmplify } from './src/config/amplify';
 configureAmplify();
 
+import { GlobalOfflineModal } from './src/components/GlobalOfflineModal';
 
-const Tab = createMaterialTopTabNavigator();
+
+const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainTabs() {
