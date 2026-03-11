@@ -290,8 +290,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - No data submission required on this screen
 
 **Testing Notes:** Have a non-technical person read the policy text to confirm plain language clarity.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Created the `TermsOfServiceScreen.tsx` layout using a full-page scroll view, implemented typography styles for readability, inserted all required privacy and terms clauses, and matched the seamless layout styling from the Create Account screen. Checked out perfectly with Typescript.
 
 ---
 
