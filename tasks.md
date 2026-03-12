@@ -570,8 +570,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Android `AndroidManifest.xml` includes camera permission
 - Permission request shown on first access to camera
 - Permission handling logic implemented per task 4.3
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Installed `expo-camera`, configured the native `cameraPermission` string in `app.json`, and implemented the permission request flow.
 
 ---
 
@@ -608,8 +608,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Permission status re-checked when app returns from background (user may have changed settings)
 
 **Testing Notes:** Test on both iOS and Android. Test app behavior when user denies permission twice (iOS shows system-level "Don't Ask Again").
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented a branded fallback screen in `FindColorScreen.tsx` that handles both initial requests and deep-linking to settings for hard-denials. Added an AppState listener to automatically refresh permission status when returning from device settings.
 
 ---
 
