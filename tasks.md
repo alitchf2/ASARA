@@ -610,6 +610,7 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 **Testing Notes:** Test on both iOS and Android. Test app behavior when user denies permission twice (iOS shows system-level "Don't Ask Again").
 **Current Status:** Complete
 **Notes:** Implemented a branded fallback screen in `FindColorScreen.tsx` that handles both initial requests and deep-linking to settings for hard-denials. Added an AppState listener to automatically refresh permission status when returning from device settings.
+Need to try this on more devices (esspecially android).
 
 ---
 
