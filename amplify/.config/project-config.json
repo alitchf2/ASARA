@@ -1,11 +1,5 @@
 {
-<<<<<<< HEAD
   "providers": ["awscloudformation"],
-=======
-  "providers": [
-    "awscloudformation"
-  ],
->>>>>>> 64d2c22 (amplify auth change and cli install)
   "projectName": "colorfind",
   "version": "3.1",
   "frontend": "javascript",
@@ -14,16 +8,8 @@
     "config": {
       "SourceDir": "/",
       "DistributionDir": "/",
-<<<<<<< HEAD
-      "BuildCommand": "#",
-      "StartCommand": "#"
-    }
-  }
-}
-=======
       "BuildCommand": "npm.cmd run-script build",
       "StartCommand": "npm.cmd run-script start"
     }
   }
 }
->>>>>>> 64d2c22 (amplify auth change and cli install)

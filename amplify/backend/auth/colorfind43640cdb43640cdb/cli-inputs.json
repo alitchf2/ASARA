@@ -47,16 +47,10 @@
     "usernameCaseSensitive": false,
     "useEnabledMfas": true,
     "authRoleArn": {
-      "Fn::GetAtt": [
-        "AuthRole",
-        "Arn"
-      ]
+      "Fn::GetAtt": ["AuthRole", "Arn"]
     },
     "unauthRoleArn": {
-      "Fn::GetAtt": [
-        "UnauthRole",
-        "Arn"
-      ]
+      "Fn::GetAtt": ["UnauthRole", "Arn"]
     },
     "breakCircularDependency": true,
     "dependsOn": [
