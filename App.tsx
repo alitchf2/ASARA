@@ -39,6 +39,10 @@ function MainTabs() {
       screenOptions={{
         swipeEnabled: true,
       }}
+      {...({
+        bounces: false,
+        overScrollMode: 'never',
+      } as any)}
     >
       <Tab.Screen name="FindColor" component={FindColorScreen} options={{ tabBarLabel: 'Find Color' }} />
       <Tab.Screen name="SavedColors" component={SavedColorsScreen} options={{ tabBarLabel: 'Saved' }} />

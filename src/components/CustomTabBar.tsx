@@ -20,7 +20,7 @@ const INACTIVE_COLOR = '#F5F2F2';
 export const CustomTabBar = ({ state, descriptors, navigation, position }: MaterialTopTabBarProps) => {
   const containerWidth = width - 40; // width minus left:20 and right:20
   const tabWidth = containerWidth / state.routes.length;
-  const paddingHorizontal = 8; 
+  const paddingHorizontal = 8;
   const pillWidth = tabWidth - (paddingHorizontal * 2);
 
   // Directly interpolate the position prop from the Material Top Tab navigator
@@ -28,6 +28,7 @@ export const CustomTabBar = ({ state, descriptors, navigation, position }: Mater
   const translateX = position.interpolate({
     inputRange: state.routes.map((_, i) => i),
     outputRange: state.routes.map((_, i) => (i * tabWidth) + paddingHorizontal),
+    extrapolate: 'clamp', // Forces the value to stay within the bounds of the 0 to (routes.length-1) range.
   });
 
   return (

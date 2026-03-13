@@ -18,7 +18,7 @@ export default function UserSettingsScreen({ navigation }: any) {
             </View>
 
             <View style={styles.content}>
-                <Ionicons name="construct-outline" size={60} color="#5A7ACD" />
+                <Ionicons name="construct-outline" size={60} color="#FEB05D" />
                 <Text style={styles.title}>User Settings Placeholder</Text>
                 <Text style={styles.subtitle}>This screen is currently under construction (Task 3.9).</Text>
             </View>
