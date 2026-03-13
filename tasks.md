@@ -590,7 +590,7 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Bottom navigation bar: color dropper icon (left, active/highlighted), bookmark icon (right, inactive)
 - Camera preview resumes when user navigates back from Object Selection screen
 **Current Status:** Complete
-**Notes:** Built the Camera UI with full-screen preview and UI overlays. Added a header with a Profile button (linking to a placeholder Settings screen) and a footer with a large Capture shutter button and a Recent Images icon placeholder. Updated bottom tab icons to use Ionicons (dropper/bookmark).
+**Notes:** Built the Camera UI with full-screen preview and UI overlays. Added a header with a Profile button (linking to a placeholder Settings screen) that is visible even when camera permissions are denied. Added a footer with a large Capture shutter button and a Recent Images icon placeholder. Updated bottom tab icons to use MaterialCommunityIcons (eyedropper) and Ionicons (bookmark).
 
 ---
 

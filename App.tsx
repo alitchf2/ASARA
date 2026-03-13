@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -39,7 +39,9 @@ function MainTabs() {
         component={FindColorScreen}
         options={{
           tabBarLabel: 'Find Color',
-          tabBarIcon: ({ color, size }) => <Ionicons name="color-filter-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="eyedropper" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen

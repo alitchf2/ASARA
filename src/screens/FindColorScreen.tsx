@@ -27,65 +27,73 @@ export default function FindColorScreen({ navigation }: any) {
         };
     }, [requestPermission]);
 
-    if (!permission) return <View />;
-
-    if (!permission.granted) {
-        return (
-            <SafeAreaView style={authStyles.container}>
-                <View style={styles.permissionContainer}>
-                    <Ionicons name="camera-outline" size={80} color="#FEB05D" style={styles.icon} />
-                    <Text style={styles.permissionTitle}>Camera Access Required</Text>
-                    <Text style={styles.permissionMessage}>
-                        {permission.canAskAgain
-                            ? "Colorfind needs access to your camera to identify colors in the real world."
-                            : "Camera access has been denied. Please open your device settings to grant camera access to Colorfind."}
-                    </Text>
-                    <TouchableOpacity
-                        style={styles.grantButton}
-                        onPress={() => permission.canAskAgain ? requestPermission() : Linking.openSettings()}
-                    >
-                        <Text style={styles.grantButtonText}>
-                            {permission.canAskAgain ? "Grant Permission" : "Open Settings"}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </SafeAreaView>
-        );
-    }
+    if (!permission) return <View style={styles.container} />;
 
     return (
         <View style={styles.container}>
-            <CameraView style={styles.camera} facing={facing} />
-            
-            {/* UI Overlay Layer */}
+            {/* Main Content Layer (Camera or Permission Fallback) */}
+            <View style={styles.mainContent}>
+                {!permission.granted ? (
+                    <View style={styles.permissionContainer}>
+                        <Ionicons name="camera-outline" size={80} color="#FEB05D" style={styles.icon} />
+                        <Text style={styles.permissionTitle}>Camera Access Required</Text>
+                        <Text style={styles.permissionMessage}>
+                            {permission.canAskAgain
+                                ? "Colorfind needs access to your camera to identify colors in the real world."
+                                : "Camera access has been denied. Please open your device settings to grant camera access to Colorfind."}
+                        </Text>
+                        <TouchableOpacity
+                            style={styles.grantButton}
+                            onPress={() => permission.canAskAgain ? requestPermission() : Linking.openSettings()}
+                        >
+                            <Text style={styles.grantButtonText}>
+                                {permission.canAskAgain ? "Grant Permission" : "Open Settings"}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <CameraView style={styles.camera} facing={facing} />
+                )}
+            </View>
+
+            {/* UI Overlay Layer (Header & Footer) */}
             <View style={styles.overlay} pointerEvents="box-none">
-                {/* Header Layer */}
+                {/* Global Header Layer */}
                 <SafeAreaView style={styles.headerLayer} pointerEvents="box-none">
-                    <TouchableOpacity 
-                        style={styles.iconButton}
+                    <TouchableOpacity
+                        style={[
+                            styles.iconButton,
+                            !permission.granted && styles.iconButtonDark
+                        ]}
                         onPress={() => navigation.navigate('UserSettings')}
                     >
-                        <Ionicons name="person-circle-outline" size={32} color="white" />
+                        <Ionicons 
+                            name="person-circle-outline" 
+                            size={32} 
+                            color={permission.granted ? "white" : "#2B2A2A"} 
+                        />
                     </TouchableOpacity>
                 </SafeAreaView>
 
-                {/* Footer Layer */}
-                <View style={styles.footerLayer} pointerEvents="box-none">
-                    <View style={styles.controlsContainer}>
-                        {/* Placeholder for Recent Images */}
-                        <TouchableOpacity style={styles.secondaryButton}>
-                            <Ionicons name="images-outline" size={28} color="white" />
-                        </TouchableOpacity>
+                {/* Footer Layer - Only show if permission is granted */}
+                {permission.granted && (
+                    <View style={styles.footerLayer} pointerEvents="box-none">
+                        <View style={styles.controlsContainer}>
+                            {/* Placeholder for Recent Images */}
+                            <TouchableOpacity style={styles.secondaryButton}>
+                                <Ionicons name="images-outline" size={28} color="white" />
+                            </TouchableOpacity>
 
-                        {/* Capture Button */}
-                        <TouchableOpacity style={styles.captureButton}>
-                            <View style={styles.captureInner} />
-                        </TouchableOpacity>
+                            {/* Capture Button */}
+                            <TouchableOpacity style={styles.captureButton}>
+                                <View style={styles.captureInner} />
+                            </TouchableOpacity>
 
-                        {/* Empty view for balance if needed, or just let spacing handle it */}
-                        <View style={styles.spacer} />
+                            {/* Empty view for balance if needed */}
+                            <View style={styles.spacer} />
+                        </View>
                     </View>
-                </View>
+                )}
             </View>
         </View>
     );
@@ -121,6 +129,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.3)',
         borderRadius: 22,
     },
+    iconButtonDark: {
+        backgroundColor: 'rgba(0,0,0,0.05)',
+    },
     captureButton: {
         width: 80,
         height: 80,
@@ -146,6 +157,9 @@ const styles = StyleSheet.create({
     },
     spacer: {
         width: 50,
+    },
+    mainContent: {
+        flex: 1,
     },
     
     // Permission Screen Styles
