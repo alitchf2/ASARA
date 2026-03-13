@@ -590,7 +590,7 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Bottom navigation bar: color dropper icon (left, active/highlighted), bookmark icon (right, inactive)
 - Camera preview resumes when user navigates back from Object Selection screen
 **Current Status:** In Progress
-**Notes:** Implementing custom tab bar and camera UI.
+**Notes:** 
 
 ---
 

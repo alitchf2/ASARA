@@ -14,8 +14,8 @@ const { width } = Dimensions.get('window');
 
 // Brand Colors
 const COMPANY_BLUE = '#5A7ACD';   // Indicator Color
-const COMPANY_ORANGE = '#FEB05D'; // Active Icon/Text Color
-const INACTIVE_GRAY = '#8E8E93';
+const COMPANY_ORANGE = '#FEB05D'; // Brand Color (unused for active here now)
+const INACTIVE_COLOR = '#F5F2F2';
 
 export const CustomTabBar = ({ state, descriptors, navigation, position }: MaterialTopTabBarProps) => {
   const tabWidth = width / state.routes.length;
@@ -31,7 +31,7 @@ export const CustomTabBar = ({ state, descriptors, navigation, position }: Mater
 
   return (
     <View style={styles.tabBarContainer}>
-      {/* Sliding Backlit Indicator (Pill) */}
+      {/* Sliding Indicator (Pill) */}
       <Animated.View
         style={[
           styles.indicator,
@@ -49,8 +49,8 @@ export const CustomTabBar = ({ state, descriptors, navigation, position }: Mater
             options.tabBarLabel !== undefined
               ? options.tabBarLabel
               : options.title !== undefined
-              ? options.title
-              : route.name;
+                ? options.title
+                : route.name;
 
           const isFocused = state.index === index;
 
@@ -83,8 +83,8 @@ export const CustomTabBar = ({ state, descriptors, navigation, position }: Mater
             return null;
           };
 
-          const activeColor = COMPANY_ORANGE;
-          const inactiveColor = INACTIVE_GRAY;
+          const activeColor = 'white';
+          const inactiveColor = COMPANY_ORANGE;
           const color = isFocused ? activeColor : inactiveColor;
 
           return (
@@ -112,14 +112,14 @@ export const CustomTabBar = ({ state, descriptors, navigation, position }: Mater
 
 const styles = StyleSheet.create({
   tabBarContainer: {
-    height: 85, 
-    backgroundColor: 'white',
+    height: 85,
+    backgroundColor: '#2B2A2A', // Company Black
     borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
+    borderTopColor: '#3D3D3D', // Subtle dark border
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     position: 'relative',
     justifyContent: 'center', // Center indicator vertically
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   indicator: {
     position: 'absolute',
     height: 60, // Large pill height
-    backgroundColor: 'rgba(90, 122, 205, 0.5)', // Medium opacity Company Blue
+    backgroundColor: COMPANY_BLUE, // Solid Company Blue
     borderRadius: 30, // Capsule shape
   },
 });
