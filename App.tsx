@@ -53,7 +53,9 @@ function MainTabs() {
         component={FindColorScreen}
         options={{
           tabBarLabel: 'Find Color',
-          tabBarIcon: ({ color, size }) => <Ionicons name="color-filter-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="eyedropper" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
