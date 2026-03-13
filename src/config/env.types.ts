@@ -23,4 +23,5 @@ export type EnvConfig = {
   };
 };
 
-export const withEnvSuffix = (base: string, env: AppEnvName) => `${base}-${env}`;
+export const withEnvSuffix = (base: string, env: AppEnvName) =>
+  `${base}-${env}`;
