@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import UserSettingsScreen from "./src/screens/UserSettingsScreen";
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, Dimensions, View, ActivityIndicator } from 'react-native';
@@ -16,6 +15,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { CustomTabBar } from "./src/components/CustomTabBar";
 import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
 import { GlobalGuestModal } from "./src/components/GlobalGuestModal";
+import UserSettingsScreen from './src/screens/UserSettingsScreen';
 
 //Task 1.2: environment switcher + validation
 import { ENV } from "./src/config";
@@ -51,12 +51,18 @@ function MainTabs() {
       <Tab.Screen
         name="FindColor"
         component={FindColorScreen}
-        options={{ tabBarLabel: "Find Color" }}
+        options={{
+          tabBarLabel: 'Find Color',
+          tabBarIcon: ({ color, size }) => <Ionicons name="color-filter-outline" size={size} color={color} />,
+        }}
       />
       <Tab.Screen
         name="SavedColors"
         component={SavedColorsScreen}
-        options={{ tabBarLabel: "Saved" }}
+        options={{
+          tabBarLabel: 'Saved',
+          tabBarIcon: ({ color, size }) => <Ionicons name="bookmark-outline" size={size} color={color} />,
+        }}
       />
     </Tab.Navigator>
   );
