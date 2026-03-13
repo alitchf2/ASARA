@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -9,6 +10,7 @@ import SavedColorsScreen from './src/screens/SavedColorsScreen';
 import SignInScreen from './src/screens/SignInScreen';
 import CreateAccountScreen from './src/screens/CreateAccountScreen';
 import TermsOfServiceScreen from './src/screens/TermsOfServiceScreen';
+import UserSettingsScreen from './src/screens/UserSettingsScreen';
 
 
 //Task 1.2: environment switcher + validation
@@ -37,7 +39,7 @@ function MainTabs() {
         component={FindColorScreen}
         options={{
           tabBarLabel: 'Find Color',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>💧</Text>,
+          tabBarIcon: ({ color, size }) => <Ionicons name="color-filter-outline" size={size} color={color} />,
         }}
       />
       <Tab.Screen
@@ -45,7 +47,7 @@ function MainTabs() {
         component={SavedColorsScreen}
         options={{
           tabBarLabel: 'Saved',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🔖</Text>,
+          tabBarIcon: ({ color, size }) => <Ionicons name="bookmark-outline" size={size} color={color} />,
         }}
       />
     </Tab.Navigator>
@@ -61,6 +63,7 @@ export default function App() {
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
           <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
+          <Stack.Screen name="UserSettings" component={UserSettingsScreen} />
           <Stack.Screen name="MainTabs" component={MainTabs} />
         </Stack.Navigator>
       </NavigationContainer>

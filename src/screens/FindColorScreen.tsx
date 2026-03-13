@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { authStyles } from '../styles/authStyles';
 
-export default function FindColorScreen() {
+export default function FindColorScreen({ navigation }: any) {
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
     const appState = useRef(AppState.currentState);
@@ -56,20 +56,105 @@ export default function FindColorScreen() {
     return (
         <View style={styles.container}>
             <CameraView style={styles.camera} facing={facing} />
+            
+            {/* UI Overlay Layer */}
+            <View style={styles.overlay} pointerEvents="box-none">
+                {/* Header Layer */}
+                <SafeAreaView style={styles.headerLayer} pointerEvents="box-none">
+                    <TouchableOpacity 
+                        style={styles.iconButton}
+                        onPress={() => navigation.navigate('UserSettings')}
+                    >
+                        <Ionicons name="person-circle-outline" size={32} color="white" />
+                    </TouchableOpacity>
+                </SafeAreaView>
+
+                {/* Footer Layer */}
+                <View style={styles.footerLayer} pointerEvents="box-none">
+                    <View style={styles.controlsContainer}>
+                        {/* Placeholder for Recent Images */}
+                        <TouchableOpacity style={styles.secondaryButton}>
+                            <Ionicons name="images-outline" size={28} color="white" />
+                        </TouchableOpacity>
+
+                        {/* Capture Button */}
+                        <TouchableOpacity style={styles.captureButton}>
+                            <View style={styles.captureInner} />
+                        </TouchableOpacity>
+
+                        {/* Empty view for balance if needed, or just let spacing handle it */}
+                        <View style={styles.spacer} />
+                    </View>
+                </View>
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: { flex: 1, backgroundColor: 'black' },
     camera: { flex: 1 },
-
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'space-between',
+    },
+    headerLayer: {
+        paddingHorizontal: 20,
+        paddingTop: 10,
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    footerLayer: {
+        paddingBottom: 40,
+    },
+    controlsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        paddingHorizontal: 30,
+    },
+    iconButton: {
+        width: 44,
+        height: 44,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        borderRadius: 22,
+    },
+    captureButton: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        borderWidth: 4,
+        borderColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    captureInner: {
+        width: 66,
+        height: 66,
+        borderRadius: 33,
+        backgroundColor: 'white',
+    },
+    secondaryButton: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    spacer: {
+        width: 50,
+    },
+    
     // Permission Screen Styles
     permissionContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 30,
+        backgroundColor: '#F5F2F2',
     },
     icon: {
         marginBottom: 20,

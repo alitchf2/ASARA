@@ -571,7 +571,7 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Permission request shown on first access to camera
 - Permission handling logic implemented per task 4.3
 **Current Status:** Complete
-**Notes:** Installed `expo-camera`, configured the native `cameraPermission` string in `app.json`, and implemented the permission request flow.
+**Notes:** Installed `expo-camera`, configured the native `cameraPermission` string in `app.json`, and implemented the permission request flow. Adam had already done most of this.
 
 ---
 
@@ -589,8 +589,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Top right: circular user icon button
 - Bottom navigation bar: color dropper icon (left, active/highlighted), bookmark icon (right, inactive)
 - Camera preview resumes when user navigates back from Object Selection screen
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Built the Camera UI with full-screen preview and UI overlays. Added a header with a Profile button (linking to a placeholder Settings screen) and a footer with a large Capture shutter button and a Recent Images icon placeholder. Updated bottom tab icons to use Ionicons (dropper/bookmark).
 
 ---
 
