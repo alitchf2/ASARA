@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
@@ -21,37 +22,26 @@ import { validateEnvOrThrow } from './src/config/validateEnv';
 import { configureAmplify } from './src/config/amplify';
 configureAmplify();
 
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { Dimensions, View } from 'react-native';
 import { GlobalOfflineModal } from './src/components/GlobalOfflineModal';
+import { CustomTabBar } from './src/components/CustomTabBar';
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainTabs() {
   return (
     <Tab.Navigator
+      tabBar={(props) => <CustomTabBar {...props} />}
+      tabBarPosition="bottom"
+      initialRouteName="FindColor"
       screenOptions={{
-        tabBarActiveTintColor: '#007AFF', // brand-blue placeholder
-        headerShown: false,
+        swipeEnabled: true,
       }}
     >
-      <Tab.Screen
-        name="FindColor"
-        component={FindColorScreen}
-        options={{
-          tabBarLabel: 'Find Color',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="eyedropper" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="SavedColors"
-        component={SavedColorsScreen}
-        options={{
-          tabBarLabel: 'Saved',
-          tabBarIcon: ({ color, size }) => <Ionicons name="bookmark-outline" size={size} color={color} />,
-        }}
-      />
+      <Tab.Screen name="FindColor" component={FindColorScreen} options={{ tabBarLabel: 'Find Color' }} />
+      <Tab.Screen name="SavedColors" component={SavedColorsScreen} options={{ tabBarLabel: 'Saved' }} />
     </Tab.Navigator>
   );
 }
@@ -71,4 +61,4 @@ export default function App() {
       </NavigationContainer>
     </SafeAreaProvider>
   );
-}
+}
