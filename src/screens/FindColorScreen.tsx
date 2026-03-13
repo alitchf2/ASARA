@@ -67,10 +67,10 @@ export default function FindColorScreen({ navigation }: any) {
                         ]}
                         onPress={() => navigation.navigate('UserSettings')}
                     >
-                        <Ionicons 
-                            name="person-circle-outline" 
-                            size={32} 
-                            color={permission.granted ? "white" : "#2B2A2A"} 
+                        <Ionicons
+                            name="person-circle-outline"
+                            size={32}
+                            color={permission.granted ? "white" : "#2B2A2A"}
                         />
                     </TouchableOpacity>
                 </SafeAreaView>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     footerLayer: {
-        paddingBottom: 40,
+        paddingBottom: 110, // Increased to clear the floating tab bar
     },
     controlsContainer: {
         flexDirection: 'row',
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     mainContent: {
         flex: 1,
     },
-    
+
     // Permission Screen Styles
     permissionContainer: {
         flex: 1,

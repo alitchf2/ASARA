@@ -18,8 +18,9 @@ const COMPANY_ORANGE = '#FEB05D'; // Brand Color (unused for active here now)
 const INACTIVE_COLOR = '#F5F2F2';
 
 export const CustomTabBar = ({ state, descriptors, navigation, position }: MaterialTopTabBarProps) => {
-  const tabWidth = width / state.routes.length;
-  const paddingHorizontal = 10; // Padding inside the tab bar for the pill
+  const containerWidth = width - 40; // width minus left:20 and right:20
+  const tabWidth = containerWidth / state.routes.length;
+  const paddingHorizontal = 8; 
   const pillWidth = tabWidth - (paddingHorizontal * 2);
 
   // Directly interpolate the position prop from the Material Top Tab navigator
@@ -112,17 +113,20 @@ export const CustomTabBar = ({ state, descriptors, navigation, position }: Mater
 
 const styles = StyleSheet.create({
   tabBarContainer: {
-    height: 85,
+    height: 70, // Slightly more compact
     backgroundColor: '#2B2A2A', // Company Black
-    borderTopWidth: 1,
-    borderTopColor: '#3D3D3D', // Subtle dark border
+    position: 'absolute',
+    bottom: 25, // Float above the bottom
+    left: 20,
+    right: 20,
+    borderRadius: 35, // Perfect capsule
     elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    position: 'relative',
-    justifyContent: 'center', // Center indicator vertically
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    justifyContent: 'center',
+    overflow: 'hidden', // Contain the indicator
   },
   routesContainer: {
     flexDirection: 'row',
@@ -132,17 +136,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1, // Ensure icons are above indicator
+    zIndex: 1,
   },
   tabLabel: {
-    fontSize: 12,
-    marginTop: 4,
-    fontWeight: '700', // Making text a bit bolder for better legibility against backlight
+    fontSize: 11, // Slightly smaller for compact bar
+    marginTop: 2,
+    fontWeight: '700',
   },
   indicator: {
     position: 'absolute',
-    height: 60, // Large pill height
-    backgroundColor: COMPANY_BLUE, // Solid Company Blue
-    borderRadius: 30, // Capsule shape
+    height: 50, // Fits inside the 70px bar comfortably
+    backgroundColor: COMPANY_BLUE,
+    borderRadius: 25,
   },
 });
