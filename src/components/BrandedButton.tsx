@@ -12,6 +12,7 @@ interface BrandedButtonProps extends TouchableOpacityProps {
   title: string;
   variant?: "primary" | "secondary" | "text" | "destructive";
   isLoading?: boolean;
+  textColor?: string;
 }
 
 export const BrandedButton: React.FC<BrandedButtonProps> = ({
@@ -20,6 +21,7 @@ export const BrandedButton: React.FC<BrandedButtonProps> = ({
   isLoading = false,
   disabled,
   style,
+  textColor,
   ...props
 }) => {
   const isPrimary = variant === "primary";
@@ -36,6 +38,7 @@ export const BrandedButton: React.FC<BrandedButtonProps> = ({
   };
 
   const getTextColor = () => {
+    if (textColor) return textColor;
     if (isText) {
       return disabled ? theme.colors.disabled : theme.colors.companyBlue;
     }

@@ -1,15 +1,19 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Modal, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { globalStyles } from '../styles/globalStyles';
 import { theme } from '../styles/theme';
 import { BrandedButton } from '../components/BrandedButton';
+import { AuthInput } from '../components/AuthInput';
 
 export default function UserSettingsScreen({ navigation, route }: any) {
     // Note: User data and guest check will be implemented in future tasks (3.11, 3.14, 3.15)
     const username = "Placeholder Username"; // Placeholder for task 3.15
     const isGuest = route.params?.guest === true;
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState("");
 
     useEffect(() => {
         if (isGuest) {
@@ -29,14 +33,20 @@ export default function UserSettingsScreen({ navigation, route }: any) {
         console.log("Sign Out pressed");
     };
 
-    const handleDeleteAccount = () => {
-        // Logic for task 3.13
-        console.log("Delete Account pressed");
+    const handleEditPassword = () => {
+        setIsModalVisible(true);
     };
 
-    const handleEditPassword = () => {
-        // Logic for task 3.12
-        console.log("Edit Password pressed");
+    const handleModalSubmit = () => {
+        console.log("Password submitted:", confirmPassword);
+        // Task 3.12: Add validation logic later
+        setIsModalVisible(false);
+        setConfirmPassword("");
+    };
+
+    const handleModalCancel = () => {
+        setIsModalVisible(false);
+        setConfirmPassword("");
     };
 
     if (isGuest) {
@@ -104,6 +114,52 @@ export default function UserSettingsScreen({ navigation, route }: any) {
                     />
                 </View>
             </View>
+
+            <Modal
+                visible={isModalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={handleModalCancel}
+            >
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View style={styles.modalOverlay}>
+                        <KeyboardAvoidingView
+                            behavior={Platform.OS === "ios" ? "padding" : "height"}
+                            keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+                            style={styles.modalContainer}
+                        >
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Confirm Changes</Text>
+                                <Text style={styles.modalSubtitle}>Enter your current password to make changes.</Text>
+                                
+                                <AuthInput 
+                                    isPassword
+                                    placeholder="Current Password"
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                    containerStyle={styles.modalInput}
+                                />
+
+                                <View style={styles.modalActions}>
+                                    <BrandedButton 
+                                        title="Cancel"
+                                        variant="text"
+                                        onPress={handleModalCancel}
+                                        style={styles.modalButton}
+                                        textColor={theme.colors.companyOrange}
+                                    />
+                                    <BrandedButton 
+                                        title="Submit"
+                                        onPress={handleModalSubmit}
+                                        disabled={confirmPassword.length === 0}
+                                        style={styles.modalButton}
+                                    />
+                                </View>
+                            </View>
+                        </KeyboardAvoidingView>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -169,5 +225,52 @@ const styles = StyleSheet.create({
         color: theme.colors.textMuted,
         textAlign: 'center',
         marginTop: 16,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    modalContainer: {
+        width: '100%',
+        maxWidth: 400,
+    },
+    modalContent: {
+        backgroundColor: theme.colors.background,
+        borderRadius: 16,
+        padding: 24,
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: theme.colors.textPrimary,
+        marginBottom: 12,
+    },
+    modalSubtitle: {
+        fontSize: 15,
+        color: theme.colors.textMuted,
+        textAlign: 'center',
+        marginBottom: 24,
+        lineHeight: 20,
+    },
+    modalInput: {
+        width: '100%',
+        marginBottom: 24,
+    },
+    modalActions: {
+        flexDirection: 'row',
+        width: '100%',
+        gap: 12,
+    },
+    modalButton: {
+        flex: 1,
     },
 });

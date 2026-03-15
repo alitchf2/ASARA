@@ -14,12 +14,14 @@ import { theme } from "../styles/theme";
 interface AuthInputProps extends TextInputProps {
   isPassword?: boolean;
   containerStyle?: StyleProp<ViewStyle>;
+  iconColor?: string;
 }
 
 export const AuthInput: React.FC<AuthInputProps> = ({
   isPassword,
   containerStyle,
   style,
+  iconColor = theme.colors.textMuted,
   ...props
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -40,7 +42,7 @@ export const AuthInput: React.FC<AuthInputProps> = ({
           <Ionicons
             name={isPasswordVisible ? "eye-off" : "eye"}
             size={24}
-            color={theme.colors.textMuted}
+            color={iconColor}
           />
         </TouchableOpacity>
       </View>
