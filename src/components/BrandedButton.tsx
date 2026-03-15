@@ -10,7 +10,7 @@ import { theme } from "../styles/theme";
 
 interface BrandedButtonProps extends TouchableOpacityProps {
   title: string;
-  variant?: "primary" | "secondary" | "text";
+  variant?: "primary" | "secondary" | "text" | "destructive";
   isLoading?: boolean;
 }
 
@@ -25,11 +25,13 @@ export const BrandedButton: React.FC<BrandedButtonProps> = ({
   const isPrimary = variant === "primary";
   const isSecondary = variant === "secondary";
   const isText = variant === "text";
+  const isDestructive = variant === "destructive";
 
   const getBackgroundColor = () => {
     if (disabled && !isText) return theme.colors.disabled;
     if (isPrimary) return theme.colors.companyBlue;
     if (isSecondary) return theme.colors.companyOrange;
+    if (isDestructive) return "#FF4B4B";
     return "transparent";
   };
 
