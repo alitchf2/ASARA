@@ -1,12 +1,7 @@
 {
-  "analytics": {
-    "colorfindAnalytics": {
-      "providerPlugin": "awscloudformation",
-      "service": "Kinesis"
-    }
-  },
+  "analytics": {},
   "auth": {
-    "colorfind3baa86a4": {
+    "colorfind43640cdb43640cdb": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -16,7 +11,7 @@
           "passwordPolicyCharacters": [],
           "passwordPolicyMinLength": "8"
         },
-        "signupAttributes": ["EMAIL"],
+        "signupAttributes": [],
         "socialProviders": [],
         "usernameAttributes": [],
         "verificationMechanisms": [

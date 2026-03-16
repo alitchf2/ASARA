@@ -1,13 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
-  "analytics": {
-    "colorfindAnalytics": {
-      "kinesisStreamArn": "string",
-      "kinesisStreamId": "string",
-      "kinesisStreamShardCount": "string"
-    }
-  },
   "auth": {
-    "colorfind3baa86a4": {
+    "colorfind43640cdb43640cdb": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
       "CreatedSNSRole": "string",

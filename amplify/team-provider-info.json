@@ -12,14 +12,11 @@
       "AmplifyAppId": "dfbv5wrnfzbnv"
     },
     "categories": {
-      "auth": {
-        "colorfind3baa86a4": {}
-      },
       "storage": {
         "images": {}
       },
-      "analytics": {
-        "colorfindAnalytics": {}
+      "auth": {
+        "colorfind43640cdb43640cdb": {}
       }
     }
   },
