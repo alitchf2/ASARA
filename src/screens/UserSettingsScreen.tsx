@@ -48,7 +48,10 @@ export default function UserSettingsScreen({ navigation, route }: any) {
 
     const handleSignOut = () => {
         console.log("Sign Out pressed");
-        // Logic for task 3.10
+        // TODO: Add API code to invalidate the session/token here
+        
+        // Reset the navigation stack to the Sign In screen
+        navigation.replace("SignIn");
     };
 
     const handleEditIconPress = () => {
@@ -230,20 +233,11 @@ export default function UserSettingsScreen({ navigation, route }: any) {
                 <View style={styles.buttonContainer}>
                     {isEditMode ? (
                         <>
-                            <View style={styles.rowButtons}>
-                                <BrandedButton
-                                    title="Cancel"
-                                    variant="secondary"
-                                    onPress={handleCancelEdit}
-                                    style={styles.flexButton}
-                                />
-                                <BrandedButton
-                                    title="Save"
-                                    onPress={handleSaveEditPress}
-                                    disabled={isSaveDisabled}
-                                    style={styles.flexButton}
-                                />
-                            </View>
+                            <BrandedButton
+                                title="Save"
+                                onPress={handleSaveEditPress}
+                                disabled={isSaveDisabled}
+                            />
                             <BrandedButton
                                 title="Delete Account"
                                 variant="primary"
