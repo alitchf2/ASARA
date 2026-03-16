@@ -9,6 +9,7 @@ export const theme = {
     textSecondary: "#4A4A4A",
     textMuted: "#767676",
     disabled: "#a0a0a0",
+    destructive: "#FF4B4B",
   },
   spacing: {
     xs: 4,
