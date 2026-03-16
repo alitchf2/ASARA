@@ -14,7 +14,11 @@
     "smsVerificationMessage": "Your verification code is {####}",
     "emailVerificationSubject": "Your verification code",
     "emailVerificationMessage": "Your verification code is {####}",
+<<<<<<< HEAD
     "defaultPasswordPolicy": false,
+=======
+    "defaultPasswordPolicy": true,
+>>>>>>> b18ad42 (reconfiguring amplify auth)
     "passwordPolicyMinLength": "8",
     "passwordPolicyCharacters": [],
     "requiredAttributes": [],
@@ -36,15 +40,20 @@
     "thirdPartyAuth": false,
     "userPoolGroups": false,
     "adminQueries": false,
+<<<<<<< HEAD
     "triggers": {
       "PreSignup": [
         "custom"
       ]
     },
+=======
+    "triggers": {},
+>>>>>>> b18ad42 (reconfiguring amplify auth)
     "hostedUI": false,
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
+<<<<<<< HEAD
     "useEnabledMfas": true,
     "authRoleArn": {
       "Fn::GetAtt": ["AuthRole", "Arn"]
@@ -70,5 +79,8 @@
     },
     "permissions": [],
     "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PreSignUp\",\n    \"lambdaFunctionName\": \"colorfind43640cdb43640cdbPreSignup\"\n  }\n]"
+=======
+    "useEnabledMfas": true
+>>>>>>> b18ad42 (reconfiguring amplify auth)
   }
 }
