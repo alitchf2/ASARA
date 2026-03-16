@@ -395,8 +395,14 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Sign Out button tap triggers sign-out flow (logic in task 3.10)
 - Delete Account button tap triggers deletion flow (logic in task 3.13)
 - Screen inaccessible to guest users (redirect to Sign In with explanation - logic in task 3.11)
-**Current Status:** Not Started
+**Current Status:** Complete
 **Notes:** 
+- Developed the `UserSettingsScreen.tsx` following the 30/70 UI ratio and branding guidelines.
+- Implemented the header with back navigation and a pencil edit icon for entering edit mode.
+- Created sections for Username and Password (masked with bullets).
+- Integrated `BrandedButton` and `AuthInput` custom components for consistency.
+- Handled guest user redirection via a branded fallback UI that prompts for Sign In.
+- Optimized UI by extracting inline modals into reusable `ActionModal` and `FeedbackModal` components.
 
 ---
 
@@ -449,8 +455,13 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Refresh User Settings screen with new username displayed
 
 **Testing Notes:** Test updating username only, password only, both simultaneously, and canceling edit mode.
-**Current Status:** Not Started
+**Current Status:** In Progress
 **Notes:** 
+- Built the "Edit Mode" transition requiring current password confirmation via the new `ActionModal` component.
+- Implemented a streamlined "Save" flow that validates inputs locally and updates the screen state immediately.
+- Integrated the shared `validatePasswordStrength` utility for live requirement checking and used the `PasswordRequirements` branch-tree UI.
+- Added TODO placeholders for the required `UpdateUserProfile` API calls.
+- Simplified the experience by removing the intermediate confirmation modal, allowing direct save-to-success transitions.
 
 ---
 

@@ -8,16 +8,13 @@ interface PasswordRequirementsProps {
   isFocused: boolean;
 }
 
+import { validatePasswordStrength } from '../utils/validators';
+
 export const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
   password,
   isFocused,
 }) => {
-  const hasLength = password.length >= 8;
-  const hasUpperLower = /[A-Z]/.test(password) && /[a-z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSpecial = /[^A-Za-z0-9\s]/.test(password);
-
-  const isPasswordValid = hasLength && hasUpperLower && hasNumber && hasSpecial;
+  const { hasLength, hasUpperLower, hasNumber, hasSpecial, isValid: isPasswordValid } = validatePasswordStrength(password);
 
   // Only show if focused OR if we have started typing and it's not valid yet OR if it is valid
   const shouldShow = isFocused || (password.length > 0 && !isPasswordValid) || isPasswordValid;
