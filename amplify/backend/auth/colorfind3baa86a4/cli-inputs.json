@@ -2,31 +2,37 @@
   "version": "1",
   "cognitoConfig": {
     "identityPoolName": "colorfind3baa86a4_identitypool_3baa86a4",
-    "allowUnauthenticatedIdentities": true,
+    "allowUnauthenticatedIdentities": false,
     "resourceNameTruncated": "colorf3baa86a4",
     "userPoolName": "colorfind3baa86a4_userpool_3baa86a4",
-    "autoVerifiedAttributes": ["email"],
+    "autoVerifiedAttributes": [
+      "phone_number"
+    ],
     "mfaConfiguration": "OFF",
     "mfaTypes": ["SMS Text Message"],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
     "emailVerificationSubject": "Your verification code",
     "emailVerificationMessage": "Your verification code is {####}",
-    "defaultPasswordPolicy": false,
-    "passwordPolicyMinLength": 8,
+    "defaultPasswordPolicy": true,
+    "passwordPolicyMinLength": "8",
     "passwordPolicyCharacters": [],
     "requiredAttributes": ["email"],
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
-    "userpoolClientRefreshTokenValidity": 30,
-    "userpoolClientWriteAttributes": ["email"],
-    "userpoolClientReadAttributes": ["email"],
+    "userpoolClientRefreshTokenValidity": "30",
+    "userpoolClientWriteAttributes": [
+      "email"
+    ],
+    "userpoolClientReadAttributes": [
+      "email"
+    ],
     "userpoolClientLambdaRole": "colorf3baa86a4_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
     "sharedId": "3baa86a4",
     "resourceName": "colorfind3baa86a4",
     "authSelections": "identityPoolAndUserPool",
-    "useDefault": "default",
+    "useDefault": "manual",
     "triggers": {},
     "userPoolGroupList": [],
     "serviceName": "Cognito",
@@ -39,6 +45,15 @@
       "Fn::GetAtt": ["UnauthRole", "Arn"]
     },
     "breakCircularDependency": true,
-    "dependsOn": []
+    "dependsOn": [],
+    "thirdPartyAuth": false,
+    "userPoolGroups": false,
+    "adminQueries": false,
+    "hostedUI": false,
+    "authProviders": [],
+    "parentStack": {
+      "Ref": "AWS::StackId"
+    },
+    "permissions": []
   }
 }
