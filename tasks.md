@@ -290,8 +290,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - No data submission required on this screen
 
 **Testing Notes:** Have a non-technical person read the policy text to confirm plain language clarity.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Created the `TermsOfServiceScreen.tsx` layout using a full-page scroll view, implemented typography styles for readability, inserted all required privacy and terms clauses, and matched the seamless layout styling from the Create Account screen. Checked out perfectly with Typescript.
 
 ---
 
@@ -359,8 +359,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Connectivity re-checked every 5 seconds while banner is visible
 - Banner auto-dismisses when connectivity restored
 - Sign In/Create Account buttons remain disabled while offline
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Built a Global Offline Modal (`GlobalOfflineModal.tsx`) that mounts on `App.tsx`. The modal completely freezes the UI with a native transparent overlay and offers a manual Retry button, while the `useNetworkStatus` hook continues to run the required 5-second automatic polling safely in the background across all screens universally.
 
 ---
 
@@ -395,8 +395,14 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Sign Out button tap triggers sign-out flow (logic in task 3.10)
 - Delete Account button tap triggers deletion flow (logic in task 3.13)
 - Screen inaccessible to guest users (redirect to Sign In with explanation - logic in task 3.11)
-**Current Status:** Not Started
+**Current Status:** Complete
 **Notes:** 
+- Developed the `UserSettingsScreen.tsx` following the 30/70 UI ratio and branding guidelines.
+- Implemented the header with back navigation and a pencil edit icon for entering edit mode.
+- Created sections for Username and Password (masked with bullets).
+- Integrated `BrandedButton` and `AuthInput` custom components for consistency.
+- Handled guest user redirection via a branded fallback UI that prompts for Sign In.
+- Optimized UI by extracting inline modals into reusable `ActionModal` and `FeedbackModal` components.
 
 ---
 
@@ -449,8 +455,13 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Refresh User Settings screen with new username displayed
 
 **Testing Notes:** Test updating username only, password only, both simultaneously, and canceling edit mode.
-**Current Status:** Not Started
+**Current Status:** In Progress
 **Notes:** 
+- Built the "Edit Mode" transition requiring current password confirmation via the new `ActionModal` component.
+- Implemented a streamlined "Save" flow that validates inputs locally and updates the screen state immediately.
+- Integrated the shared `validatePasswordStrength` utility for live requirement checking and used the `PasswordRequirements` branch-tree UI.
+- Added TODO placeholders for the required `UpdateUserProfile` API calls.
+- Simplified the experience by removing the intermediate confirmation modal, allowing direct save-to-success transitions.
 
 ---
 
@@ -570,8 +581,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Android `AndroidManifest.xml` includes camera permission
 - Permission request shown on first access to camera
 - Permission handling logic implemented per task 4.3
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Installed `expo-camera`, configured the native `cameraPermission` string in `app.json`, and implemented the permission request flow. Adam had already done most of this.
 
 ---
 
@@ -589,8 +600,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Top right: circular user icon button
 - Bottom navigation bar: color dropper icon (left, active/highlighted), bookmark icon (right, inactive)
 - Camera preview resumes when user navigates back from Object Selection screen
-**Current Status:** Not Started
-**Notes:** 
+  **Current Status:** Complete
+  **Notes:** Built the Find Color screen matching the requirement specifications including the camera view underneath the UI layout. Also implemented a floating tab bar to manage navigation between Find Color and Saved Colors. Note: the native react-native-pager-view library used by material-top-tabs has a known issue where rapid swiping or adding a second finger during a swipe will cause the pager's index to desync from the visual tab indicator. To resolve this stability issue, tab transition animations (animationEnabled) have been disabled for now.
 
 ---
 
@@ -608,8 +619,9 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Permission status re-checked when app returns from background (user may have changed settings)
 
 **Testing Notes:** Test on both iOS and Android. Test app behavior when user denies permission twice (iOS shows system-level "Don't Ask Again").
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented a branded fallback screen in `FindColorScreen.tsx` that handles both initial requests and deep-linking to settings for hard-denials. Added an AppState listener to automatically refresh permission status when returning from device settings.
+Need to try this on more devices (esspecially android).
 
 ---
 

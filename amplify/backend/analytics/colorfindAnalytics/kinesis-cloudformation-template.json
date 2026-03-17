@@ -73,15 +73,9 @@
           "Statement": [
             {
               "Effect": "Allow",
-              "Action": [
-                "kinesis:PutRecord",
-                "kinesis:PutRecords"
-              ],
+              "Action": ["kinesis:PutRecord", "kinesis:PutRecords"],
               "Resource": {
-                "Fn::GetAtt": [
-                  "KinesisStream",
-                  "Arn"
-                ]
+                "Fn::GetAtt": ["KinesisStream", "Arn"]
               }
             }
           ]
@@ -104,15 +98,9 @@
           "Statement": [
             {
               "Effect": "Allow",
-              "Action": [
-                "kinesis:PutRecord",
-                "kinesis:PutRecords"
-              ],
+              "Action": ["kinesis:PutRecord", "kinesis:PutRecords"],
               "Resource": {
-                "Fn::GetAtt": [
-                  "KinesisStream",
-                  "Arn"
-                ]
+                "Fn::GetAtt": ["KinesisStream", "Arn"]
               }
             }
           ]
@@ -123,10 +111,7 @@
   "Outputs": {
     "kinesisStreamArn": {
       "Value": {
-        "Fn::GetAtt": [
-          "KinesisStream",
-          "Arn"
-        ]
+        "Fn::GetAtt": ["KinesisStream", "Arn"]
       }
     },
     "kinesisStreamId": {
