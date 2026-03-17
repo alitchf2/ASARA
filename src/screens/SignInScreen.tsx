@@ -37,12 +37,20 @@ export default function SignInScreen({ navigation }: any) {
             const { isSignedIn } = await signIn({
                 username: username.trim(),
                 password, // never trim or log the password
+                options: {
+                    authFlowType: 'USER_PASSWORD_AUTH',
+                },
             });
 
             if (isSignedIn) {
                 navigation.replace('MainTabs');
             }
         } catch (err: any) {
+            if (err.name === 'UserAlreadyAuthenticatedException') {
+                // Already signed in — just go to the app
+                navigation.replace('MainTabs');
+                return;
+            }
             // NotAuthorizedException = wrong password/username
             // UserNotFoundException = username doesn't exist
             // Both show the same generic message per spec (don't reveal which)
@@ -108,8 +116,35 @@ export default function SignInScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  linksContainer: {
-    alignItems: "center",
-    gap: 15,
-  },
+    signInButton: {
+        backgroundColor: '#5A7ACD',
+        height: 50,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
+        marginBottom: 20,
+    },
+    signInButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    linksContainer: {
+        alignItems: 'center',
+        gap: 15,
+    },
+    linkText: {
+        color: '#5A7ACD',
+        fontSize: 16,
+    },
+    signInButtonDisabled: {
+        backgroundColor: '#a0a0a0',
+    },
+    errorText: {
+        color: '#D32F2F',
+        fontSize: 14,
+        marginBottom: 8,
+        marginTop: -4,
+    },
 });

@@ -50,7 +50,7 @@ export default function CreateAccountScreen({ navigation }: any) {
             // duplicates below as a fallback.
 
             // Step 1: Sign up with Cognito
-            const { isSignUpComplete } = await signUp({
+            const signUpResult = await signUp({
                 username: username.trim(),
                 password,
                 options: {
@@ -58,17 +58,24 @@ export default function CreateAccountScreen({ navigation }: any) {
                 },
             });
 
-            // Step 2: Auto sign in immediately after successful sign up
-            if (isSignUpComplete) {
-                await signIn({
+            // Step 2: Sign in using USER_PASSWORD_AUTH (bypasses SRP crypto — required for Expo)
+            if (signUpResult.isSignUpComplete) {
+                const signInResult = await signIn({
                     username: username.trim(),
                     password,
+                    options: {
+                        authFlowType: 'USER_PASSWORD_AUTH',
+                    },
                 });
 
-                // TODO (Task 3.5 / 2.1): Write user record to DynamoDB Users table here
-                // { userID: Cognito sub, username, createdAt } via SaveUser Lambda
+                if (signInResult.isSignedIn) {
+                    // TODO (Task 3.5 / 2.1): Write user record to DynamoDB Users table here
+                    // { userID: Cognito sub, username, createdAt } via SaveUser Lambda
 
-                navigation.replace('MainTabs');
+                    navigation.replace('MainTabs');
+                }
+            } else {
+                setGeneralError('Something went wrong. Please try again.');
             }
         } catch (err: any) {
             if (

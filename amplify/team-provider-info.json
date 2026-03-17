@@ -9,7 +9,8 @@
       "UnauthRoleName": "amplify-colorfind-dev-8b035-unauthRole",
       "StackName": "amplify-colorfind-dev-8b035",
       "StackId": "arn:aws:cloudformation:us-east-2:538780774280:stack/amplify-colorfind-dev-8b035/dedd3d80-1401-11f1-9967-0657617b45fb",
-      "AmplifyAppId": "dfbv5wrnfzbnv"
+      "AmplifyAppId": "dfbv5wrnfzbnv",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-colorfind-dev-8b035-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
     },
     "categories": {
       "storage": {
@@ -17,6 +18,12 @@
       },
       "auth": {
         "colorfind43640cdb43640cdb": {}
+      },
+      "function": {
+        "colorfind43640cdb43640cdbPreSignup": {
+          "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
+          "s3Key": "amplify-builds/colorfind43640cdb43640cdbPreSignup-7839354243505a52414d-build.zip"
+        }
       }
     }
   },
