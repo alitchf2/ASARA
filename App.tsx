@@ -25,18 +25,21 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { Dimensions, View } from "react-native";
 import { GlobalOfflineModal } from "./src/components/GlobalOfflineModal";
 import { CustomTabBar } from "./src/components/CustomTabBar";
+import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
+import { GlobalGuestModal } from "./src/components/GlobalGuestModal";
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainTabs() {
+  const { isGuest } = useAuth();
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}
       tabBarPosition="bottom"
       initialRouteName="FindColor"
       screenOptions={{
-        swipeEnabled: true,
+        swipeEnabled: !isGuest,
       }}
       {...({
         bounces: false,
@@ -60,19 +63,22 @@ function MainTabs() {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <GlobalOfflineModal />
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="SignIn" component={SignInScreen} />
-          <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
-          <Stack.Screen
-            name="TermsOfService"
-            component={TermsOfServiceScreen}
-          />
-          <Stack.Screen name="UserSettings" component={UserSettingsScreen} />
-          <Stack.Screen name="MainTabs" component={MainTabs} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <AuthProvider>
+        <GlobalOfflineModal />
+        <NavigationContainer>
+          <GlobalGuestModal />
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="SignIn" component={SignInScreen} />
+            <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
+            <Stack.Screen
+              name="TermsOfService"
+              component={TermsOfServiceScreen}
+            />
+            <Stack.Screen name="UserSettings" component={UserSettingsScreen} />
+            <Stack.Screen name="MainTabs" component={MainTabs} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

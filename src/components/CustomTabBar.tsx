@@ -10,6 +10,7 @@ import {
 import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { theme } from "../styles/theme";
+import { useAuth } from "../contexts/AuthContext";
 
 const { width } = Dimensions.get("window");
 
@@ -19,6 +20,7 @@ export const CustomTabBar = ({
   navigation,
   position,
 }: MaterialTopTabBarProps) => {
+  const { isGuest, showGuestModal } = useAuth();
   const containerWidth = width - 40; // width minus left:20 and right:20
   const tabWidth = containerWidth / state.routes.length;
   const paddingHorizontal = 8;
@@ -63,6 +65,12 @@ export const CustomTabBar = ({
               target: route.key,
               canPreventDefault: true,
             });
+
+            if (route.name === "SavedColors" && isGuest) {
+              event.preventDefault();
+              showGuestModal("Sign in to view your saved colors.");
+              return;
+            }
 
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name);
