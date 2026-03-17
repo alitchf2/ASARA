@@ -327,8 +327,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Handle Cognito errors gracefully (e.g., username already exists in Cognito despite check)
 
 **Testing Notes:** Test race condition where two users try to register the same username simultaneously.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Completed
+**Notes:** Had to go into Cognito user pool App clients to physically switch the ALLOW_USER_PASSWORD_AUTH to be enabled for password sign-in and account creation.
 
 ---
 
