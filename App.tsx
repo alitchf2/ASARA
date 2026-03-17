@@ -16,6 +16,8 @@ import { CustomTabBar } from "./src/components/CustomTabBar";
 import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
 import { GlobalGuestModal } from "./src/components/GlobalGuestModal";
 import UserSettingsScreen from './src/screens/UserSettingsScreen';
+=======
+>>>>>>> 41108dd (Adding accout creation functionality, with persistent sign-in status. Edited Cognito allowances)
 
 //Task 1.2: environment switcher + validation
 import { ENV } from "./src/config";

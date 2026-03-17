@@ -5,26 +5,30 @@
     "allowUnauthenticatedIdentities": true,
     "resourceNameTruncated": "colorf43640cdb",
     "userPoolName": "colorfind43640cdb_userpool_43640cdb",
-    "autoVerifiedAttributes": [],
+    "autoVerifiedAttributes": [
+      "phone_number"
+    ],
     "mfaConfiguration": "OFF",
-    "mfaTypes": ["SMS Text Message"],
+    "mfaTypes": [
+      "SMS Text Message"
+    ],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
     "emailVerificationSubject": "Your verification code",
     "emailVerificationMessage": "Your verification code is {####}",
-<<<<<<< HEAD
     "defaultPasswordPolicy": false,
-=======
-    "defaultPasswordPolicy": true,
->>>>>>> b18ad42 (reconfiguring amplify auth)
     "passwordPolicyMinLength": "8",
     "passwordPolicyCharacters": [],
     "requiredAttributes": [],
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": "30",
-    "userpoolClientWriteAttributes": [],
-    "userpoolClientReadAttributes": [],
+    "userpoolClientWriteAttributes": [
+      "email"
+    ],
+    "userpoolClientReadAttributes": [
+      "email"
+    ],
     "userpoolClientLambdaRole": "colorf43640cdb_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
     "sharedId": "43640cdb",
@@ -34,26 +38,27 @@
     "thirdPartyAuth": false,
     "userPoolGroups": false,
     "adminQueries": false,
-<<<<<<< HEAD
     "triggers": {
       "PreSignup": [
         "custom"
       ]
     },
-=======
-    "triggers": {},
->>>>>>> b18ad42 (reconfiguring amplify auth)
     "hostedUI": false,
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-<<<<<<< HEAD
     "useEnabledMfas": true,
     "authRoleArn": {
-      "Fn::GetAtt": ["AuthRole", "Arn"]
+      "Fn::GetAtt": [
+        "AuthRole",
+        "Arn"
+      ]
     },
     "unauthRoleArn": {
-      "Fn::GetAtt": ["UnauthRole", "Arn"]
+      "Fn::GetAtt": [
+        "UnauthRole",
+        "Arn"
+      ]
     },
     "breakCircularDependency": true,
     "dependsOn": [
@@ -73,8 +78,5 @@
     },
     "permissions": [],
     "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PreSignUp\",\n    \"lambdaFunctionName\": \"colorfind43640cdb43640cdbPreSignup\"\n  }\n]"
-=======
-    "useEnabledMfas": true
->>>>>>> b18ad42 (reconfiguring amplify auth)
   }
 }

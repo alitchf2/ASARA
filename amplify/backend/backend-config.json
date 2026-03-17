@@ -24,7 +24,9 @@
         "signupAttributes": [],
         "socialProviders": [],
         "usernameAttributes": [],
-        "verificationMechanisms": []
+        "verificationMechanisms": [
+          "PHONE_NUMBER"
+        ]
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
