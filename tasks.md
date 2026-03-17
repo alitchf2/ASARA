@@ -306,8 +306,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - On failure: inline error message displays below password field: "Incorrect username or password."
 - Loading indicator shown during authentication
 - No plain text password logging
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Finished
+**Notes:** Had to reconfigure amplify to not require email accounts for signup. This task will immediately precede the next couple of tasks that work on user account creation and sign-ins. 
 
 ---
 
