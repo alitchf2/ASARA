@@ -10,12 +10,13 @@ import { PasswordRequirements } from '../components/PasswordRequirements';
 import { ActionModal } from '../components/ActionModal';
 import { FeedbackModal } from '../components/FeedbackModal';
 import { validatePasswordStrength } from '../utils/validators';
+import { useAuth } from '../contexts/AuthContext';
 
-export default function UserSettingsScreen({ navigation, route }: any) {
+export default function UserSettingsScreen({ navigation }: any) {
+    const { isGuest, setIsGuest } = useAuth();
     // Current "Live" data (Placeholders for Task 3.14/3.15)
     const [username, setUsername] = useState("Placeholder Username");
     const [password, setPassword] = useState("placeHolderPassword123!"); // Valid test password
-    const isGuest = route.params?.guest === true;
 
     // Security Gate Modal State
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -35,23 +36,11 @@ export default function UserSettingsScreen({ navigation, route }: any) {
     // Success Modal State
     const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
 
-    useEffect(() => {
-        if (isGuest) {
-            Alert.alert(
-                "Access Denied",
-                "Sign in to access account settings.",
-                [
-                    { text: "Sign In", onPress: () => navigation.replace("SignIn") },
-                    { text: "Cancel", onPress: () => navigation.goBack(), style: "cancel" }
-                ]
-            );
-        }
-    }, [isGuest]);
-
     const handleSignOut = () => {
         console.log("Sign Out pressed");
         // TODO: Add API code to invalidate the session/token here
-        
+        setIsGuest(false);
+
         // Reset the navigation stack to the Sign In screen
         navigation.replace("SignIn");
     };
@@ -149,7 +138,10 @@ export default function UserSettingsScreen({ navigation, route }: any) {
                     <Text style={styles.guestText}>Please sign in to view your settings.</Text>
                     <BrandedButton
                         title="Sign In"
-                        onPress={() => navigation.replace("SignIn")}
+                        onPress={() => {
+                            setIsGuest(false);
+                            navigation.replace("SignIn");
+                        }}
                         style={{ width: '60%', marginTop: 20 }}
                     />
                 </View>

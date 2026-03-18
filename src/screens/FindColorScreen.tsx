@@ -11,8 +11,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../styles/theme";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function FindColorScreen({ navigation }: any) {
+  const { isGuest, showGuestModal } = useAuth();
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const appState = useRef(AppState.currentState);
@@ -81,7 +83,13 @@ export default function FindColorScreen({ navigation }: any) {
               styles.iconButton,
               !permission.granted && styles.iconButtonDark,
             ]}
-            onPress={() => navigation.navigate("UserSettings")}
+            onPress={() => {
+              if (isGuest) {
+                showGuestModal("Sign in to access account settings.");
+              } else {
+                navigation.navigate("UserSettings");
+              }
+            }}
           >
             <Ionicons
               name="person-circle-outline"

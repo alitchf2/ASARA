@@ -16,13 +16,20 @@ import { globalStyles } from "../styles/globalStyles";
 import { AuthInput } from "../components/AuthInput";
 import { BrandedButton } from "../components/BrandedButton";
 import { theme } from "../styles/theme";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function SignInScreen({ navigation }: any) {
+  const { setIsGuest } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const isFormValid = username.trim().length > 0 && password.trim().length > 0;
 
   const { translateY, setFocusedField } = useKeyboardScroll(65);
+
+  const handleSignIn = () => {
+    setIsGuest(false);
+    navigation.replace("MainTabs");
+  };
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -54,7 +61,7 @@ export default function SignInScreen({ navigation }: any) {
             />
             <BrandedButton
               title="Sign In"
-              onPress={() => navigation.replace("MainTabs")}
+              onPress={handleSignIn}
               disabled={!isFormValid}
               style={{ marginTop: 10, marginBottom: 20 }}
             />
@@ -62,7 +69,10 @@ export default function SignInScreen({ navigation }: any) {
               <BrandedButton
                 title="Continue as Guest"
                 variant="text"
-                onPress={() => navigation.replace("MainTabs", { guest: true })}
+                onPress={() => {
+                  setIsGuest(true);
+                  navigation.replace("MainTabs");
+                }}
               />
               <BrandedButton
                 title="Create an Account"

@@ -335,15 +335,15 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 ### 3.6 - Implement Guest Mode Navigation
 **Assignee:** Full Stack Frontend - Alex  
 **PDR Reference:** Section 2.2, Section 5.2.2  
-**Description:** Implement guest mode flag and navigation logic. Guest users skip authentication and proceed directly to Find Color screen.  
+**Description:** Implement guest mode flag and navigation logic. Guest users skip authentication and proceed directly to Find Color screen.
 **Dependencies:** 3.1  
 **Acceptance Criteria:**
 - Tapping "Continue as Guest" sets global guest mode flag to true
 - Navigation to Find Color screen occurs immediately without Cognito calls
 - Guest flag persists in memory only (cleared on app close)
 - No data written to any database for guest users
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented global `isGuest` flag using React Context (`AuthContext.tsx`). Flag is memory-only and resets on app restart or explicit sign-in/out. Refactored `SignInScreen` to use this global state. Performed a major codebase refactor to globalize the guest modal state and logic, ensuring a single reusable instance (`GlobalGuestModal`) is used across all feature entry points. This centralized architecture removes redundant local states and prevents visual 'flashing' by intercepting guest access before restricted screens ever mount.
 
 ---
 
@@ -432,8 +432,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - If guest user taps Saved Colors tab: show modal "Sign in to view your saved colors." with Sign In button
 - If guest user taps Compare Color button: show modal "Sign in to compare colors." with Sign In button
 - Modals dismissible (user can tap outside or X button to close and stay on current screen)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** In Progress
+**Notes:** Implemented guest redirection logic for User Settings and Saved Colors features. Intercepted navigation at the `CustomTabBar` level for the "Saved" tab to prevent unauthorized screens from mounting and providing a smoother UI experience. Added a top-level `GlobalGuestModal` and disabled tab swiping for guest users to prevent accidental bypass of redirection logic. Note: Redirection for the "Compare" feature is currently pending as the Compare button/screen has not yet been implemented in the application UI.
 
 ---
 
@@ -506,7 +506,7 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 ---
 
 ### 3.15 - Test User Profile Retrieval on User Settings Screen
-**Assignee:** Full Stack Frontend - Alex  
+**Assignee:** Full Stack Backend - Adam, API - Sean
 **PDR Reference:** Section 5.12.1  
 **Description:** Call GetUserProfile Lambda on User Settings screen mount to display username.  
 **Dependencies:** 3.9, 3.14  
