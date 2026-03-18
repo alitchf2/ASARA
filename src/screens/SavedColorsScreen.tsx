@@ -31,13 +31,5 @@ const styles = StyleSheet.create({
   },
   text: { fontSize: 24, fontWeight: "bold" },
   sub: { fontSize: 14, color: "#888", marginTop: 8 },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-  },
-  text: { fontSize: 24, fontWeight: "bold" },
-  sub: { fontSize: 14, color: "#888", marginTop: 8 },
 });
 
