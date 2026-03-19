@@ -1,8 +1,8 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, Dimensions, View, ActivityIndicator } from 'react-native';
+
+import { View, ActivityIndicator } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { getCurrentUser } from 'aws-amplify/auth';
@@ -28,7 +28,7 @@ configureAmplify();
 import { GlobalOfflineModal } from './src/components/GlobalOfflineModal';
 
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainTabs() {
@@ -53,8 +53,8 @@ function MainTabs() {
         component={FindColorScreen}
         options={{
           tabBarLabel: 'Find Color',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="eyedropper" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="eyedropper" color={color} />
           ),
         }}
       />
@@ -63,7 +63,7 @@ function MainTabs() {
         component={SavedColorsScreen}
         options={{
           tabBarLabel: 'Saved',
-          tabBarIcon: ({ color, size }) => <Ionicons name="bookmark-outline" size={size} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="bookmark-outline" color={color} />,
         }}
       />
     </Tab.Navigator>
@@ -97,7 +97,10 @@ export default function App() {
         <GlobalOfflineModal />
         <NavigationContainer>
           <GlobalGuestModal />
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Navigator
+            initialRouteName={isAuthenticated ? 'MainTabs' : 'SignIn'}
+            screenOptions={{ headerShown: false }}
+          >
             <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
             <Stack.Screen
