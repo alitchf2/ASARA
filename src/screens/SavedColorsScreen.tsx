@@ -1,9 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function SavedColorsScreen() {
-  const { isGuest } = useAuth();
+export default function SavedColorsScreen({ navigation }: any) {
+  const { isGuest, showGuestModal } = useAuth();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    // If a guest managed to land here (e.g. via swipe), bounce them back and show the modal
+    if (isGuest && isFocused) {
+      const timer = setTimeout(() => {
+        navigation.navigate("FindColor");
+        showGuestModal("Sign in to view your saved colors.");
+      }, 10);
+      return () => clearTimeout(timer);
+    }
+  }, [isGuest, isFocused, navigation, showGuestModal]);
 
   if (isGuest) {
     return (

@@ -52,7 +52,7 @@ function MainTabs() {
         component={FindColorScreen}
         options={{
           tabBarLabel: 'Find Color',
-          swipeEnabled: !isGuest,
+          swipeEnabled: true,
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="eyedropper" color={color} />
           ),
@@ -63,7 +63,7 @@ function MainTabs() {
         component={SavedColorsScreen}
         options={{
           tabBarLabel: 'Saved',
-          swipeEnabled: !isGuest,
+          swipeEnabled: true,
           tabBarIcon: ({ color }) => <Ionicons name="bookmark-outline" color={color} />,
         }}
       />
