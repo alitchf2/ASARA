@@ -39,7 +39,6 @@ function MainTabs() {
       tabBarPosition="bottom"
       initialRouteName="FindColor"
       screenOptions={{
-        swipeEnabled: !isGuest,
         tabBarActiveTintColor: '#007AFF',
         headerShown: false,
       }}
@@ -53,6 +52,7 @@ function MainTabs() {
         component={FindColorScreen}
         options={{
           tabBarLabel: 'Find Color',
+          swipeEnabled: !isGuest,
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="eyedropper" color={color} />
           ),
@@ -63,6 +63,7 @@ function MainTabs() {
         component={SavedColorsScreen}
         options={{
           tabBarLabel: 'Saved',
+          swipeEnabled: !isGuest,
           tabBarIcon: ({ color }) => <Ionicons name="bookmark-outline" color={color} />,
         }}
       />
