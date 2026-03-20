@@ -2,8 +2,8 @@ import React from "react";
 import {
   View,
   StyleSheet,
-  TouchableOpacity,
-  ScrollView,
+  TouchableOpacity, 
+  ScrollView, 
   Text,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,24 +12,17 @@ import { globalStyles } from "../styles/globalStyles";
 import { theme } from "../styles/theme";
 
 export default function TermsOfServiceScreen({ navigation }: any) {
-  return (
-    <SafeAreaView style={globalStyles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={28} color="#2B2A2A" />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <Text style={styles.mainTitle}>Terms of Service & Privacy Policy</Text>
-        {/* Terms of Service Section */}
-        <Text style={styles.sectionTitle}>1. Terms of Service</Text>
+    return (
+      <ScrollView>
+        <SafeAreaView style={globalStyles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.goBack()}
+                >
+                    <Ionicons name="arrow-back" size={28} color="#2B2A2A" />
+                </TouchableOpacity>
+            </View>
 
         <Text
           style={{
@@ -196,8 +189,8 @@ export default function TermsOfServiceScreen({ navigation }: any) {
           colors and images, will be immediately and completely deleted from our
           servers.
         </Text>
-      </ScrollView>
     </SafeAreaView>
+      </ScrollView>
   );
 }
 

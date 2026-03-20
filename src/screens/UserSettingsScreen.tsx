@@ -11,12 +11,26 @@ import { ActionModal } from '../components/ActionModal';
 import { FeedbackModal } from '../components/FeedbackModal';
 import { validatePasswordStrength } from '../utils/validators';
 import { useAuth } from '../contexts/AuthContext';
+import { getCurrentUser, signOut } from 'aws-amplify/auth';
 
 export default function UserSettingsScreen({ navigation }: any) {
     const { isGuest, setIsGuest } = useAuth();
     // Current "Live" data (Placeholders for Task 3.14/3.15)
-    const [username, setUsername] = useState("Placeholder Username");
+    const [username, setUsername] = useState("Loading...");
     const [password, setPassword] = useState("placeHolderPassword123!"); // Valid test password
+
+    useEffect(() => {
+        if (!isGuest) {
+            getCurrentUser()
+                .then(user => {
+                    setUsername(user.username);
+                })
+                .catch(err => {
+                    console.log("Error fetching user:", err);
+                    setUsername("Unknown User");
+                });
+        }
+    }, [isGuest]);
 
     // Security Gate Modal State
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -36,13 +50,16 @@ export default function UserSettingsScreen({ navigation }: any) {
     // Success Modal State
     const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
 
-    const handleSignOut = () => {
-        console.log("Sign Out pressed");
-        // TODO: Add API code to invalidate the session/token here
-        setIsGuest(false);
-
-        // Reset the navigation stack to the Sign In screen
-        navigation.replace("SignIn");
+    const handleSignOut = async () => {
+        try {
+            await signOut();
+            setIsGuest(false);
+            
+            // Reset the navigation stack to the Sign In screen
+            navigation.replace("SignIn");
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
     };
 
     const handleEditIconPress = () => {

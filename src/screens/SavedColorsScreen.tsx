@@ -32,3 +32,4 @@ const styles = StyleSheet.create({
   text: { fontSize: 24, fontWeight: "bold" },
   sub: { fontSize: 14, color: "#888", marginTop: 8 },
 });
+

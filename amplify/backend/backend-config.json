@@ -1,28 +1,62 @@
 {
-  "analytics": {
-    "colorfindAnalytics": {
-      "providerPlugin": "awscloudformation",
-      "service": "Kinesis"
-    }
-  },
+  "analytics": {},
   "auth": {
-    "colorfind3baa86a4": {
+    "colorfind43640cdb43640cdb": {
       "customAuth": false,
-      "dependsOn": [],
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "colorfind43640cdb43640cdbPreSignup",
+          "triggerProvider": "Cognito"
+        }
+      ],
       "frontendAuthConfig": {
         "mfaConfiguration": "OFF",
-        "mfaTypes": ["SMS"],
+        "mfaTypes": [
+          "SMS"
+        ],
         "passwordProtectionSettings": {
           "passwordPolicyCharacters": [],
-          "passwordPolicyMinLength": 8
+          "passwordPolicyMinLength": "8"
         },
-        "signupAttributes": ["EMAIL"],
+        "signupAttributes": [],
         "socialProviders": [],
         "usernameAttributes": [],
-        "verificationMechanisms": ["EMAIL"]
+        "verificationMechanisms": [
+          "PHONE_NUMBER"
+        ]
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    }
+  },
+  "function": {
+    "colorfind43640cdb43640cdbPreSignup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_colorfind43640cdb43640cdbPreSignup_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "colorfind43640cdb43640cdbPreSignup"
+        }
+      ]
+    },
+    "AMPLIFY_function_colorfind43640cdb43640cdbPreSignup_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "colorfind43640cdb43640cdbPreSignup"
+        }
+      ]
     }
   },
   "storage": {
