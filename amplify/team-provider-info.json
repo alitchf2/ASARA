@@ -29,6 +29,9 @@
           "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
           "s3Key": "amplify-builds/UpdateUserProfile-6d55493638554d534665-build.zip"
         }
+      },
+      "api": {
+        "colorfindAPI": {}
       }
     }
   },
