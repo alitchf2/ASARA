@@ -27,6 +27,7 @@ export default function SignInScreen({ navigation }: any) {
 
     const isFormValid = username.trim().length > 0 && password.trim().length > 0;
     const { translateY, setFocusedField } = useKeyboardScroll(65);
+    const { setIsGuest } = useAuth();
 
     async function handleSignIn() {
         if (!isFormValid || loading) return;
@@ -43,11 +44,13 @@ export default function SignInScreen({ navigation }: any) {
             });
 
             if (isSignedIn) {
+                setIsGuest(false);
                 navigation.replace('MainTabs');
             }
         } catch (err: any) {
             if (err.name === 'UserAlreadyAuthenticatedException') {
                 // Already signed in — just go to the app
+                setIsGuest(false);
                 navigation.replace('MainTabs');
                 return;
             }
@@ -101,7 +104,7 @@ export default function SignInScreen({ navigation }: any) {
                         </TouchableOpacity>
 
                         <View style={styles.linksContainer}>
-                            <TouchableOpacity onPress={() => navigation.replace('MainTabs', { guest: true })}>
+                            <TouchableOpacity onPress={() => { setIsGuest(true); navigation.replace('MainTabs'); }}>
                                 <Text style={styles.linkText}>Continue as Guest</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => navigation.navigate('CreateAccount')}>

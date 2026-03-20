@@ -417,8 +417,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Navigation to Sign In screen
 - Recent photos remain on device if user was authenticated (per Section 3.5 - persist across sessions)
 - No server-side calls required (token invalidation handled by Cognito automatically)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Started
+**Notes:** Currently Sign out work with the user settings screen. Need to further implement photos to remain if user was authenticated. 
 
 ---
 
