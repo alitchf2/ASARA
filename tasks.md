@@ -641,8 +641,8 @@ Need to try this on more devices (esspecially android).
 - Navigation to Object Selection screen after successful capture
 
 **Testing Notes:** Test FIFO deletion logic. Test guest vs authenticated persistence.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented a robust FIFO (First-In-First-Out) local storage system using `expo-file-system` and `AsyncStorage`. Captured photos are moved from temporary cache to a permanent `recent_photos` directory. The utility manages a 6-image limit, automatically deleting the oldest file when a new one is added. Includes session-based cleanup for guest users (wiped on app close) while persisting locally for authenticated users. Integrated with `FindColorScreen` with a 1.2s freeze for visual feedback.
 
 ---
 
@@ -663,8 +663,8 @@ Need to try this on more devices (esspecially android).
 - Tapping Select: closes popup, loads selected image as if just captured, navigates to Object Selection screen
 
 **Testing Notes:** Test with 0, 3, and 6 recent images.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented `RecentImagesModal` as a custom animated bottom-sheet component with `PanResponder` for intuitive swipe-to-dismiss. Features a 3x2 grid that pulls from the FIFO storage indices managed in Task 4.4. Enhanced the UI with a dynamic height offset, a custom transparent backdrop, and a refined brand-blue checkmark selection system (with white cutout filler). Integrated the modal into the camera screen and updated the "Recent Photos" button to show a live thumbnail of the latest capture.
 
 ---
 
