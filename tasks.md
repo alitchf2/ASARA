@@ -500,8 +500,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Returns `{ userID, username, createdAt }`
 - Returns 404 if user record not found (should not happen for authenticated users, but handle gracefully)
 - Logs to CloudWatch
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Decided against implementing a dedicated Lambda function (`GET /users/me`) just to fetch the username. Since the username is securely embedded in the active Cognito session, this functionality was successfully handled entirely client-side via the native `getCurrentUser()` method provided by the `aws-amplify/auth` SDK. This approach completely resolves the core requirement while reducing backend complexity, round-trip latency, and Lambda invocation costs.
 
 ---
 
@@ -515,8 +515,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Display username from response in username field
 - Show loading skeleton while API call in progress
 - Handle error gracefully (show error message if profile cannot be loaded)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Successfully implemented user profile string retrieval within `UserSettingsScreen.tsx`. Instead of making a network request to a custom API gateway, the component utilizes a `useEffect` hook to call `getCurrentUser()` directly on mount. It perfectly pulls and dynamically displays the signed-in user's alias while securely handling errors by falling back to "Unknown User".
 
 ---
 

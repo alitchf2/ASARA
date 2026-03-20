@@ -23,6 +23,31 @@ This guide helps developers set up the **ColorFind** project locally.
     ```
     > **Note:** If you encounter permission errors, try using a terminal with Administrator privileges (Windows) or `sudo` (Mac/Linux).
 
+3.  **AWS Amplify CLI Setup**
+    Since ColorFind uses AWS services (Cognito, DynamoDB, API Gateway, etc.), you need to install and configure the AWS Amplify CLI to sync the backend resources to your local machine.
+    
+    *Install the CLI globally:*
+    ```bash
+    npm install -g @aws-amplify/cli
+    ```
+    
+    *Configure the CLI:*
+    ```bash
+    amplify configure
+    ```
+    
+    **The configuration process will walk you through the following steps:**
+    - **Browser Login:** The CLI will automatically open your default browser. Sign in to your AWS Administrator Console. Once logged in, return to the terminal and press `Enter`.
+    - **Specify Region:** Choose the AWS Region that matches the project's setup (e.g., `us-east-1`).
+    - **Create IAM User:** It will ask you to specify a username (e.g., `amplify-admin`). It then opens the AWS Console to finish creating the IAM user. Accept the default `AdministratorAccess-Amplify` permissions template, and create the user.
+    - **Enter Credentials:** After the IAM user is successfully created in the browser, copy the newly generated `Access Key ID` and `Secret Access Key` and paste them back into the terminal prompts.
+    - **Profile Name:** It will ask for a profile name. Press `Enter` to use `default` or type a specific name.
+    
+    Once successfully configured, pull the backend down into your local project by running:
+    ```bash
+    amplify pull
+    ```
+
 ## Running the App
 
 1.  **Start the Development Server**
