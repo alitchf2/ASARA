@@ -81,7 +81,7 @@ export default function FindColorScreen({ navigation }: any) {
 
         // 3. Save to local FIFO storage
         const savedUri = await savePhoto(photo.uri);
-        
+
         // Refresh thumbnail
         loadLatestPhoto();
 
@@ -158,7 +158,7 @@ export default function FindColorScreen({ navigation }: any) {
         )}
       </View>
 
-      <RecentImagesModal 
+      <RecentImagesModal
         isVisible={showRecentModal}
         onClose={() => setShowRecentModal(false)}
         onSelect={(uri) => {
@@ -200,7 +200,7 @@ export default function FindColorScreen({ navigation }: any) {
           <View style={styles.footerLayer} pointerEvents="box-none">
             <View style={styles.controlsContainer}>
               {/* Placeholder for Recent Images */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.secondaryButton}
                 onPress={() => setShowRecentModal(true)}
               >
