@@ -678,8 +678,7 @@ Need to try this on more devices (esspecially android).
 - Compression function created that accepts image URI and returns compressed URI
 - Compression settings: max 2048px on longest side, JPEG format, quality 0.9 (90%)
 - EXIF data stripped during compression
-**Current Status:** Not Started
-**Notes:** 
+**Notes:** Implemented `compressImage` utility in `src/utils/imageUtils.ts` using `expo-image-manipulator` to automatically scale the longest side to a maximum of 2048px. Configured JPEG output at 90% quality with EXIF data stripping to significantly reduce storage footprint without compromising the pixel detail necessary for Phase 1 color extraction. Integrated this optimization directly into the `FindColorScreen` post-capture flow, replacing uncompressed raw data in the FIFO storage queue.
 
 ---
 
@@ -687,7 +686,7 @@ Need to try this on more devices (esspecially android).
 **Assignee:** Full Stack Frontend - Alex  
 **PDR Reference:** Section 3.4, Section 9.3  
 **Description:** Apply image compression before uploading saved color images to S3 (not for Recent Photos - only when user explicitly saves a color).  
-**Dependencies:** 4.6  
+**Dependencies:** 4.6, 5.7  
 **Acceptance Criteria:**
 - Before calling S3 pre-signed PUT URL (task 5.7), compress image using ImageManipulator
 - Compression flow: original URI → ImageManipulator.manipulateAsync() with resize to max 2048px, save as JPEG quality 0.9, strip EXIF → compressed URI
@@ -711,8 +710,8 @@ Need to try this on more devices (esspecially android).
 - Instructional text below image: "Tap the object or area whose color you want to identify."
 - Tapping anywhere on image places selection marker (Phase 1 logic in task 5.1)
 - Screen displays loading indicator during color detection processing (Phase 1 and Phase 2)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Built a high-fidelity `ObjectSelectionScreen` featuring a flexible, image-centric layout and a custom "Target" marker designed for surgical precision. The marker utilizes a triple-concentric visual system (30px/12px/5px) to help users align their selection with the 5x5 pixel neighborhood extraction logic. Added a branded loading overlay ("Finding Color...") using `companyOrange` for the indicator and bold `companyBlack` for textual feedback, while condensing the footer for improved ergonomics.
 
 ---
 
@@ -726,11 +725,11 @@ Need to try this on more devices (esspecially android).
 **Acceptance Criteria:**
 - User can tap anywhere on displayed image
 - Tap coordinate (x, y) captured relative to image dimensions
-- Visible marker placed at tapped coordinate: small circle (~16px diameter), brand-blue border, semi-transparent fill
+- Visible marker placed at tapped coordinate: triple-concentric "target" marker (30px/orange)
 - Marker position stored in state along with tap coordinates
 - Navigation to Selection Confirmation screen after marker placement
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Developed coordinate-aware selection logic utilizing `onLayout` on the preview image to capture real-time display dimensions ($W_{disp}, H_{disp}$), which is critical for future 1:1 scaling to native photo pixels. Solved a critical coordinate-shift bug by implementing a "Ghost Marker" fix (`pointerEvents="none"`) on the `SelectionMarker` component, ensuring touch events always pass through the UI indicator to the background image. Adopted `resizeMode="cover"` to provide a modern "full-screen" feel without sacrificing mathematical accuracy.
 
 ---
 
@@ -747,8 +746,8 @@ Need to try this on more devices (esspecially android).
 - Phase 2 addition (task 17.4): 'Use exact point instead' tertiary button (not shown in Phase 1)
 - Tapping Confirm Selection triggers color extraction (task 5.3)
 - Tapping Reselect returns to Object Selection screen with image still displayed, no marker
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Created `SelectionConfirmationScreen.tsx` as a dedicated verification step, featuring a locked "Target" viewfinder and synchronized UI symmetry with the main selection screen. Standardized headers (with a black back arrow) and footers (tighter 4px button gaps / 20px bottom padding) to ensure a seamless, professional transition through the identification flow. Implemented a state-preserving "Reselect" loop and a primary "Confirm Selection" action with branded `companyOrange` accents to finalize the user's point selection before color extraction.
 
 ---
 
@@ -815,7 +814,7 @@ Need to try this on more devices (esspecially android).
 ---
 
 ### 5.6 - Integrate DetectColor Lambda Call on Selection Confirmation
-**Assignee:** Full Stack Frontend - Alex, API - Sean  
+**Assignee:** Full Stack Backend - Adam, API - Sean  
 **PDR Reference:** Section 5.6.2  
 **Description:** Call DetectColor Lambda when user taps Confirm Selection, then navigate to Color Results screen.  
 **Dependencies:** 5.2, 5.5  
@@ -943,8 +942,8 @@ Need to try this on more devices (esspecially android).
 - 'Compare Color' button (functionality in task 10.1)
 - Color Themes section placeholder (populated in task 7.5)
 - Save Color button disabled state after color is saved (set in task 8.2)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** In Progress
+**Notes:** NOT MARKED AS COMPLETE BECAUSE THERE ARE ONLY PLACEHOLDERS AND THERE STILL NEEDS TO BE CALLS TO FILL THE PAGE WITH VAILD DATA. Implemented the `ColorResultsScreen` with a high-precision identification architecture Features a 200x200 zoomed square thumbnail centered exactly on the selection coordinates, using boundary-clamping to prevent edge overflow. Added a 20px mini-target marker overlay on the thumbnail to visually confirm the 5x5 pixel sampling area. Integrated with the "Full-Screen Background" architecture, ensuring 1:1 coordinate parity between the Selection, Confirmation, and Results screens. Standardized the header to 60px height with Bold typography and 20px horizontal padding to match the app's User Settings page. Implemented frosted glass overlays (rgba(255, 255, 255, 0.85)) that bleed into the device status bar and home indicator areas using `useSafeAreaInsets`. Standardized the footer to 180px min-height for perfectly mirrored transitions across the identification flow. Action buttons ("Save Color" and "Compare Color") are implemented as side-by-side primary solid buttons. **Refactoring Complete**: Extracted immersive UI patterns into reusable `ImmersiveHeader`, `ImmersiveFooter`, and `FullImageBackground` components, and centralized the tap-to-pixel math in `coordinateUtils.ts` for standardized identification accuracy.
 
 ---
 

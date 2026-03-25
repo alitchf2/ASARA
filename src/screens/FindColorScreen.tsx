@@ -151,7 +151,7 @@ export default function FindColorScreen({ navigation }: any) {
             {/* Processing Indicator */}
             {isCapturing && !capturedImage && (
               <View style={styles.loadingOverlay}>
-                <ActivityIndicator size="large" color="white" />
+                <ActivityIndicator size="large" color={theme.colors.companyOrange} />
               </View>
             )}
           </View>
