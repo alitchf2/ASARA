@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "paths": {
+    "/users/me": {
+      "name": "/users/me",
+      "lambdaFunction": "UpdateUserProfile",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "update"
+        ]
+      }
+    }
+  }
+}
