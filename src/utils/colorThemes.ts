@@ -104,3 +104,55 @@ export const generateComplementaryTheme = (hex: string): string[] => {
     return hslToHex(finalH, s, l);
   });
 };
+
+/**
+ * Generates a 5-swatch Analogous Theme.
+ * Samples colors adjacent to the source hue (source, +/- 15, +/- 30 degrees).
+ */
+export const generateAnalogousTheme = (hex: string): string[] => {
+  const { h, s, l } = hexToHsl(hex);
+  
+  // Pattern: [H-30, H-15, H, H+15, H+30]
+  const hOffsets = [-30, -15, 0, 15, 30];
+
+  return hOffsets.map(offset => {
+    let finalH = (h + offset) % 360;
+    if (finalH < 0) finalH += 360;
+    return hslToHex(finalH, s, l);
+  });
+};
+
+/**
+ * Generates a 5-swatch Triadic Theme.
+ * Anchors at 0, 120, and 240 degrees, plus intermediate logic (60, 180).
+ */
+export const generateTriadicTheme = (hex: string): string[] => {
+  const { h, s, l } = hexToHsl(hex);
+  
+  // Pattern: [0, 120, 240, 60, 180] relative to source hue
+  const hOffsets = [0, 120, 240, 60, 180];
+
+  return hOffsets.map(offset => {
+    let finalH = (h + offset) % 360;
+    if (finalH < 0) finalH += 360;
+    return hslToHex(finalH, s, l);
+  });
+};
+
+/**
+ * Generates a 5-swatch Monochromatic Theme.
+ * Keeps H/S constant and varies Lightness (L) at +/- 15 and +/- 30 percent.
+ */
+export const generateMonochromaticTheme = (hex: string): string[] => {
+  const { h, s, l } = hexToHsl(hex);
+  
+  // Pattern: [L-30%, L-15%, L, L+15%, L+30%]
+  const lOffsets = [-30, -15, 0, 15, 30];
+
+  return lOffsets.map(offset => {
+    let finalL = l + offset;
+    // Clamp between 5% and 95% to avoid pure black/white
+    finalL = Math.max(5, Math.min(95, finalL));
+    return hslToHex(h, s, finalL);
+  });
+};

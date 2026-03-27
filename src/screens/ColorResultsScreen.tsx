@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { theme } from '../styles/theme';
 import { ImmersiveHeader } from '../components/ImmersiveHeader';
-import { generateComplementaryTheme } from '../utils/colorThemes';
+import { generateComplementaryTheme, generateAnalogousTheme, generateTriadicTheme, generateMonochromaticTheme } from '../utils/colorThemes';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -51,6 +51,9 @@ export default function ColorResultsScreen({ route, navigation }: any) {
 
   const offsets = calculateOffsets();
   const complementaryTheme = generateComplementaryTheme(detectedColor);
+  const analogousTheme = generateAnalogousTheme(detectedColor);
+  const triadicTheme = generateTriadicTheme(detectedColor);
+  const monochromaticTheme = generateMonochromaticTheme(detectedColor);
 
   return (
     <View style={styles.container}>
@@ -151,8 +154,56 @@ export default function ColorResultsScreen({ route, navigation }: any) {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.swatchRow}
               >
-                {complementaryTheme.map((color, index) => (
+                {complementaryTheme.map((color: string, index: number) => (
                   <View key={`comp-${index}`} style={styles.themeSwatchContainer}>
+                    <View style={[styles.themeSwatch, { backgroundColor: color }]} />
+                    <Text style={styles.swatchHex}>{color}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+
+            <View style={styles.themeRowContainer}>
+              <Text style={styles.themeLabel}>Analogous</Text>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.swatchRow}
+              >
+                {analogousTheme.map((color: string, index: number) => (
+                  <View key={`analog-${index}`} style={styles.themeSwatchContainer}>
+                    <View style={[styles.themeSwatch, { backgroundColor: color }]} />
+                    <Text style={styles.swatchHex}>{color}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+
+            <View style={styles.themeRowContainer}>
+              <Text style={styles.themeLabel}>Triadic</Text>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.swatchRow}
+              >
+                {triadicTheme.map((color: string, index: number) => (
+                  <View key={`triadic-${index}`} style={styles.themeSwatchContainer}>
+                    <View style={[styles.themeSwatch, { backgroundColor: color }]} />
+                    <Text style={styles.swatchHex}>{color}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+
+            <View style={styles.themeRowContainer}>
+              <Text style={styles.themeLabel}>Monochromatic</Text>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.swatchRow}
+              >
+                {monochromaticTheme.map((color: string, index: number) => (
+                  <View key={`mono-${index}`} style={styles.themeSwatchContainer}>
                     <View style={[styles.themeSwatch, { backgroundColor: color }]} />
                     <Text style={styles.swatchHex}>{color}</Text>
                   </View>
