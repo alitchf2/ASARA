@@ -9,17 +9,41 @@
       "UnauthRoleName": "amplify-colorfind-dev-8b035-unauthRole",
       "StackName": "amplify-colorfind-dev-8b035",
       "StackId": "arn:aws:cloudformation:us-east-2:538780774280:stack/amplify-colorfind-dev-8b035/dedd3d80-1401-11f1-9967-0657617b45fb",
-      "AmplifyAppId": "dfbv5wrnfzbnv"
+      "AmplifyAppId": "dfbv5wrnfzbnv",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-colorfind-dev-8b035-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-colorfind-dev-8b035-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {
-        "colorfind3baa86a4": {}
+        "colorfind3baa86a4": {},
+        "colorfind43640cdb43640cdb": {}
       },
       "storage": {
         "images": {}
       },
       "analytics": {
         "colorfindAnalytics": {}
+      },
+      "function": {
+        "colorfind43640cdb43640cdbPreSignup": {
+          "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
+          "s3Key": "amplify-builds/colorfind43640cdb43640cdbPreSignup-37444958784741677a44-build.zip"
+        },
+        "UpdateUserProfile": {
+          "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
+          "s3Key": "amplify-builds/UpdateUserProfile-6e6d71467257584c7148-build.zip"
+        },
+        "detectColorFunction": {
+          "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
+          "s3Key": "amplify-builds/detectColorFunction-646e707a6150794c456e-build.zip"
+        },
+        "savedColorsFunction": {
+          "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
+          "s3Key": "amplify-builds/savedColorsFunction-634f5364756e6d433937-build.zip"
+        }
+      },
+      "api": {
+        "colorfindAPI": {}
       }
     }
   },

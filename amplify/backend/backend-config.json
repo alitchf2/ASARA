@@ -1,28 +1,149 @@
 {
-  "analytics": {
-    "colorfindAnalytics": {
+  "analytics": {},
+  "api": {
+    "colorfindAPI": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "detectColorFunction"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "savedColorsFunction"
+        }
+      ],
       "providerPlugin": "awscloudformation",
-      "service": "Kinesis"
+      "service": "API Gateway"
     }
   },
   "auth": {
-    "colorfind3baa86a4": {
+    "colorfind43640cdb43640cdb": {
       "customAuth": false,
-      "dependsOn": [],
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "colorfind43640cdb43640cdbPreSignup",
+          "triggerProvider": "Cognito"
+        }
+      ],
       "frontendAuthConfig": {
         "mfaConfiguration": "OFF",
-        "mfaTypes": ["SMS"],
+        "mfaTypes": [
+          "SMS"
+        ],
         "passwordProtectionSettings": {
           "passwordPolicyCharacters": [],
-          "passwordPolicyMinLength": 8
+          "passwordPolicyMinLength": "8"
         },
-        "signupAttributes": ["EMAIL"],
+        "signupAttributes": [],
         "socialProviders": [],
         "usernameAttributes": [],
-        "verificationMechanisms": ["EMAIL"]
+        "verificationMechanisms": [
+          "PHONE_NUMBER"
+        ]
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    }
+  },
+  "function": {
+    "UpdateUserProfile": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "colorfind43640cdb43640cdbPreSignup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "detectColorFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "savedColorsFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_UpdateUserProfile_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "UpdateUserProfile"
+        }
+      ]
+    },
+    "AMPLIFY_function_UpdateUserProfile_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "UpdateUserProfile"
+        }
+      ]
+    },
+    "AMPLIFY_function_colorfind43640cdb43640cdbPreSignup_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "colorfind43640cdb43640cdbPreSignup"
+        }
+      ]
+    },
+    "AMPLIFY_function_colorfind43640cdb43640cdbPreSignup_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "colorfind43640cdb43640cdbPreSignup"
+        }
+      ]
+    },
+    "AMPLIFY_function_detectColorFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "detectColorFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_detectColorFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "detectColorFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_savedColorsFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "savedColorsFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_savedColorsFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "savedColorsFunction"
+        }
+      ]
     }
   },
   "storage": {
