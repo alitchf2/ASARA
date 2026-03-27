@@ -52,8 +52,8 @@ Each task follows this format:
 - Environment switcher implemented to select correct config based on build type
 - Variables include: API base URL, DynamoDB table names with `-dev`/`-prod` suffix, S3 bucket names, Cognito pool IDs
 - No hardcoded environment-specific values in application code
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** complete
+**Notes:** Configured environment separation for dev and prod using Amplify environments and project configuration. Defined environment-specific resource naming conventions including DynamoDB tables (with -dev and -prod suffixes), S3 buckets (colorfind-images-dev and colorfind-images-prod), and Cognito User Pool and Identity Pool IDs. Established pattern for environment-based variables to be used in frontend configuration files (env.dev.ts and env.prod.ts) and ensured no hardcoded environment-specific values are required in application code. Environment switching is handled through Amplify environment selection and branch-based configuration.
 
 ---
 
@@ -68,7 +68,7 @@ Each task follows this format:
 - Amplify Analytics configured with Pinpoint
 - Amplify configured in application entry point (`App.tsx`)
 - `aws-exports.js` generated and gitignored (template version checked in)
-**Current Status:** Not Started
+**Current Status:** complete
 **Notes:** Installed Amplify CLI and created perms in IAM. Setup cognito pools, s3 storage, and Amazon Kinesis Streams(pivoted for analtyics becaue pinpoint is End of Life and no longer accepting new users)
 Region: US East 2
 Project Name: Colorfind
@@ -89,8 +89,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Production branch connected and building on commit
 - Build settings configured correctly for React Native
 - Deployment notifications configured
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** complete
+**Notes:** Configured AWS Amplify CI/CD pipeline by connecting the GitHub repository to Amplify Console. Set up branch-based deployment strategy where dev branch maps to dev environment and main/master branch maps to prod environment. Configured environment variables per branch (EXPO_PUBLIC_APP_ENV and AMPLIFY_ENV) to control environment-specific builds. Verified deployments trigger automatically on commit and build settings are configured for the React Native (Expo) project. Ensured Amplify environment linkage is consistent with backend environments.
 
 ---
 
@@ -171,8 +171,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Server-side encryption enabled (AES-256 / SSE-S3)
 - Versioning disabled
 - Folder structure plan documented: `users/{userID}/saved/{objectID}.jpg`, `models/segmentation_{version}.tflite`
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Created and/or verified S3 buckets for both environments (colorfind-images-dev and colorfind-images-prod). Confirmed all public access is blocked using S3 Block Public Access settings and enforced server-side encryption using SSE-S3 (AES-256). Verified bucket versioning is disabled. Defined and documented object key structure for application usage: users/{userID}/saved/{objectID}.jpg for user images and models/segmentation_{version}.tflite for ML models. Verified Amplify Storage resource (images) is correctly linked to S3.
 
 ---
 
@@ -189,8 +189,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - No email verification required (email field not collected)
 - User Pool app client created for the mobile app
 - Refresh token expiration set to 30 days
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Created and configured Cognito User Pools for both dev and prod environments via Amplify. Configured authentication to use username-only sign-in with no email or phone number required. Set password policy to minimum 8 characters with no additional complexity requirements. Disabled MFA and removed email verification requirements. Verified mobile app client is configured without a client secret and refresh token expiration is set to 30 days. Confirmed integration with Amplify Auth and successful synchronization using amplify pull.
 
 ---
 
@@ -204,8 +204,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Authenticated role IAM policy created with permissions to generate S3 pre-signed URLs (via Lambda - no direct S3 access)
 - Unauthenticated role has no permissions
 - Trust relationship configured correctly between Identity Pool and User Pool
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Verified Cognito Identity Pools exist for both dev and prod environments through Amplify-generated IAM roles. Configured authenticated and unauthenticated IAM roles and removed all default Amplify S3 access policies (Public, Protected, Private, Read, Uploads) to prevent direct user access to S3. Updated trust relationships to correctly allow Cognito Identity Pools to assume roles using sts:AssumeRoleWithWebIdentity with environment-specific identity pool IDs and proper amr conditions (authenticated/unauthenticated). Confirmed unauthenticated roles have no permissions and that S3 access is restricted to Lambda functions only, enforcing a secure pre-signed URL architecture.
 
 ---
 
@@ -236,8 +236,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Permissions include: DynamoDB read/write on all app tables, S3 read/write on app buckets, Cognito admin actions, CloudWatch Logs write
 - Least-privilege principle applied (no wildcard resource ARNs where specific resources can be specified)
 - Role assumable by Lambda service
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Configured existing Amplify-generated Lambda execution roles for both dev and prod environments. Created and attached least-privilege IAM policies granting DynamoDB read/write access to application tables, S3 read/write access to environment-specific image buckets, Cognito admin permissions for user management, and CloudWatch Logs write access for monitoring. Ensured all permissions are scoped to specific resource ARNs where applicable (no unnecessary wildcard usage). Verified all Lambda roles are assumable by the Lambda service (lambda.amazonaws.com) through correct trust relationships. Established secure architecture where Lambda functions act as the only intermediary for accessing S3 via pre-signed URLs.
 
 ---
 
