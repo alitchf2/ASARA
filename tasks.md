@@ -222,7 +222,7 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - CORS enabled for mobile app origin
 - CloudWatch logging enabled
 **Current Status:** Completed
-**Notes:** Set up `colorfindAPI` REST API via Amplify. Created a public `/colors/detect` endpoint using an unauthenticated Serverless ExpressJS Lambda template. Added protected paths (`/colors/saved` and `/users/me`) using authenticated Lambda templates. The API Gateway infrastructure is now fully provisioned and securely routed, ready for future backend development tasks.
+**Notes:** Finished Set up `colorfindAPI` REST API via Amplify. Created a public `/colors/detect` endpoint using an unauthenticated Serverless ExpressJS Lambda template. Added protected paths (`/colors/saved` and `/users/me`) using authenticated Lambda templates. The API Gateway infrastructure is now fully provisioned and securely routed, ready for future backend development tasks.
 
 ---
 
