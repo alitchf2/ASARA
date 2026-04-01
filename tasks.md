@@ -306,8 +306,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - On failure: inline error message displays below password field: "Incorrect username or password."
 - Loading indicator shown during authentication
 - No plain text password logging
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Finished
+**Notes:** Had to reconfigure amplify to not require email accounts for signup. This task will immediately precede the next couple of tasks that work on user account creation and sign-ins. 
 
 ---
 
@@ -327,8 +327,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Handle Cognito errors gracefully (e.g., username already exists in Cognito despite check)
 
 **Testing Notes:** Test race condition where two users try to register the same username simultaneously.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Completed
+**Notes:** Had to go into Cognito user pool App clients to physically switch the ALLOW_USER_PASSWORD_AUTH to be enabled for password sign-in and account creation.
 
 ---
 
@@ -417,8 +417,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Navigation to Sign In screen
 - Recent photos remain on device if user was authenticated (per Section 3.5 - persist across sessions)
 - No server-side calls required (token invalidation handled by Cognito automatically)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Started
+**Notes:** Currently Sign out work with the user settings screen. Need to further implement photos to remain if user was authenticated. 
 
 ---
 
