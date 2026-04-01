@@ -14,6 +14,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { clearRecentPhotos } from '../utils/photoStorage';
 import { getCurrentUser, fetchUserAttributes, updateUserAttributes, signOut, updatePassword, deleteUser } from 'aws-amplify/auth';
 import { updateUsername } from '../services/lambdaClient';
+import { verifyCognitoPassword } from '../utils/cognitoVerify';
 
 export default function UserSettingsScreen({ navigation }: any) {
     const { isGuest, setIsGuest } = useAuth();
@@ -85,19 +86,29 @@ export default function UserSettingsScreen({ navigation }: any) {
 
     const handleModalSubmit = async () => {
         if (!confirmPassword) return;
+        setIsVerifyingPassword(true);
 
-        // Store the entered password — Cognito will verify it for real
-        // in handleSaveEditPress via updatePassword(oldPassword, newPassword).
-        // Pre-verifying here with the same-password trick causes session side-effects
-        // when changing both username and password in the same save.
-        setVerifiedCurrentPassword(confirmPassword);
-        setIsModalVisible(false);
-        setConfirmPassword("");
+        try {
+            const user = await getCurrentUser();
+            const isValid = await verifyCognitoPassword(user.username, confirmPassword);
 
-        // Initialize temp values with current values
-        setTempUsername(username);
-        setTempPassword(password);
-        setIsEditMode(true);
+            if (!isValid) {
+                Alert.alert("Incorrect Password", "The password you entered is incorrect. Please try again.");
+                return;
+            }
+
+            // Password verified — store it and enter edit mode
+            setVerifiedCurrentPassword(confirmPassword);
+            setIsModalVisible(false);
+            setConfirmPassword("");
+            setTempUsername(username);
+            setTempPassword(password);
+            setIsEditMode(true);
+        } catch (err: any) {
+            Alert.alert("Verification Failed", "Could not verify your password. Check your connection and try again.");
+        } finally {
+            setIsVerifyingPassword(false);
+        }
     };
 
     const handleModalCancel = () => {
@@ -187,12 +198,19 @@ export default function UserSettingsScreen({ navigation }: any) {
         setIsDeleteModalVisible(false);
 
         try {
-            // TODO (Task 3.17): Before deleting the Cognito user, call DeleteAccount
-            // Lambda to clean up: DynamoDB Users record, all Reference Objects,
-            // and all S3 objects under users/{userID}/
-            // The Lambda should also re-verify the password server-side before proceeding.
+            // Step 1: Verify password silently before deleting
+            const user = await getCurrentUser();
+            const isValid = await verifyCognitoPassword(user.username, deleteConfirmPassword);
 
-            // Delete the Cognito user and clear all local tokens
+            if (!isValid) {
+                setDeleteConfirmPassword("");
+                Alert.alert("Incorrect Password", "The password you entered is incorrect. Your account was not deleted.");
+                return;
+            }
+
+            // Step 2: Delete the Cognito user and clear all local tokens
+            // TODO (Task 3.17): Also call DeleteAccount Lambda to clean up:
+            // DynamoDB Users record, all Reference Objects, and S3 objects under users/{userID}/
             await deleteUser();
 
             setDeleteConfirmPassword("");
