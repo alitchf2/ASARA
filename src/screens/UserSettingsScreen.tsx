@@ -20,7 +20,7 @@ export default function UserSettingsScreen({ navigation }: any) {
     const { isGuest, setIsGuest } = useAuth();
     // Current "Live" data (Placeholders for Task 3.14/3.15)
     const [username, setUsername] = useState("Loading...");
-    const [password, setPassword] = useState("placeHolderPassword123!"); // Valid test password
+    const [password, setPassword] = useState(""); // Never shown — only used for change detection
 
     useEffect(() => {
         if (!isGuest) {
@@ -166,7 +166,7 @@ export default function UserSettingsScreen({ navigation }: any) {
             }
 
             setUsername(tempUsername);
-            setPassword(tempPassword); // Update current password
+            if (tempPassword !== "") setPassword(""); // Reset — never store the actual password in state
 
             setIsEditMode(false);
             setTempPassword("");
@@ -243,7 +243,8 @@ export default function UserSettingsScreen({ navigation }: any) {
     const isSaveDisabled =
         !hasChanges ||
         tempUsername.trim().length === 0 ||
-        !validatePasswordStrength(tempPassword).isValid;
+        // Only enforce password strength if the user actually typed a new password
+        (tempPassword !== "" && !validatePasswordStrength(tempPassword).isValid);
 
     if (isGuest) {
         return (
@@ -296,6 +297,8 @@ export default function UserSettingsScreen({ navigation }: any) {
 
             <ScrollView contentContainerStyle={styles.content}>
                 <View style={styles.section}>
+                    {/* Note: this edits preferred_username (mutable display name),
+                        NOT the Cognito login username which is permanently immutable. */}
                     <Text style={styles.sectionLabel}>Username</Text>
                     {isEditMode ? (
                         <AuthInput
@@ -327,7 +330,7 @@ export default function UserSettingsScreen({ navigation }: any) {
                         </View>
                     ) : (
                         <Text style={styles.passwordMask}>
-                            {"•".repeat(password.length)}
+                            {"••••••••"}
                         </Text>
                     )}
                 </View>
