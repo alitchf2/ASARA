@@ -12,6 +12,7 @@ import { FeedbackModal } from '../components/FeedbackModal';
 import { validatePasswordStrength } from '../utils/validators';
 import { useAuth } from '../contexts/AuthContext';
 import { getCurrentUser, signOut } from 'aws-amplify/auth';
+import { clearRecentPhotos } from '../utils/photoStorage';
 
 export default function UserSettingsScreen({ navigation }: any) {
     const { isGuest, setIsGuest } = useAuth();
@@ -52,6 +53,7 @@ export default function UserSettingsScreen({ navigation }: any) {
 
     const handleSignOut = async () => {
         try {
+            await clearRecentPhotos();
             await signOut();
             setIsGuest(false);
             
@@ -124,7 +126,12 @@ export default function UserSettingsScreen({ navigation }: any) {
         setDeleteConfirmPassword("");
     };
 
-    const handleDeleteSuccessModalClose = () => {
+    const handleDeleteSuccessModalClose = async () => {
+        try {
+            await clearRecentPhotos();
+        } catch (error) {
+            console.error('Error clearing photos on account deletion:', error);
+        }
         setIsDeleteSuccessModalVisible(false);
         navigation.replace("SignIn");
     };
