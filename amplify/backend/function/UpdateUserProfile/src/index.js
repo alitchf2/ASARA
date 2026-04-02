@@ -20,7 +20,7 @@ function respond(statusCode, body) {
  *
  * PATCH /users/me
  * Body: { newUsername: string }
- * Auth: Cognito User Pool (userID extracted from JWT claims — never trusted from client)
+ * Auth: SigV4 / IAM via Cognito Identity Pool (userID extracted from cognitoAuthenticationProvider)
  */
 exports.handler = async (event) => {
     console.log("UpdateUserProfile invoked:", JSON.stringify(event));
@@ -30,8 +30,12 @@ exports.handler = async (event) => {
 
     if (method !== "PUT") return respond(405, { error: "Method not allowed" });
 
-    // ── Extract userID from verified Cognito JWT claims ───────────────────────
-    const userID = event.requestContext?.authorizer?.claims?.sub;
+    // ── Extract userID from Cognito Identity Pool context (SigV4 / IAM auth) ──
+    // With SigV4-signed requests the user sub lives in cognitoAuthenticationProvider,
+    // not in authorizer.claims (that's only present with a Cognito User Pool authorizer).
+    // Format: "...amazonaws.com/POOL_ID,…:CognitoSignIn:<sub-uuid>"
+    const authProvider = event.requestContext?.identity?.cognitoAuthenticationProvider;
+    const userID = authProvider ? authProvider.split(':CognitoSignIn:').pop() : null;
     if (!userID) return respond(401, { error: "Unauthorized" });
 
     // ── Parse and validate body ───────────────────────────────────────────────

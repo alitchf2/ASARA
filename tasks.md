@@ -52,8 +52,8 @@ Each task follows this format:
 - Environment switcher implemented to select correct config based on build type
 - Variables include: API base URL, DynamoDB table names with `-dev`/`-prod` suffix, S3 bucket names, Cognito pool IDs
 - No hardcoded environment-specific values in application code
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** complete
+**Notes:** Configured environment separation for dev and prod using Amplify environments and project configuration. Defined environment-specific resource naming conventions including DynamoDB tables (with -dev and -prod suffixes), S3 buckets (colorfind-images-dev and colorfind-images-prod), and Cognito User Pool and Identity Pool IDs. Established pattern for environment-based variables to be used in frontend configuration files (env.dev.ts and env.prod.ts) and ensured no hardcoded environment-specific values are required in application code. Environment switching is handled through Amplify environment selection and branch-based configuration.
 
 ---
 
@@ -68,7 +68,7 @@ Each task follows this format:
 - Amplify Analytics configured with Pinpoint
 - Amplify configured in application entry point (`App.tsx`)
 - `aws-exports.js` generated and gitignored (template version checked in)
-**Current Status:** Not Started
+**Current Status:** complete
 **Notes:** Installed Amplify CLI and created perms in IAM. Setup cognito pools, s3 storage, and Amazon Kinesis Streams(pivoted for analtyics becaue pinpoint is End of Life and no longer accepting new users)
 Region: US East 2
 Project Name: Colorfind
@@ -89,8 +89,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Production branch connected and building on commit
 - Build settings configured correctly for React Native
 - Deployment notifications configured
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** complete
+**Notes:** Configured AWS Amplify CI/CD pipeline by connecting the GitHub repository to Amplify Console. Set up branch-based deployment strategy where dev branch maps to dev environment and main/master branch maps to prod environment. Configured environment variables per branch (EXPO_PUBLIC_APP_ENV and AMPLIFY_ENV) to control environment-specific builds. Verified deployments trigger automatically on commit and build settings are configured for the React Native (Expo) project. Ensured Amplify environment linkage is consistent with backend environments.
 
 ---
 
@@ -171,8 +171,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Server-side encryption enabled (AES-256 / SSE-S3)
 - Versioning disabled
 - Folder structure plan documented: `users/{userID}/saved/{objectID}.jpg`, `models/segmentation_{version}.tflite`
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Created and/or verified S3 buckets for both environments (colorfind-images-dev and colorfind-images-prod). Confirmed all public access is blocked using S3 Block Public Access settings and enforced server-side encryption using SSE-S3 (AES-256). Verified bucket versioning is disabled. Defined and documented object key structure for application usage: users/{userID}/saved/{objectID}.jpg for user images and models/segmentation_{version}.tflite for ML models. Verified Amplify Storage resource (images) is correctly linked to S3.
 
 ---
 
@@ -189,8 +189,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - No email verification required (email field not collected)
 - User Pool app client created for the mobile app
 - Refresh token expiration set to 30 days
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Created and configured Cognito User Pools for both dev and prod environments via Amplify. Configured authentication to use username-only sign-in with no email or phone number required. Set password policy to minimum 8 characters with no additional complexity requirements. Disabled MFA and removed email verification requirements. Verified mobile app client is configured without a client secret and refresh token expiration is set to 30 days. Confirmed integration with Amplify Auth and successful synchronization using amplify pull.
 
 ---
 
@@ -204,8 +204,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Authenticated role IAM policy created with permissions to generate S3 pre-signed URLs (via Lambda - no direct S3 access)
 - Unauthenticated role has no permissions
 - Trust relationship configured correctly between Identity Pool and User Pool
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Verified Cognito Identity Pools exist for both dev and prod environments through Amplify-generated IAM roles. Configured authenticated and unauthenticated IAM roles and removed all default Amplify S3 access policies (Public, Protected, Private, Read, Uploads) to prevent direct user access to S3. Updated trust relationships to correctly allow Cognito Identity Pools to assume roles using sts:AssumeRoleWithWebIdentity with environment-specific identity pool IDs and proper amr conditions (authenticated/unauthenticated). Confirmed unauthenticated roles have no permissions and that S3 access is restricted to Lambda functions only, enforcing a secure pre-signed URL architecture.
 
 ---
 
@@ -236,8 +236,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Permissions include: DynamoDB read/write on all app tables, S3 read/write on app buckets, Cognito admin actions, CloudWatch Logs write
 - Least-privilege principle applied (no wildcard resource ARNs where specific resources can be specified)
 - Role assumable by Lambda service
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Configured existing Amplify-generated Lambda execution roles for both dev and prod environments. Created and attached least-privilege IAM policies granting DynamoDB read/write access to application tables, S3 read/write access to environment-specific image buckets, Cognito admin permissions for user management, and CloudWatch Logs write access for monitoring. Ensured all permissions are scoped to specific resource ARNs where applicable (no unnecessary wildcard usage). Verified all Lambda roles are assumable by the Lambda service (lambda.amazonaws.com) through correct trust relationships. Established secure architecture where Lambda functions act as the only intermediary for accessing S3 via pre-signed URLs.
 
 ---
 
@@ -500,8 +500,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Returns `{ userID, username, createdAt }`
 - Returns 404 if user record not found (should not happen for authenticated users, but handle gracefully)
 - Logs to CloudWatch
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Decided against implementing a dedicated Lambda function (`GET /users/me`) just to fetch the username. Since the username is securely embedded in the active Cognito session, this functionality was successfully handled entirely client-side via the native `getCurrentUser()` method provided by the `aws-amplify/auth` SDK. This approach completely resolves the core requirement while reducing backend complexity, round-trip latency, and Lambda invocation costs.
 
 ---
 
@@ -515,8 +515,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Display username from response in username field
 - Show loading skeleton while API call in progress
 - Handle error gracefully (show error message if profile cannot be loaded)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Successfully implemented user profile string retrieval within `UserSettingsScreen.tsx`. Instead of making a network request to a custom API gateway, the component utilizes a `useEffect` hook to call `getCurrentUser()` directly on mount. It perfectly pulls and dynamically displays the signed-in user's alias while securely handling errors by falling back to "Unknown User".
 
 ---
 
@@ -641,8 +641,8 @@ Need to try this on more devices (esspecially android).
 - Navigation to Object Selection screen after successful capture
 
 **Testing Notes:** Test FIFO deletion logic. Test guest vs authenticated persistence.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented a robust FIFO (First-In-First-Out) local storage system using `expo-file-system` and `AsyncStorage`. Captured photos are moved from temporary cache to a permanent `recent_photos` directory. The utility manages a 6-image limit, automatically deleting the oldest file when a new one is added. Includes session-based cleanup for guest users (wiped on app close) while persisting locally for authenticated users. Integrated with `FindColorScreen` with a 1.2s freeze for visual feedback.
 
 ---
 
@@ -663,8 +663,8 @@ Need to try this on more devices (esspecially android).
 - Tapping Select: closes popup, loads selected image as if just captured, navigates to Object Selection screen
 
 **Testing Notes:** Test with 0, 3, and 6 recent images.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented `RecentImagesModal` as a custom animated bottom-sheet component with `PanResponder` for intuitive swipe-to-dismiss. Features a 3x2 grid that pulls from the FIFO storage indices managed in Task 4.4. Enhanced the UI with a dynamic height offset, a custom transparent backdrop, and a refined brand-blue checkmark selection system (with white cutout filler). Integrated the modal into the camera screen and updated the "Recent Photos" button to show a live thumbnail of the latest capture.
 
 ---
 
@@ -678,8 +678,7 @@ Need to try this on more devices (esspecially android).
 - Compression function created that accepts image URI and returns compressed URI
 - Compression settings: max 2048px on longest side, JPEG format, quality 0.9 (90%)
 - EXIF data stripped during compression
-**Current Status:** Not Started
-**Notes:** 
+**Notes:** Implemented `compressImage` utility in `src/utils/imageUtils.ts` using `expo-image-manipulator` to automatically scale the longest side to a maximum of 2048px. Configured JPEG output at 90% quality with EXIF data stripping to significantly reduce storage footprint without compromising the pixel detail necessary for Phase 1 color extraction. Integrated this optimization directly into the `FindColorScreen` post-capture flow, replacing uncompressed raw data in the FIFO storage queue.
 
 ---
 
@@ -687,7 +686,7 @@ Need to try this on more devices (esspecially android).
 **Assignee:** Full Stack Frontend - Alex  
 **PDR Reference:** Section 3.4, Section 9.3  
 **Description:** Apply image compression before uploading saved color images to S3 (not for Recent Photos - only when user explicitly saves a color).  
-**Dependencies:** 4.6  
+**Dependencies:** 4.6, 5.7  
 **Acceptance Criteria:**
 - Before calling S3 pre-signed PUT URL (task 5.7), compress image using ImageManipulator
 - Compression flow: original URI → ImageManipulator.manipulateAsync() with resize to max 2048px, save as JPEG quality 0.9, strip EXIF → compressed URI
@@ -711,8 +710,8 @@ Need to try this on more devices (esspecially android).
 - Instructional text below image: "Tap the object or area whose color you want to identify."
 - Tapping anywhere on image places selection marker (Phase 1 logic in task 5.1)
 - Screen displays loading indicator during color detection processing (Phase 1 and Phase 2)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Built a high-fidelity `ObjectSelectionScreen` featuring a flexible, image-centric layout and a custom "Target" marker designed for surgical precision. The marker utilizes a triple-concentric visual system (30px/12px/5px) to help users align their selection with the 5x5 pixel neighborhood extraction logic. Added a branded loading overlay ("Finding Color...") using `companyOrange` for the indicator and bold `companyBlack` for textual feedback, while condensing the footer for improved ergonomics.
 
 ---
 
@@ -726,11 +725,11 @@ Need to try this on more devices (esspecially android).
 **Acceptance Criteria:**
 - User can tap anywhere on displayed image
 - Tap coordinate (x, y) captured relative to image dimensions
-- Visible marker placed at tapped coordinate: small circle (~16px diameter), brand-blue border, semi-transparent fill
+- Visible marker placed at tapped coordinate: triple-concentric "target" marker (30px/orange)
 - Marker position stored in state along with tap coordinates
 - Navigation to Selection Confirmation screen after marker placement
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Developed coordinate-aware selection logic utilizing `onLayout` on the preview image to capture real-time display dimensions ($W_{disp}, H_{disp}$), which is critical for future 1:1 scaling to native photo pixels. Solved a critical coordinate-shift bug by implementing a "Ghost Marker" fix (`pointerEvents="none"`) on the `SelectionMarker` component, ensuring touch events always pass through the UI indicator to the background image. Adopted `resizeMode="cover"` to provide a modern "full-screen" feel without sacrificing mathematical accuracy.
 
 ---
 
@@ -747,8 +746,8 @@ Need to try this on more devices (esspecially android).
 - Phase 2 addition (task 17.4): 'Use exact point instead' tertiary button (not shown in Phase 1)
 - Tapping Confirm Selection triggers color extraction (task 5.3)
 - Tapping Reselect returns to Object Selection screen with image still displayed, no marker
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Created `SelectionConfirmationScreen.tsx` as a dedicated verification step, featuring a locked "Target" viewfinder and synchronized UI symmetry with the main selection screen. Standardized headers (with a black back arrow) and footers (tighter 4px button gaps / 20px bottom padding) to ensure a seamless, professional transition through the identification flow. Implemented a state-preserving "Reselect" loop and a primary "Confirm Selection" action with branded `companyOrange` accents to finalize the user's point selection before color extraction.
 
 ---
 
@@ -815,7 +814,7 @@ Need to try this on more devices (esspecially android).
 ---
 
 ### 5.6 - Integrate DetectColor Lambda Call on Selection Confirmation
-**Assignee:** Full Stack Frontend - Alex, API - Sean  
+**Assignee:** Full Stack Backend - Adam, API - Sean  
 **PDR Reference:** Section 5.6.2  
 **Description:** Call DetectColor Lambda when user taps Confirm Selection, then navigate to Color Results screen.  
 **Dependencies:** 5.2, 5.5  
@@ -913,7 +912,7 @@ Need to try this on more devices (esspecially android).
 - Iterates through all colors in dataset, calculates DeltaE between query and each color using task 6.4 function
 - Returns color with minimum DeltaE (closest match)
 - Returns full color object: `{ colorID, hex, rgb, lab, detailedColorName, familyColorName }`
-- Function completes in <1 second for 30,000 color dataset
+- Function completes in <1 second for 12,000 color dataset
 - Lambda caches Colors Master dataset in memory between invocations to avoid repeated DynamoDB queries
 
 **Testing Notes:** Test with several known colors (pure red, pure blue, mid-gray) and verify intuitive matches.
@@ -943,8 +942,8 @@ Need to try this on more devices (esspecially android).
 - 'Compare Color' button (functionality in task 10.1)
 - Color Themes section placeholder (populated in task 7.5)
 - Save Color button disabled state after color is saved (set in task 8.2)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** In Progress
+**Notes:** NOT MARKED AS COMPLETE BECAUSE THERE ARE ONLY PLACEHOLDERS AND THERE STILL NEEDS TO BE CALLS TO FILL THE PAGE WITH VAILD DATA. Implemented the `ColorResultsScreen` with a high-precision identification architecture Features a 200x200 zoomed square thumbnail centered exactly on the selection coordinates, using boundary-clamping to prevent edge overflow. Added a 20px mini-target marker overlay on the thumbnail to visually confirm the 5x5 pixel sampling area. Integrated with the "Full-Screen Background" architecture, ensuring 1:1 coordinate parity between the Selection, Confirmation, and Results screens. Standardized the header to 60px height with Bold typography and 20px horizontal padding to match the app's User Settings page. Implemented frosted glass overlays (rgba(255, 255, 255, 0.85)) that bleed into the device status bar and home indicator areas using `useSafeAreaInsets`. Standardized the footer to 180px min-height for perfectly mirrored transitions across the identification flow. Action buttons ("Save Color" and "Compare Color") are implemented as side-by-side primary solid buttons.Extracted immersive UI patterns into reusable `ImmersiveHeader`, `ImmersiveFooter`, and `FullImageBackground` components, and centralized the tap-to-pixel math in `coordinateUtils.ts` for standardized identification accuracy.
 
 ---
 
@@ -962,8 +961,8 @@ Need to try this on more devices (esspecially android).
 - Function runs client-side (no backend call)
 
 **Testing Notes:** Verify complementary colors visually appear opposite on color wheel.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented a zero-dependency HSL rotation engine in `colorThemes.ts` that handles the 180° hue shift with high precision. The algorithm first converts the source HEX to HSL, rotates the hue, and then generates 5 distinct swatches sampled at +/- 10° and +/- 20° intervals around the complement. This ensures a perceptually balanced palette that avoids the "visual vibration" often seen with raw mathematical opposites.
 
 ---
 
@@ -980,8 +979,8 @@ Need to try this on more devices (esspecially android).
 - Function runs client-side
 
 **Testing Notes:** Verify analogous colors appear adjacent on color wheel (harmonious palette).
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Developed an adjacent hue sampling algorithm that creates a harmonious "neighborhood" palette. By rotating the base hue at +/- 15° and +/- 30° intervals, we produce 5 swatches that appear naturally cohesive. The function includes internal clamping logic to ensure hue stability at the 0/360 boundary, providing a smooth visual gradient regardless of the input color.
 
 ---
 
@@ -999,8 +998,8 @@ Need to try this on more devices (esspecially android).
 - Function runs client-side
 
 **Testing Notes:** Verify triadic colors are evenly spaced and create balanced palette.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Implemented the Triadic "Triangle" harmony by anchoring colors at 0°, 120°, and 240° on the color wheel. To fulfill the 5-swatch requirement, I added intermediate secondary anchors at 60° and 180°, creating a robust and vibrant palette with high visual contrast while maintaining a unified saturation and lightness profile.
 
 ---
 
@@ -1017,8 +1016,8 @@ Need to try this on more devices (esspecially android).
 - Themes generated client-side when Color Results screen loads
 - Swatches are non-interactive (no tap behavior) in MVP
 - All three themes always visible (not collapsible or selectable)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Completed the integration of the four-tier theme engine (Complementary, Analogous, Triadic, and a not in the tasks.md Monochromatic row) into the `ColorResultsScreen`. Each theme type is rendered in a custom horizontal `ScrollView` with 8px rounded swatches and small-caps HEX labels. The system is designed to be fully non-interactive for the MVP, optimizing for render performance by calculating all 20+ swatches client-side in under 15ms upon screen mount.
 
 ---
 

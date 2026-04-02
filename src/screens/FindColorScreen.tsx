@@ -12,12 +12,39 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../styles/theme";
 import { useAuth } from "../contexts/AuthContext";
+import { savePhoto, getRecentPhotos } from "../utils/photoStorage";
+import { RecentImagesModal } from "../components/RecentImagesModal";
+import { ActivityIndicator } from "react-native";
+import { Image } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function FindColorScreen({ navigation }: any) {
   const { isGuest, showGuestModal } = useAuth();
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [showRecentModal, setShowRecentModal] = useState(false);
+  const [latestPhotoUri, setLatestPhotoUri] = useState<string | null>(null);
+
+  const cameraRef = useRef<CameraView>(null);
   const appState = useRef(AppState.currentState);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      loadLatestPhoto();
+    }
+  }, [isFocused]);
+
+  const loadLatestPhoto = async () => {
+    const photos = await getRecentPhotos();
+    if (photos.length > 0) {
+      setLatestPhotoUri(photos[0]);
+    } else {
+      setLatestPhotoUri(null);
+    }
+  };
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -35,6 +62,43 @@ export default function FindColorScreen({ navigation }: any) {
       subscription.remove();
     };
   }, [requestPermission]);
+
+  const handleCapture = async () => {
+    if (!cameraRef.current || isCapturing) return;
+
+    try {
+      setIsCapturing(true);
+      // 1. Take the picture
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 1,
+        base64: false,
+        skipProcessing: false,
+      });
+
+      if (photo) {
+        // 2. Freeze the UI by setting the captured image URI
+        setCapturedImage(photo.uri);
+
+        // 3. Save to local FIFO storage
+        const savedUri = await savePhoto(photo.uri);
+
+        // Refresh thumbnail
+        loadLatestPhoto();
+
+        // 4. Navigate to Object Selection after a short delay for "freeze" effect
+        setTimeout(() => {
+          navigation.navigate("ObjectSelection", { photoUri: savedUri || photo.uri });
+
+          // Reset internal capture state for when they come back
+          setIsCapturing(false);
+          setCapturedImage(null);
+        }, 1200); // 1.2s freeze per Section 3.3 requirement logic
+      }
+    } catch (error) {
+      console.error("Capture failed:", error);
+      setIsCapturing(false);
+    }
+  };
 
   if (!permission) return <View style={styles.container} />;
 
@@ -70,9 +134,37 @@ export default function FindColorScreen({ navigation }: any) {
             </TouchableOpacity>
           </View>
         ) : (
-          <CameraView style={styles.camera} facing={facing} />
+          <View style={{ flex: 1 }}>
+            <CameraView
+              ref={cameraRef}
+              style={styles.camera}
+              facing={facing}
+            />
+            {/* Freeze Overlay */}
+            {capturedImage && (
+              <Image
+                source={{ uri: capturedImage }}
+                style={StyleSheet.absoluteFill}
+                resizeMode="cover"
+              />
+            )}
+            {/* Processing Indicator */}
+            {isCapturing && !capturedImage && (
+              <View style={styles.loadingOverlay}>
+                <ActivityIndicator size="large" color={theme.colors.companyOrange} />
+              </View>
+            )}
+          </View>
         )}
       </View>
+
+      <RecentImagesModal
+        isVisible={showRecentModal}
+        onClose={() => setShowRecentModal(false)}
+        onSelect={(uri) => {
+          navigation.navigate("ObjectSelection", { photoUri: uri });
+        }}
+      />
 
       {/* UI Overlay Layer (Header & Footer) */}
       <View style={styles.overlay} pointerEvents="box-none">
@@ -108,17 +200,28 @@ export default function FindColorScreen({ navigation }: any) {
           <View style={styles.footerLayer} pointerEvents="box-none">
             <View style={styles.controlsContainer}>
               {/* Placeholder for Recent Images */}
-              <TouchableOpacity style={styles.secondaryButton}>
-                <Ionicons
-                  name="images-outline"
-                  size={28}
-                  color={theme.colors.companyWhite}
-                />
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={() => setShowRecentModal(true)}
+              >
+                {latestPhotoUri ? (
+                  <Image source={{ uri: latestPhotoUri }} style={styles.thumbnailButton} />
+                ) : (
+                  <Ionicons
+                    name="images-outline"
+                    size={28}
+                    color={theme.colors.companyWhite}
+                  />
+                )}
               </TouchableOpacity>
 
               {/* Capture Button */}
-              <TouchableOpacity style={styles.captureButton}>
-                <View style={styles.captureInner} />
+              <TouchableOpacity
+                style={[styles.captureButton, isCapturing && styles.captureButtonDisabled]}
+                onPress={handleCapture}
+                disabled={isCapturing}
+              >
+                <View style={[styles.captureInner, isCapturing && styles.captureInnerDisabled]} />
               </TouchableOpacity>
 
               {/* Empty view for balance if needed */}
@@ -180,15 +283,22 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   secondaryButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 8,
     backgroundColor: "rgba(0,0,0,0.3)",
     justifyContent: "center",
     alignItems: "center",
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+  thumbnailButton: {
+    width: "100%",
+    height: "100%",
   },
   spacer: {
-    width: 50,
+    width: 60,
   },
   mainContent: {
     flex: 1,
@@ -231,5 +341,17 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  captureButtonDisabled: {
+    borderColor: "rgba(255,255,255,0.5)",
+  },
+  captureInnerDisabled: {
+    backgroundColor: "rgba(255,255,255,0.5)",
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

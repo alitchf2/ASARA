@@ -16,6 +16,11 @@ import { CustomTabBar } from "./src/components/CustomTabBar";
 import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
 import { GlobalGuestModal } from "./src/components/GlobalGuestModal";
 import UserSettingsScreen from './src/screens/UserSettingsScreen';
+import ObjectSelectionScreen from './src/screens/ObjectSelectionScreen';
+import SelectionConfirmationScreen from './src/screens/SelectionConfirmationScreen';
+import ColorResultsScreen from './src/screens/ColorResultsScreen';
+import { clearRecentPhotos } from "./src/utils/photoStorage";
+import { AppState } from 'react-native';
 
 //Task 1.2: environment switcher + validation
 import { ENV } from "./src/config";
@@ -71,6 +76,21 @@ function MainTabs() {
   );
 }
 
+function GuestCleanup() {
+  const { isGuest } = useAuth();
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
+      // Clear data if guest and app is closing/backgrounding
+      if (isGuest && nextAppState !== 'active') {
+        console.log("Cleaning up guest photos on session end...");
+        await clearRecentPhotos();
+      }
+    });
+    return () => subscription.remove();
+  }, [isGuest]);
+  return null;
+}
+
 export default function App() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -95,6 +115,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
+        <GuestCleanup />
         <GlobalOfflineModal />
         <NavigationContainer>
           <GlobalGuestModal />
@@ -110,6 +131,9 @@ export default function App() {
             />
             <Stack.Screen name="UserSettings" component={UserSettingsScreen} />
             <Stack.Screen name="MainTabs" component={MainTabs} />
+            <Stack.Screen name="ObjectSelection" component={ObjectSelectionScreen} />
+            <Stack.Screen name="SelectionConfirmation" component={SelectionConfirmationScreen} />
+            <Stack.Screen name="ColorResults" component={ColorResultsScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>

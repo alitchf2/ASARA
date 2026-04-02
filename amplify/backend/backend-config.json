@@ -18,6 +18,13 @@
           ],
           "category": "function",
           "resourceName": "savedColorsFunction"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "resourceName": "UpdateUserProfile"
         }
       ],
       "providerPlugin": "awscloudformation",

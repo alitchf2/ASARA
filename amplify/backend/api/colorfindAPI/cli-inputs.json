@@ -1,6 +1,7 @@
 {
   "version": 1,
   "paths": {
+<<<<<<< horne-2.7-Create-API-Gateway
     "/colors/detect": {
       "name": "/colors/detect",
       "lambdaFunction": "detectColorFunction",
@@ -18,6 +19,15 @@
           "read",
           "update",
           "delete"
+=======
+    "/users/me": {
+      "name": "/users/me",
+      "lambdaFunction": "UpdateUserProfile",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "update"
+>>>>>>> master
         ]
       }
     }
