@@ -129,7 +129,13 @@ export default function ColorResultsScreen({ route, navigation }: any) {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.primaryButton}
-              onPress={() => {/* Task 8.1 */ }}
+              onPress={() => navigation.navigate('SaveColorPrompt', {
+                detectedColor,
+                colorName: 'Quercitron', // Placeholder for Task 5.3
+                photoUri,
+                marker,
+                displayDimensions
+              })}
             >
               <Text style={styles.primaryButtonText}>Save Color</Text>
             </TouchableOpacity>
