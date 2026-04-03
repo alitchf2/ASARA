@@ -481,8 +481,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - On failure: show error banner with Retry option
 
 **Testing Notes:** Test account deletion with 0 saved colors, 1 saved color, and 10+ saved colors. Verify all S3 objects deleted.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Password verification implemented via a silent raw InitiateAuth fetch to Cognito that doesn't disrupt the active session. Account deletion uses Amplify's deleteUser() which handles Cognito user removal and local token cleanup in one call. The /users/me DELETE API endpoint and cascade-delete Lambda (3.17) are deferred — no saved colors or DynamoDB records exist yet to clean up. When 3.17 is implemented, it should be called before deleteUser() to clean up data first. Navigation to Sign In on success is functional.
 
 ---
 
@@ -500,8 +500,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Returns `{ userID, username, createdAt }`
 - Returns 404 if user record not found (should not happen for authenticated users, but handle gracefully)
 - Logs to CloudWatch
-**Current Status:** Complete
-**Notes:** Decided against implementing a dedicated Lambda function (`GET /users/me`) just to fetch the username. Since the username is securely embedded in the active Cognito session, this functionality was successfully handled entirely client-side via the native `getCurrentUser()` method provided by the `aws-amplify/auth` SDK. This approach completely resolves the core requirement while reducing backend complexity, round-trip latency, and Lambda invocation costs.
+**Current Status:** #### Deferred
+**Notes:** Username is retrieved directly via Amplify's getCurrentUser() which returns the Cognito username synchronously from the local token — no Lambda or DynamoDB query needed. Since Cognito usernames are immutable (they serve as the permanent login identifier), and the Users DynamoDB table doesn't yet have reliable records for all users (signUp DynamoDB write is still a TODO), getCurrentUser() is the more reliable source. This Lambda is deferred unless a separate "display name" concept distinct from the login username is introduced in a future iteration.
 
 ---
 
@@ -515,8 +515,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Display username from response in username field
 - Show loading skeleton while API call in progress
 - Handle error gracefully (show error message if profile cannot be loaded)
-**Current Status:** Complete
-**Notes:** Successfully implemented user profile string retrieval within `UserSettingsScreen.tsx`. Instead of making a network request to a custom API gateway, the component utilizes a `useEffect` hook to call `getCurrentUser()` directly on mount. It perfectly pulls and dynamically displays the signed-in user's alias while securely handling errors by falling back to "Unknown User".
+**Current Status:** Complete via workaround
+**Notes:** Username displays correctly on User Settings screen via getCurrentUser(). No API call is made on mount, so there is no loading skeleton — Cognito returns the username synchronously from the cached token. This satisfies the screen requirement. If a DynamoDB-backed display name is introduced later, this task would need revisiting for the API call and loading state.
 
 ---
 
@@ -536,8 +536,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Return `{ success: boolean, message: string }`
 - Handle errors: username taken, Cognito API failure, DynamoDB write failure
 - Logs to CloudWatch
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Partially Complete
+**Notes:** Lambda built and deployed as UpdateUserProfile in Amplify backend. Endpoint is PUT /users/me (Amplify's REST API maps the "update" CRUD permission to PUT, not PATCH). Lambda performs a DynamoDB upsert on colorfind-users-dev and queries username-index GSI to check availability before writing. Client-side updateUsername() calls this via Amplify's REST API client with Cognito JWT auth attached automatically. Important caveat: the acceptance criteria requires updating the username in Cognito via Admin API — this is not possible. Cognito usernames are immutable once created and cannot be changed even via the Admin API. The username stored in DynamoDB functions as a display name while the Cognito username remains the permanent login identifier. This distinction should be documented in the PDR.
 
 ---
 
@@ -563,8 +563,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - Logs to CloudWatch with detailed step-by-step logging
 
 **Testing Notes:** Critical - test rollback scenarios where S3 delete fails but DynamoDB succeeds, etc.
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Deferred
+**Notes:** Deferred — no S3 images or Reference Objects table records exist yet, so there is nothing to cascade-delete beyond the Cognito user itself (handled client-side by deleteUser()). When saved colors are implemented (tasks 8.x, 9.x), this Lambda should be revisited. At that point it needs to: batch delete Reference Objects records, batch delete S3 objects under users/{userID}/, delete the Users table record, then confirm to the client before deleteUser() is called. Deferring this until those features exist avoids building and maintaining a Lambda that has no meaningful work to do in the current state.
 
 ---
 

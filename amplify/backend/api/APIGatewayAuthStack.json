@@ -64,7 +64,7 @@
                           }
                         ]
                       },
-                      "/*/users/me/*"
+                      "/PUT/users/me/*"
                     ]
                   ]
                 },
@@ -94,7 +94,67 @@
                           }
                         ]
                       },
-                      "/*/users/me"
+                      "/PUT/users/me"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "colorfindAPI"
+                      },
+                      "/",
+                      {
+                        "Fn::If": [
+                          "ShouldNotCreateEnvResources",
+                          "Prod",
+                          {
+                            "Ref": "env"
+                          }
+                        ]
+                      },
+                      "/PATCH/users/me/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "colorfindAPI"
+                      },
+                      "/",
+                      {
+                        "Fn::If": [
+                          "ShouldNotCreateEnvResources",
+                          "Prod",
+                          {
+                            "Ref": "env"
+                          }
+                        ]
+                      },
+                      "/PATCH/users/me"
                     ]
                   ]
                 }
