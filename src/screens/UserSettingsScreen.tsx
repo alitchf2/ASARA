@@ -11,24 +11,38 @@ import { ActionModal } from '../components/ActionModal';
 import { FeedbackModal } from '../components/FeedbackModal';
 import { validatePasswordStrength } from '../utils/validators';
 import { useAuth } from '../contexts/AuthContext';
-import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import { clearRecentPhotos } from '../utils/photoStorage';
+import { getCurrentUser, fetchUserAttributes, updateUserAttributes, signOut, updatePassword, deleteUser } from 'aws-amplify/auth';
+import { updateUsername } from '../services/lambdaClient';
+import { verifyCognitoPassword } from '../utils/cognitoVerify';
 
 export default function UserSettingsScreen({ navigation }: any) {
     const { isGuest, setIsGuest } = useAuth();
     // Current "Live" data (Placeholders for Task 3.14/3.15)
     const [username, setUsername] = useState("Loading...");
-    const [password, setPassword] = useState("placeHolderPassword123!"); // Valid test password
+    const [password, setPassword] = useState(""); // Never shown — only used for change detection
 
     useEffect(() => {
         if (!isGuest) {
-            getCurrentUser()
-                .then(user => {
-                    setUsername(user.username);
+            // preferred_username is the mutable display name stored in Cognito.
+            // Fall back to the immutable Cognito username if it hasn't been set yet.
+            fetchUserAttributes()
+                .then(async (attrs) => {
+                    if (attrs.preferred_username) {
+                        setUsername(attrs.preferred_username);
+                    } else {
+                        // preferred_username not set — first-time user, use Cognito username
+                        const user = await getCurrentUser();
+                        setUsername(user.username);
+                    }
                 })
-                .catch(err => {
-                    console.log("Error fetching user:", err);
-                    setUsername("Unknown User");
+                .catch(async () => {
+                    try {
+                        const user = await getCurrentUser();
+                        setUsername(user.username);
+                    } catch {
+                        setUsername("Unknown User");
+                    }
                 });
         }
     }, [isGuest]);
@@ -36,11 +50,13 @@ export default function UserSettingsScreen({ navigation }: any) {
     // Security Gate Modal State
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
 
     // Edit Mode State
     const [isEditMode, setIsEditMode] = useState(false);
     const [tempUsername, setTempUsername] = useState("");
     const [tempPassword, setTempPassword] = useState("");
+    const [verifiedCurrentPassword, setVerifiedCurrentPassword] = useState("");
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
     // Delete Account Flow State
@@ -68,16 +84,31 @@ export default function UserSettingsScreen({ navigation }: any) {
         setIsModalVisible(true);
     };
 
-    const handleModalSubmit = () => {
-        console.log("Security password submitted:", confirmPassword);
-        // Security gate passed, enter edit mode
-        setIsModalVisible(false);
-        setConfirmPassword("");
+    const handleModalSubmit = async () => {
+        if (!confirmPassword) return;
+        setIsVerifyingPassword(true);
 
-        // Initialize temp values with current values
-        setTempUsername(username);
-        setTempPassword(password); // Pre-fill with actual password for testing
-        setIsEditMode(true);
+        try {
+            const user = await getCurrentUser();
+            const isValid = await verifyCognitoPassword(user.username, confirmPassword);
+
+            if (!isValid) {
+                Alert.alert("Incorrect Password", "The password you entered is incorrect. Please try again.");
+                return;
+            }
+
+            // Password verified — store it and enter edit mode
+            setVerifiedCurrentPassword(confirmPassword);
+            setIsModalVisible(false);
+            setConfirmPassword("");
+            setTempUsername(username);
+            setTempPassword(password);
+            setIsEditMode(true);
+        } catch (err: any) {
+            Alert.alert("Verification Failed", "Could not verify your password. Check your connection and try again.");
+        } finally {
+            setIsVerifyingPassword(false);
+        }
     };
 
     const handleModalCancel = () => {
@@ -85,24 +116,73 @@ export default function UserSettingsScreen({ navigation }: any) {
         setConfirmPassword("");
     };
 
-    const handleSaveEditPress = () => {
+    const handleSaveEditPress = async () => {
         if (isSaveDisabled) return;
 
         console.log("Saving changes...");
-        // TODO: Add API code to change the actual database here (Task 3.16)
 
-        setUsername(tempUsername);
-        setPassword(tempPassword); // Update current password
+        try {
+            // 1. Update username — must happen BEFORE updating the Cognito password,
+            // because changing the password invalidates session tokens which would
+            // break the authenticated API call to the Lambda.
+            if (tempUsername !== username) {
+                // 1a. Update DynamoDB via Lambda (availability check + persistence for server-side lookups)
+                try {
+                    await updateUsername(tempUsername.trim());
+                } catch (err: any) {
+                    if (err.code === "USERNAME_TAKEN") {
+                        Alert.alert("Username Taken", "That username is already in use. Please choose a different one.");
+                        return;
+                    }
+                    throw err;
+                }
 
-        setIsEditMode(false);
-        setTempPassword("");
-        setIsSuccessModalVisible(true);
+                // 1b. Write to Cognito preferred_username so it persists across sessions
+                // and can be read back by fetchUserAttributes() on next mount.
+                await updateUserAttributes({
+                    userAttributes: { preferred_username: tempUsername.trim() },
+                });
+            }
+
+            // 2. Update Password in Cognito (always last — invalidates session tokens on success)
+            // updatePassword naturally verifies the old password — if it's wrong,
+            // Cognito throws NotAuthorizedException and we show a targeted error.
+            if (tempPassword !== password) {
+                try {
+                    await updatePassword({
+                        oldPassword: verifiedCurrentPassword,
+                        newPassword: tempPassword,
+                    });
+                } catch (err: any) {
+                    if (err.name === 'NotAuthorizedException') {
+                        Alert.alert(
+                            "Incorrect Password",
+                            "The current password you entered is wrong. Please exit edit mode and try again."
+                        );
+                        return;
+                    }
+                    throw err; // unexpected error — bubble up to outer catch
+                }
+            }
+
+            setUsername(tempUsername);
+            if (tempPassword !== "") setPassword(""); // Reset — never store the actual password in state
+
+            setIsEditMode(false);
+            setTempPassword("");
+            setVerifiedCurrentPassword("");
+            setIsSuccessModalVisible(true);
+        } catch (error: any) {
+            console.error("Error updating settings:", error);
+            Alert.alert("Action Failed", error?.message || "Failed to update settings. Check your current password and try again.");
+        }
     };
 
     const handleCancelEdit = () => {
         setIsEditMode(false);
         setTempUsername("");
         setTempPassword("");
+        setVerifiedCurrentPassword("");
     };
 
     const handleSuccessModalClose = () => {
@@ -113,12 +193,32 @@ export default function UserSettingsScreen({ navigation }: any) {
         setIsDeleteModalVisible(true);
     };
 
-    const handleDeleteModalSubmit = () => {
-        console.log("DELETING ACCOUNT with password:", deleteConfirmPassword);
-        // TODO: Add API code to delete the actual account (Task 3.17)
+    const handleDeleteModalSubmit = async () => {
+        if (deleteConfirmPassword.length === 0) return;
         setIsDeleteModalVisible(false);
-        setDeleteConfirmPassword("");
-        setIsDeleteSuccessModalVisible(true);
+
+        try {
+            // Step 1: Verify password silently before deleting
+            const user = await getCurrentUser();
+            const isValid = await verifyCognitoPassword(user.username, deleteConfirmPassword);
+
+            if (!isValid) {
+                setDeleteConfirmPassword("");
+                Alert.alert("Incorrect Password", "The password you entered is incorrect. Your account was not deleted.");
+                return;
+            }
+
+            // Step 2: Delete the Cognito user and clear all local tokens
+            // TODO (Task 3.17): Also call DeleteAccount Lambda to clean up:
+            // DynamoDB Users record, all Reference Objects, and S3 objects under users/{userID}/
+            await deleteUser();
+
+            setDeleteConfirmPassword("");
+            setIsDeleteSuccessModalVisible(true);
+        } catch (err: any) {
+            setDeleteConfirmPassword("");
+            Alert.alert("Deletion Failed", err?.message || "Could not delete your account. Please try again.");
+        }
     };
 
     const handleDeleteModalCancel = () => {
@@ -143,7 +243,8 @@ export default function UserSettingsScreen({ navigation }: any) {
     const isSaveDisabled =
         !hasChanges ||
         tempUsername.trim().length === 0 ||
-        !validatePasswordStrength(tempPassword).isValid;
+        // Only enforce password strength if the user actually typed a new password
+        (tempPassword !== "" && !validatePasswordStrength(tempPassword).isValid);
 
     if (isGuest) {
         return (
@@ -196,6 +297,8 @@ export default function UserSettingsScreen({ navigation }: any) {
 
             <ScrollView contentContainerStyle={styles.content}>
                 <View style={styles.section}>
+                    {/* Note: this edits preferred_username (mutable display name),
+                        NOT the Cognito login username which is permanently immutable. */}
                     <Text style={styles.sectionLabel}>Username</Text>
                     {isEditMode ? (
                         <AuthInput
@@ -227,7 +330,7 @@ export default function UserSettingsScreen({ navigation }: any) {
                         </View>
                     ) : (
                         <Text style={styles.passwordMask}>
-                            {"•".repeat(password.length)}
+                            {"••••••••"}
                         </Text>
                     )}
                 </View>
@@ -267,9 +370,9 @@ export default function UserSettingsScreen({ navigation }: any) {
                 inputPlaceholder="Current Password"
                 cancelButtonTitle="Cancel"
                 onCancelAction={handleModalCancel}
-                primaryButtonTitle="Submit"
+                primaryButtonTitle={isVerifyingPassword ? "Verifying..." : "Submit"}
                 onPrimaryAction={handleModalSubmit}
-                isPrimaryDisabled={confirmPassword.length === 0}
+                isPrimaryDisabled={confirmPassword.length === 0 || isVerifyingPassword}
             />
 
             {/* Delete Account Password Modal */}
