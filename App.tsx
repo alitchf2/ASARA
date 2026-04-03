@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationState } from '@react-navigation/native';
 
 import { View, ActivityIndicator } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -21,6 +21,7 @@ import SelectionConfirmationScreen from './src/screens/SelectionConfirmationScre
 import ColorResultsScreen from './src/screens/ColorResultsScreen';
 import { clearRecentPhotos } from "./src/utils/photoStorage";
 import { AppState } from 'react-native';
+import { HeaderUserIcon } from "./src/components/HeaderUserIcon";
 
 //Task 1.2: environment switcher + validation
 import { ENV } from "./src/config";
@@ -36,43 +37,49 @@ import { GlobalOfflineModal } from './src/components/GlobalOfflineModal';
 const Tab = createMaterialTopTabNavigator();
 const Stack = createNativeStackNavigator();
 
+function GlobalHeaderOverlay() {
+  return <HeaderUserIcon absolute />;
+}
+
 function MainTabs() {
-  const { isGuest } = useAuth();
   return (
-    <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
-      tabBarPosition="bottom"
-      initialRouteName="FindColor"
-      screenOptions={{
-        tabBarActiveTintColor: '#007AFF',
-        headerShown: false,
-      }}
-      {...({
-        bounces: false,
-        overScrollMode: "never",
-      } as any)}
-    >
-      <Tab.Screen
-        name="FindColor"
-        component={FindColorScreen}
-        options={{
-          tabBarLabel: 'Find Color',
-          swipeEnabled: true,
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="eyedropper" color={color} />
-          ),
+    <View style={{ flex: 1 }}>
+      <Tab.Navigator
+        tabBar={(props) => <CustomTabBar {...props} />}
+        tabBarPosition="bottom"
+        initialRouteName="FindColor"
+        screenOptions={{
+          tabBarActiveTintColor: '#007AFF',
+          headerShown: false,
         }}
-      />
-      <Tab.Screen
-        name="SavedColors"
-        component={SavedColorsScreen}
-        options={{
-          tabBarLabel: 'Saved',
-          swipeEnabled: true,
-          tabBarIcon: ({ color }) => <Ionicons name="bookmark-outline" color={color} />,
-        }}
-      />
-    </Tab.Navigator>
+        {...({
+          bounces: false,
+          overScrollMode: "never",
+        } as any)}
+      >
+        <Tab.Screen
+          name="FindColor"
+          component={FindColorScreen}
+          options={{
+            tabBarLabel: 'Find Color',
+            swipeEnabled: true,
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="eyedropper" color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="SavedColors"
+          component={SavedColorsScreen}
+          options={{
+            tabBarLabel: 'Saved',
+            swipeEnabled: true,
+            tabBarIcon: ({ color }) => <Ionicons name="bookmark-outline" color={color} />,
+          }}
+        />
+      </Tab.Navigator>
+      <GlobalHeaderOverlay />
+    </View>
   );
 }
 

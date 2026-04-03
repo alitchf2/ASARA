@@ -7,6 +7,7 @@ import {
   View,
   Linking,
   AppState,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,7 +15,6 @@ import { theme } from "../styles/theme";
 import { useAuth } from "../contexts/AuthContext";
 import { savePhoto, getRecentPhotos } from "../utils/photoStorage";
 import { RecentImagesModal } from "../components/RecentImagesModal";
-import { ActivityIndicator } from "react-native";
 import { Image } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 
@@ -170,29 +170,7 @@ export default function FindColorScreen({ navigation }: any) {
       <View style={styles.overlay} pointerEvents="box-none">
         {/* Global Header Layer */}
         <SafeAreaView style={styles.headerLayer} pointerEvents="box-none">
-          <TouchableOpacity
-            style={[
-              styles.iconButton,
-              !permission.granted && styles.iconButtonDark,
-            ]}
-            onPress={() => {
-              if (isGuest) {
-                showGuestModal("Sign in to access account settings.");
-              } else {
-                navigation.navigate("UserSettings");
-              }
-            }}
-          >
-            <Ionicons
-              name="person-circle-outline"
-              size={32}
-              color={
-                permission.granted
-                  ? theme.colors.companyWhite
-                  : theme.colors.companyBlack
-              }
-            />
-          </TouchableOpacity>
+          {/* Global icon now handled in MainTabs overlay */}
         </SafeAreaView>
 
         {/* Footer Layer - Only show if permission is granted */}
