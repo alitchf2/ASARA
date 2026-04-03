@@ -10,6 +10,14 @@
           ],
           "category": "function",
           "resourceName": "UpdateUserProfile"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "DetectColor"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -51,6 +59,11 @@
     }
   },
   "function": {
+    "DetectColor": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "UpdateUserProfile": {
       "build": true,
       "providerPlugin": "awscloudformation",
