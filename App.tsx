@@ -19,6 +19,7 @@ import UserSettingsScreen from './src/screens/UserSettingsScreen';
 import ObjectSelectionScreen from './src/screens/ObjectSelectionScreen';
 import SelectionConfirmationScreen from './src/screens/SelectionConfirmationScreen';
 import ColorResultsScreen from './src/screens/ColorResultsScreen';
+import SaveColorPromptScreen from './src/screens/SaveColorPromptScreen';
 import { clearRecentPhotos } from "./src/utils/photoStorage";
 import { AppState } from 'react-native';
 import { HeaderUserIcon } from "./src/components/HeaderUserIcon";
@@ -141,6 +142,7 @@ export default function App() {
             <Stack.Screen name="ObjectSelection" component={ObjectSelectionScreen} />
             <Stack.Screen name="SelectionConfirmation" component={SelectionConfirmationScreen} />
             <Stack.Screen name="ColorResults" component={ColorResultsScreen} />
+            <Stack.Screen name="SaveColorPrompt" component={SaveColorPromptScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
