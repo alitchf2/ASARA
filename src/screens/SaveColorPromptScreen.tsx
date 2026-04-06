@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../styles/theme";
 import { ColorMetricsContainer } from "../components/ColorMetricsContainer";
+import { post } from "aws-amplify/api";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -60,20 +61,72 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
   }, [marker, displayDimensions]);
 
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) {
       setError("Name required");
       return;
     }
     
-    // Reset the navigation stack so the user cannot go back to the prompt/results
-    navigation.reset({
-      index: 0,
-      routes: [{ 
-        name: 'MainTabs', 
-        params: { screen: 'SavedColors' } 
-      }],
-    });
+    try {
+      setError(""); // Clear previous errors
+      
+      // STEP 1: Get a secure upload ticket
+      console.log("-> Fetching S3 Upload URL...");
+      const urlResponse = await post({
+        apiName: "colorfindAPI",
+        path: "/users/me/savedColors/upload-url",
+        options: {
+          body: { fileType: 'image/jpeg' }
+        }
+      }).response;
+      
+      const urlData = (await urlResponse.body.json()) as any;
+      const { uploadUrl, s3Key } = urlData;
+      
+      // STEP 2: Upload image directly to S3
+      console.log("-> Uploading image to S3...", s3Key);
+      const fetchResponse = await fetch(photoUri);
+      const photoBlob = await fetchResponse.blob();
+      
+      const uploadResult = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: photoBlob,
+        headers: {
+          'Content-Type': 'image/jpeg',
+        },
+      });
+
+      if (!uploadResult.ok) throw new Error("S3 Upload Failed");
+
+      // STEP 3: Save color record to DynamoDB with imageS3Key
+      console.log("-> Saving color metadata to DynamoDB...");
+      await post({
+        apiName: "colorfindAPI",
+        path: "/users/me/savedColors",
+        options: {
+          body: {
+            name: name.trim(),
+            hex: detectedColor,
+            family: "Yellow", // Temp MVP Default
+            imageS3Key: s3Key,
+          }
+        }
+      }).response;
+
+      console.log("-> Save Complete!");
+
+      // Reset the navigation stack
+      navigation.reset({
+        index: 0,
+        routes: [{ 
+          name: 'MainTabs', 
+          params: { screen: 'SavedColors' } 
+        }],
+      });
+    } catch (err: any) {
+      console.error("Save Color Error:", err);
+      setError("Cloud sync failed. Please check your connection.");
+    }
   };
 
   return (

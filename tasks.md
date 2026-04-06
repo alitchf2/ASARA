@@ -221,8 +221,8 @@ Amazon Kinesis Stream Name: colorfindAnalytics. WE NEED TO DISCUSS IMPLEMENTATIO
 - HTTPS enforced (HTTP rejected)
 - CORS enabled for mobile app origin
 - CloudWatch logging enabled
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Successfully restored and re-linked API paths after merge conflicts. Addressed the `s3Key` and `deploymentBucketName` build errors by forcing `amplify build` locally. Created the `/colors/detect` public endpoint, the `/users/me` private endpoint, and upgraded to the highly RESTful `/users/me/savedColors` authenticated endpoint exactly as designed. The unified routing infrastructure is fully finalized and correctly pushed to AWS.
 
 ---
 
@@ -1197,8 +1197,8 @@ Need to try this on more devices (esspecially android).
 - For each card, display saved image thumbnail (fetched via pre-signed URL from task 9.5), userAssignedName, familyColorName
 - If response array empty: show empty state
 - Handle API errors gracefully (show error message)
-**Current Status:** Not Started
-**Notes:** 
+**Current Status:** Complete
+**Notes:** Successfully implemented the frontend API connection using `aws-amplify/api`. Replaced the static dummy arrays with dynamic `useState` variables, and set up an async `fetchColors()` call to point securely to the updated `/users/me/savedColors` REST endpoint. Wired the fetch action to a `useEffect` hook that triggers seamlessly upon screen mount (while properly checking to prevent Guest access). Fully implemented loading skeletons and error banners to satisfy all acceptance criteria.
 
 ---
 
