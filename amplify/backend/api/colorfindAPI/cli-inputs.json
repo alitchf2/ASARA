@@ -1,13 +1,36 @@
 {
   "version": 1,
   "paths": {
+    "/colors/detect": {
+      "name": "/colors/detect",
+      "lambdaFunction": "detectColorFunction",
+      "permissions": {
+        "setting": "open"
+      }
+    },
     "/users/me": {
       "name": "/users/me",
-      "lambdaFunction": "UpdateUserProfile",
+      "lambdaFunction": "savedColorsFunction",
       "permissions": {
         "setting": "private",
         "auth": [
-          "update"
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
+    },
+    "/users/me/savedColors": {
+      "name": "/users/me/savedColors",
+      "lambdaFunction": "savedColorsFunction",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
         ]
       }
     }
