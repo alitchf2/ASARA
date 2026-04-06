@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  TextInput, 
-  ScrollView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  ScrollView,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { useAuth } from "../contexts/AuthContext";
@@ -15,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../styles/theme";
 import { ColorCard } from "../components/ColorCard";
+import { get } from 'aws-amplify/api';
 
 const { width } = Dimensions.get("window");
 
@@ -24,17 +26,17 @@ const SAVED_COLORS: any[] = [];
 const FAMILIES = ["All", "Red", "Yellow", "Blue", "Green", "Orange", "Purple", "Brown", "Gray", "Black", "White"];
 
 // --- Stable Header Component ---
-const SavedColorsHeader = React.memo(({ 
-  searchQuery, 
-  setSearchQuery, 
-  selectedFamily, 
-  setSelectedFamily 
+const SavedColorsHeader = React.memo(({
+  searchQuery,
+  setSearchQuery,
+  selectedFamily,
+  setSelectedFamily
 }: any) => {
   return (
     <View style={styles.contentHeader}>
       <View style={styles.titleRow}>
         <Text style={styles.screenTitle}>Saved Colors</Text>
-        <View style={{ width: 44 }} /> 
+        <View style={{ width: 44 }} />
       </View>
 
       <View style={styles.searchContainer}>
@@ -50,8 +52,8 @@ const SavedColorsHeader = React.memo(({
         />
       </View>
 
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filterBar}
       >
@@ -78,13 +80,13 @@ const SavedColorsHeader = React.memo(({
 });
 
 // --- Stable Empty State Component ---
-const SavedColorsEmptyState = React.memo(({ 
-  searchQuery, 
-  selectedFamily, 
-  onCtaPress 
+const SavedColorsEmptyState = React.memo(({
+  searchQuery,
+  selectedFamily,
+  onCtaPress
 }: any) => {
   const isFiltered = selectedFamily !== "All" || searchQuery !== "";
-  const emptyTitle = isFiltered 
+  const emptyTitle = isFiltered
     ? `No results ${selectedFamily !== "All" ? `in ${selectedFamily}` : ""}`
     : "No saved colors yet";
   const emptySubtitle = isFiltered
@@ -93,16 +95,16 @@ const SavedColorsEmptyState = React.memo(({
 
   return (
     <View style={styles.emptyContainer}>
-      <Ionicons 
-        name={isFiltered ? "search-outline" : "bookmark-outline"} 
-        size={80} 
+      <Ionicons
+        name={isFiltered ? "search-outline" : "bookmark-outline"}
+        size={80}
         color={theme.colors.companyOrange}
         style={styles.emptyIcon}
       />
       <Text style={styles.emptyTitle}>{emptyTitle}</Text>
       <Text style={styles.emptySubtitle}>{emptySubtitle}</Text>
       {!isFiltered && (
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.captureCta}
           onPress={onCtaPress}
         >
@@ -117,7 +119,32 @@ export default function SavedColorsScreen({ navigation }: any) {
   const { isGuest, showGuestModal } = useAuth();
   const isFocused = useIsFocused();
   const [searchQuery, setSearchQuery] = useState("");
+  const [savedColors, setSavedColors] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedFamily, setSelectedFamily] = useState("All");
+
+  const fetchColors = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const restOperation = get({
+        apiName: 'colorfindAPI',
+        path: '/users/me/savedColors'
+      });
+      const { body } = await restOperation.response;
+      const data = await body.json();
+      
+      console.log("Fetched colors successfully:", data);
+      setSavedColors(data as any[]);
+    } catch (err) {
+      console.error("DEBUG: Failed to fetch colors details:", JSON.stringify(err, null, 2));
+      setError("could not load your saved colors. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (isGuest && isFocused) {
@@ -126,10 +153,13 @@ export default function SavedColorsScreen({ navigation }: any) {
         showGuestModal("Sign in to view your saved colors.");
       }, 10);
       return () => clearTimeout(timer);
+    } else if (!isGuest && isFocused) {
+      console.log("SavedColorsScreen focused - initiating fetch...");
+      fetchColors();
     }
   }, [isGuest, isFocused, navigation, showGuestModal]);
 
-  const filteredColors = SAVED_COLORS.filter(color => {
+  const filteredColors = savedColors.filter(color => {
     const matchesSearch = color.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFamily = selectedFamily === "All" || color.family === selectedFamily;
     return matchesSearch && matchesFamily;
@@ -138,9 +168,28 @@ export default function SavedColorsScreen({ navigation }: any) {
 
   if (isGuest) return <View style={styles.container} />;
 
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={theme.colors.companyOrange} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
+        <TouchableOpacity style={styles.captureCta} onPress={() => fetchColors()}>
+          <Text style={styles.captureCtaText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <SavedColorsHeader 
+      <SavedColorsHeader
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedFamily={selectedFamily}
@@ -148,19 +197,20 @@ export default function SavedColorsScreen({ navigation }: any) {
       />
       <FlatList
         data={filteredColors}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => item.objectID || item.id || index.toString()}
         renderItem={({ item }) => (
-          <ColorCard 
-            name={item.name} 
-            family={item.family} 
-            imageUri={item.imageUri} 
-            onPress={() => {}} // Navigate to detail in Task 9.9
+          <ColorCard
+            name={item.name}
+            family={item.family}
+            hex={item.hex}
+            imageUri={item.imageUri}
+            onPress={() => { }} // Navigate to detail in Task 9.9
           />
         )}
         numColumns={2}
         columnWrapperStyle={styles.gridRow}
         ListEmptyComponent={
-          <SavedColorsEmptyState 
+          <SavedColorsEmptyState
             searchQuery={searchQuery}
             selectedFamily={selectedFamily}
             onCtaPress={() => navigation.navigate("FindColor")}

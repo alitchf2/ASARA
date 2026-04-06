@@ -6,7 +6,8 @@ const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 60) / 2; // (Screen - 20 padding * 2 - 20 gap) / 2
 
 interface ColorCardProps {
-  imageUri: string;
+  imageUri?: string;
+  hex?: string;
   name: string;
   family: string;
   onPress?: () => void;
@@ -14,13 +15,18 @@ interface ColorCardProps {
 
 export const ColorCard: React.FC<ColorCardProps> = ({ 
   imageUri, 
+  hex,
   name, 
   family, 
   onPress 
 }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
-      <Image source={{ uri: imageUri }} style={styles.thumbnail} />
+      {imageUri ? (
+        <Image source={{ uri: imageUri }} style={styles.thumbnail} />
+      ) : (
+        <View style={[styles.thumbnail, { backgroundColor: hex || "#f0f0f0" }]} />
+      )}
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>{name}</Text>
         <Text style={styles.family}>{family}</Text>

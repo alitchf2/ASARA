@@ -66,7 +66,10 @@
           "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
           "s3Key": "amplify-builds/UpdateUserProfile-6e6d71467257584c7148-build.zip"
         },
+<<<<<<< HEAD
         "DetectColor": {},
+=======
+>>>>>>> b91279a (ran amplify, set up mock colors, connected s3, dynamoDb connection for saved colors)
         "detectColorFunction": {
           "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
           "s3Key": "amplify-builds/detectColorFunction-732b69564453746d4667-build.zip"
