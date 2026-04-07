@@ -152,10 +152,12 @@ export default function SavedColorsScreen({ navigation }: any) {
         showGuestModal("Sign in to view your saved colors.");
       }, 10);
       return () => clearTimeout(timer);
+    } else if (!isGuest && isFocused) {
+      fetchColors();
     }
   }, [isGuest, isFocused, navigation, showGuestModal]);
 
-  const filteredColors = SAVED_COLORS.filter(color => {
+  const filteredColors = savedColors.filter(color => {
     const matchesSearch = color.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFamily = selectedFamily === "All" || color.family === selectedFamily;
     return matchesSearch && matchesFamily;
@@ -163,6 +165,22 @@ export default function SavedColorsScreen({ navigation }: any) {
 
 
   if (isGuest) return <View style={styles.container} />;
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={theme.colors.companyOrange} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: 'red' }}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
