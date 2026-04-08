@@ -9,7 +9,7 @@
             "Arn"
           ],
           "category": "function",
-          "resourceName": "UpdateUserProfile"
+          "resourceName": "detectColorFunction"
         },
         {
           "attributes": [
@@ -17,7 +17,7 @@
             "Arn"
           ],
           "category": "function",
-          "resourceName": "DetectColor"
+          "resourceName": "savedColorsFunction"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -59,17 +59,22 @@
     }
   },
   "function": {
-    "DetectColor": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "UpdateUserProfile": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
     "colorfind43640cdb43640cdbPreSignup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "detectColorFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "savedColorsFunction": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
@@ -105,6 +110,38 @@
         {
           "category": "function",
           "resourceName": "colorfind43640cdb43640cdbPreSignup"
+        }
+      ]
+    },
+    "AMPLIFY_function_detectColorFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "detectColorFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_detectColorFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "detectColorFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_savedColorsFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "savedColorsFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_savedColorsFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "savedColorsFunction"
         }
       ]
     }

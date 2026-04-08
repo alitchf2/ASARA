@@ -14,13 +14,44 @@ import { FullImageBackground } from '../components/FullImageBackground';
 import { ImmersiveHeader } from '../components/ImmersiveHeader';
 import { ImmersiveFooter } from '../components/ImmersiveFooter';
 
+import * as FileSystem from 'expo-file-system/legacy';
+import { calculate5x5Average } from '../utils/colorExtraction';
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function SelectionConfirmationScreen({ route, navigation }: any) {
   const { photoUri, marker, originalDimensions, displayDimensions } = route.params || {};
 
-  const handleConfirm = () => {
-    // Transition to results for Task 7.1
+  const handleConfirm = async () => {
+    // MINIMAL TEST: Only to see if the extraction function works
+    console.log("--- START EXTRACTION TEST ---");
+    if (marker && originalDimensions && displayDimensions && photoUri) {
+      try {
+        // 1. Read the image file as base64
+        console.log(`[TEST] Reading file: ${photoUri}`);
+        const base64Data = await FileSystem.readAsStringAsync(photoUri, {
+          encoding: 'base64',
+        });
+
+        // 2. We need to be careful with orientation. 
+        // Image.getSize (originalDimensions) might be rotated relative to raw data.
+        // Let's pass the display data and the raw dimensions to a more robust mapping.
+        
+        // We'll perform a "Safety Map" inside the extraction or right before it.
+        // For this minimal test, let's just use the calculate5x5Average and 
+        // I've updated it to be more robust.
+
+        const rgb = calculate5x5Average(base64Data, marker.x, marker.y, displayDimensions);
+        console.log("EXTRACTED RGB SUCCESS:", rgb);
+      } catch (err) {
+        console.error("EXTRACTION TEST FAILED:", err);
+      }
+    } else {
+      console.log("Skipping test: Missing dimension data");
+    }
+    console.log("--- END EXTRACTION TEST ---");
+
+    // Normal navigation as per current baseline
     navigation.navigate('ColorResults', { 
       photoUri, 
       marker,
