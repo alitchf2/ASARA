@@ -80,5 +80,45 @@
         "colorfindAPI": {}
       }
     }
+<<<<<<< HEAD
+=======
+  },
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-colorfind-prod-ede92-authRole",
+      "UnauthRoleArn": "arn:aws:iam::538780774280:role/amplify-colorfind-prod-ede92-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::538780774280:role/amplify-colorfind-prod-ede92-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-colorfind-prod-ede92-deployment",
+      "UnauthRoleName": "amplify-colorfind-prod-ede92-unauthRole",
+      "StackName": "amplify-colorfind-prod-ede92",
+      "StackId": "arn:aws:cloudformation:us-east-2:538780774280:stack/amplify-colorfind-prod-ede92/a6113380-17e9-11f1-a8d4-0ac72e8e51a1",
+      "AmplifyAppId": "dfbv5wrnfzbnv",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-colorfind-prod-ede92-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-colorfind-prod-ede92-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "auth": {
+        "colorfind3baa86a4": {},
+        "colorfind43640cdb43640cdb": {}
+      },
+      "analytics": {
+        "colorfindAnalytics": {}
+      },
+      "storage": {
+        "images": {}
+      },
+      "function": {
+        "UpdateUserProfile": {
+          "deploymentBucketName": "amplify-colorfind-prod-ede92-deployment",
+          "s3Key": "amplify-builds/UpdateUserProfile-6d55493638554d534665-build.zip"
+        },
+        "colorfind43640cdb43640cdbPreSignup": {
+          "deploymentBucketName": "amplify-colorfind-prod-ede92-deployment",
+          "s3Key": "amplify-builds/colorfind43640cdb43640cdbPreSignup-37444958784741677a44-build.zip"
+        }
+      }
+    }
+>>>>>>> 77a7b42 (added basic color compare screen (task 10.1))
   }
 }
