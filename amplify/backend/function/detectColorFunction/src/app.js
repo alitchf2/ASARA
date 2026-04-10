@@ -41,43 +41,11 @@ app.get('/colors/detect/*', function(req, res) {
 });
 
 /****************************
-* Cached Color Match Method *
+* Static Memory Color Match Method *
 ****************************/
 
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, ScanCommand } = require("@aws-sdk/lib-dynamodb");
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
-const TABLE_NAME = 'colorfind-colors-master-dev';
-
-// In-memory cache outside the handler to persist across warm invocations
-let colorsCache = null;
-let lastCacheUpdate = 0;
-const CACHE_TTL = 3600000; // 1 hour
-
-async function fetchAllColors() {
-  if (colorsCache && (Date.now() - lastCacheUpdate < CACHE_TTL)) {
-    return colorsCache;
-  }
-  
-  let allItems = [];
-  let params = { TableName: TABLE_NAME };
-  let result;
-  
-  do {
-    result = await docClient.send(new ScanCommand(params));
-    if (result.Items) {
-      allItems = allItems.concat(result.Items);
-    }
-    params.ExclusiveStartKey = result.LastEvaluatedKey;
-  } while (result.LastEvaluatedKey);
-  
-  colorsCache = allItems;
-  lastCacheUpdate = Date.now();
-  
-  return colorsCache;
-}
+const colorsData = require('./colors.json');
+const ALL_COLORS = colorsData.Items || [];
 
 function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -108,24 +76,33 @@ app.post('/colors/detect/match', async function(req, res) {
       return res.status(400).json({ error: 'Invalid hex format' });
     }
     
-    const colors = await fetchAllColors();
-    
     let closestColor = null;
     let minDistance = Infinity;
     
-    for (const color of colors) {
-      if (!color.rgb) continue;
+    for (const item of ALL_COLORS) {
+      if (!item.rgb || !item.rgb.M) continue;
       
-      const r = Number(color.rgb.r);
-      const b = Number(color.rgb.b);
-      const g = Number(color.rgb.g);
+      const r = Number(item.rgb.M.r?.N);
+      const b = Number(item.rgb.M.b?.N);
+      const g = Number(item.rgb.M.g?.N);
       
       if (isNaN(r) || isNaN(g) || isNaN(b)) continue;
       
       const distance = calculateRgbDistance(targetRgb.r, targetRgb.g, targetRgb.b, r, g, b);
       if (distance < minDistance) {
         minDistance = distance;
-        closestColor = color;
+        closestColor = {
+            colorID: item.colorID?.S,
+            hex: item.hex?.S,
+            detailedColorName: item.detailedColorName?.S,
+            familyColorName: item.familyColorName?.S,
+            rgb: { r, g, b },
+            lab: item.lab?.M ? {
+                l: Number(item.lab.M.l?.N),
+                a: Number(item.lab.M.a?.N),
+                b: Number(item.lab.M.b?.N)
+            } : null
+        };
       }
     }
     

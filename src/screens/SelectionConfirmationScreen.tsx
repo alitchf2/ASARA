@@ -17,6 +17,7 @@ import { post } from 'aws-amplify/api';
 
 import * as FileSystem from 'expo-file-system/legacy';
 import { calculate5x5Average } from '../utils/colorExtraction';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -34,9 +35,14 @@ export default function SelectionConfirmationScreen({ route, navigation }: any) 
     try {
       setIsProcessing(true);
       
-      const base64Data = await FileSystem.readAsStringAsync(photoUri, {
-        encoding: 'base64',
-      });
+      // Native Hardware-accelerated Resize scales 12 million pixels drastically down natively!
+      const manipResult = await manipulateAsync(
+        photoUri,
+        [{ resize: { width: 800 } }], 
+        { base64: true, format: SaveFormat.JPEG, compress: 0.8 }
+      );
+      
+      const base64Data = manipResult.base64!;
 
       const rgb = calculate5x5Average(base64Data, marker.x, marker.y, displayDimensions);
       
