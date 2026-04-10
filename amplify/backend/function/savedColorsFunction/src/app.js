@@ -27,59 +27,52 @@ app.use(function(req, res, next) {
 
 
 /**********************
- * Example get method *
+ * get method *
  **********************/
 
-app.get('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
+app.get('/users/me/savedColors', function(req, res) {
+  try {
+    const userID = req.apiGateway.event.requestContext.authorizer.claims.sub || "mock-user";
+
+    // Mock database to be changed later
+    const mockColors = [
+      {id: "1", userID: userID, name: "Ocean Blue", family: "Blue", hex: "#0077FF", createdAt: "2024-04-01T12:00:00Z"},
+      {id: "2", userID: userID, name: "Sunset Orange", family: "Orange", hex: "#FF7700", createdAt: "2024-04-02T13:00:00Z"},
+      {id: "3", userID: userID, name: "Forest Green", family: "Green", hex: "#228B22", createdAt: "2024-04-03T14:00:00Z"},
+      {id: "4", userID: userID, name: "Royal Purple", family: "Purple", hex: "#7851A9", createdAt: "2024-04-04T15:00:00Z"},
+      {id: "5", userID: userID, name: "Cloud White", family: "White", hex: "#F5F5F5", createdAt: "2024-04-05T16:00:00Z"}
+    ];
+
+    console.log("Serving mock colors for user:", userID);
+    res.json(mockColors); //shows mock saved colors
+  } catch (error) {
+    console.error("GET Colors Error:", error);
+    res.status(500).json({error: "Failed to fetch saved colors", details: error.message});
+  }
 });
 
-app.get('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
-});
 
 /****************************
-* Example post method *
+* post method *
 ****************************/
 
-app.post('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
-});
+app.post('/users/me/savedColors', function(req, res) {
+  try {
+    const userID = req.apiGateway.event.requestContext.authorizer.claims.sub;
+    const colorData = req.body;
 
-app.post('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
-});
+    // instead of writing data to dynamoDB, we will pretend it succeeded
+    const fakeSaved = {
+      id: "999",
+      userID: userID,
+      ...colorData,
+      createdAt: new Date().toISOString()
+    };
 
-/****************************
-* Example put method *
-****************************/
-
-app.put('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
-});
-
-app.put('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
-});
-
-/****************************
-* Example delete method *
-****************************/
-
-app.delete('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
-});
-
-app.delete('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
+    res.json({success: "Mock color saved", color: fakeSaved});
+  } catch (error) {
+    res.status(500).json({error: "Failed to save color", details: error});
+  }
 });
 
 app.listen(3000, function() {

@@ -10,7 +10,7 @@
     },
     "/users/me": {
       "name": "/users/me",
-      "lambdaFunction": "savedColorsFunction",
+      "lambdaFunction": "UpdateUserProfile",
       "permissions": {
         "setting": "private",
         "auth": [

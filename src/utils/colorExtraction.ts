@@ -34,25 +34,56 @@ export const calculate5x5Average = (
 
         console.log(`[DEBUG] Image Decoded: ${width}x${height}`);
 
-        // Handle coordinate mapping if display dimensions are provided (Phase 1 Fix for rotation)
+        // Handle coordinate mapping if display dimensions are provided
         let finalTapX = tapX;
         let finalTapY = tapY;
 
         if (displayDimensions) {
-            const rawAR = width / height;
-            const displayAR = displayDimensions.width / displayDimensions.height;
+            const IW = width;
+            const IH = height;
+            const CW = displayDimensions.width;
+            const CH = displayDimensions.height;
+
+            const rawAspect = IW / IH;
+            const displayAspect = CW / CH;
+            let displayIW = IW;
+            let displayIH = IH;
+
+            const isSwapped = (rawAspect > 1 && displayAspect < 1) || (rawAspect < 1 && displayAspect > 1);
+            if (isSwapped) {
+                 displayIW = IH;
+                 displayIH = IW;
+            }
+
+            // Calculate 'resizeMode="cover"' scaling factor
+            const scale = Math.max(CW / displayIW, CH / displayIH);
             
-            // Check for potential orientation mismatch (e.g., Raw is Landscape, Display is Portrait)
-            // This is a common issue with EXIF orientation metadata.
-            const isSwapped = (rawAR > 1 && displayAR < 1) || (rawAR < 1 && displayAR > 1);
+            // Calculate what physical display dimension the image would take if unrestricted
+            const scaledImageWidth = displayIW * scale;
+            const scaledImageHeight = displayIH * scale;
+
+            // Cover natively crops by centering. Calculate spatial translation vectors:
+            const offsetX = (scaledImageWidth - CW) / 2;
+            const offsetY = (scaledImageHeight - CH) / 2;
+
+            // Remap touch space relative to the un-cropped Image plane rendering (0 to scaledDimensions)
+            let imageTapX = tapX + offsetX;
+            let imageTapY = tapY + offsetY;
+
+            // Downscale back into physical encoded pixel ratios
+            let logicalRawX = imageTapX / scale;
+            let logicalRawY = imageTapY / scale;
 
             if (isSwapped) {
-                // If orientation is swapped, we map display Y to raw X and display X to raw Y (90deg logic)
-                finalTapX = (tapY / displayDimensions.height) * width;
-                finalTapY = (tapX / displayDimensions.width) * height;
+                // If Orientation was swapped inside React Native via EXIF mapping,
+                // this performs a generic 90-degree mapping correction (assuming primary CCW/CW standards)
+                finalTapX = logicalRawY;
+                finalTapY = IW - logicalRawX; 
+                // Quick bound check for typical 90deg opposite
+                if (finalTapY < 0 || finalTapY > height) { finalTapY = logicalRawX; }
             } else {
-                finalTapX = (tapX / displayDimensions.width) * width;
-                finalTapY = (tapY / displayDimensions.height) * height;
+                finalTapX = logicalRawX;
+                finalTapY = logicalRawY;
             }
         }
 

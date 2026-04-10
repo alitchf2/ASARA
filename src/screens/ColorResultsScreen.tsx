@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   StyleSheet,
   View,
@@ -20,7 +19,8 @@ export default function ColorResultsScreen({ route, navigation }: any) {
     photoUri, 
     detectedColor = '#E5A100', 
     marker, 
-    displayDimensions 
+    displayDimensions,
+    matchedColor 
   } = route.params || {};
 
   const THUMB_SIZE = 200;
@@ -102,8 +102,10 @@ export default function ColorResultsScreen({ route, navigation }: any) {
               ]}
             />
             <View style={styles.nameContainer}>
-              <Text style={styles.colorName}>Quercitron</Text>
-              <Text style={styles.familyName}>Yellow</Text>
+              <Text style={styles.colorName}>
+                {matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match'}
+              </Text>
+              <Text style={styles.familyName}>{matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color'}</Text>
             </View>
           </View>
 
@@ -111,17 +113,23 @@ export default function ColorResultsScreen({ route, navigation }: any) {
           <View style={styles.metricsContainer}>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>HEX</Text>
-              <Text style={styles.metricValue}>#E5A100</Text>
+              <Text style={styles.metricValue}>
+                {(matchedColor?.hex ? `#${matchedColor.hex}` : detectedColor)?.toUpperCase()}
+              </Text>
             </View>
 
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>RGB</Text>
-              <Text style={styles.metricValue}>R: 229  G: 161  B: 0</Text>
+              <Text style={styles.metricValue}>
+                R: {matchedColor?.rgb?.r || '?'}  G: {matchedColor?.rgb?.g || '?'}  B: {matchedColor?.rgb?.b || '?'}
+              </Text>
             </View>
 
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>LAB</Text>
-              <Text style={styles.metricValue}>L: 68.4  A: 12.1  B: 61.8</Text>
+              <Text style={styles.metricValue}>
+                L: {matchedColor?.lab?.l || '?'}  A: {matchedColor?.lab?.a || '?'}  B: {matchedColor?.lab?.b || '?'}
+              </Text>
             </View>
           </View>
 
@@ -131,7 +139,7 @@ export default function ColorResultsScreen({ route, navigation }: any) {
               style={styles.primaryButton}
               onPress={() => navigation.navigate('SaveColorPrompt', {
                 detectedColor,
-                colorName: 'Quercitron', // Placeholder for Task 5.3
+                colorName: matchedColor?.name || matchedColor?.colorName || 'Unknown Match', // Placeholder for Task 5.3
                 photoUri,
                 marker,
                 displayDimensions

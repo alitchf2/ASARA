@@ -8,7 +8,7 @@
   "resourceName": "colorfind43640cdb43640cdbPreSignup",
   "parentStack": "auth",
   "triggerEnvs": "[]",
-  "triggerDir": "C:\\snapshot\\amplify-cli\\build\\node_modules\\@aws-amplify\\amplify-category-auth\\provider-utils\\awscloudformation\\triggers\\PreSignup",
+  "triggerDir": "/snapshot/amplify-cli/build/node_modules/@aws-amplify/amplify-category-auth/provider-utils/awscloudformation/triggers/PreSignup",
   "triggerTemplate": "PreSignup.json.ejs",
   "triggerEventPath": "PreSignup.event.json",
   "roleName": "colorfind43640cdb43640cdbPreSignup",
