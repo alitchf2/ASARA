@@ -11,7 +11,6 @@ import SavedColorsScreen from './src/screens/SavedColorsScreen';
 import SignInScreen from './src/screens/SignInScreen';
 import CreateAccountScreen from './src/screens/CreateAccountScreen';
 import TermsOfServiceScreen from './src/screens/TermsOfServiceScreen';
-import ColorCompareScreen from './src/screens/ColorCompareScreen';
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { CustomTabBar } from "./src/components/CustomTabBar";
 import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
@@ -144,7 +143,6 @@ export default function App() {
             <Stack.Screen name="SelectionConfirmation" component={SelectionConfirmationScreen} />
             <Stack.Screen name="ColorResults" component={ColorResultsScreen} />
             <Stack.Screen name="SaveColorPrompt" component={SaveColorPromptScreen} />
-            <Stack.Screen name="ColorCompare" component={ColorCompareScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
