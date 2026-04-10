@@ -135,10 +135,11 @@ export default function SavedColorsScreen({ navigation }: any) {
       });
       const { body } = await restOperation.response;
       const data = await body.json();
-
+      
+      console.log("Fetched colors successfully:", data);
       setSavedColors(data as any[]);
     } catch (err) {
-      console.error("Failed to fetch colors:", err);
+      console.error("DEBUG: Failed to fetch colors details:", JSON.stringify(err, null, 2));
       setError("could not load your saved colors. Please try again later.");
     } finally {
       setIsLoading(false);
@@ -153,6 +154,7 @@ export default function SavedColorsScreen({ navigation }: any) {
       }, 10);
       return () => clearTimeout(timer);
     } else if (!isGuest && isFocused) {
+      console.log("SavedColorsScreen focused - initiating fetch...");
       fetchColors();
     }
   }, [isGuest, isFocused, navigation, showGuestModal]);
@@ -177,7 +179,10 @@ export default function SavedColorsScreen({ navigation }: any) {
   if (error) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: 'red' }}>{error}</Text>
+        <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
+        <TouchableOpacity style={styles.captureCta} onPress={() => fetchColors()}>
+          <Text style={styles.captureCtaText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -197,6 +202,7 @@ export default function SavedColorsScreen({ navigation }: any) {
           <ColorCard
             name={item.name}
             family={item.family}
+            hex={item.hex}
             imageUri={item.imageUri}
             onPress={() => { }} // Navigate to detail in Task 9.9
           />

@@ -17,6 +17,14 @@
             "Arn"
           ],
           "category": "function",
+          "resourceName": "UpdateUserProfile"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
           "resourceName": "savedColorsFunction"
         }
       ],
@@ -76,6 +84,7 @@
     },
     "savedColorsFunction": {
       "build": true,
+      "description": "Handles fetching and saving of user color palettes",
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
