@@ -46,9 +46,9 @@ app.get('/users/me/savedColors', async function (req, res) {
 
     let items = data.Items || [];
     items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-    console.log("-> DynamoDB Query Success! Number of items found:", items.length);
-    res.json(items); 
+
+    console.log("-> DynamoDB Query Success", items.length);
+    res.json(items);
 
   } catch (error) {
     console.error("GET Colors Error:", error);
