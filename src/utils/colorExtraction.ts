@@ -12,16 +12,25 @@ export interface RGB {
  * average of the RGB channels for a precise 5x5 pixel area centered around the user tap point.
  * 
  * @param base64Data - Raw base64 string slice representing the JPEG (NO "data:image/jpeg;base64," prefix)
+<<<<<<< HEAD
  * @param tapX - Mathematical X coordinate of the target selection point (screen or pixel depending on displayDimensions)
  * @param tapY - Mathematical Y coordinate of the target selection point (screen or pixel depending on displayDimensions)
  * @param displayDimensions - Optional display size to enable robust mapping for rotated images
+=======
+ * @param tapX - Mathematical X coordinate of the target selection point
+ * @param tapY - Mathematical Y coordinate of the target selection point
+>>>>>>> 8b42c64 (Added compare sceen and select compare color model)
  * @returns The {r,g,b} averaged color profile of the 25-pixel footprint
  */
 export const calculate5x5Average = (
     base64Data: string,
     tapX: number,
+<<<<<<< HEAD
     tapY: number,
     displayDimensions?: { width: number, height: number }
+=======
+    tapY: number
+>>>>>>> 8b42c64 (Added compare sceen and select compare color model)
 ): RGB => {
     try {
         // Convert the lightweight base64 string into a memory buffer and decode the exact matrix
@@ -32,6 +41,7 @@ export const calculate5x5Average = (
         const height = rawImageData.height;
         const pixelData = rawImageData.data;
 
+<<<<<<< HEAD
         console.log(`[DEBUG] Image Decoded: ${width}x${height}`);
 
         // Handle coordinate mapping if display dimensions are provided
@@ -98,6 +108,14 @@ export const calculate5x5Average = (
         const endY = Math.min(height - 1, Math.round(finalTapY + 2));
 
         console.log(`[DEBUG] Final Bounds: X(${startX}-${endX}), Y(${startY}-${endY}) | Final Tap: (${finalTapX.toFixed(1)},${finalTapY.toFixed(1)})`);
+=======
+        // Bounding Box Logic: Guarantee the 5x5 grid dynamically clamps at the absolute image borders.
+        // This stops array out-of-bounds pointer crashes from corner selections. 
+        const startX = Math.max(0, tapX - 2);
+        const endX = Math.min(width - 1, tapX + 2);
+        const startY = Math.max(0, tapY - 2);
+        const endY = Math.min(height - 1, tapY + 2);
+>>>>>>> 8b42c64 (Added compare sceen and select compare color model)
 
         let sumR = 0;
         let sumG = 0;
@@ -107,6 +125,10 @@ export const calculate5x5Average = (
         // Iterate identically across the 25 spatial points
         for (let y = startY; y <= endY; y++) {
             for (let x = startX; x <= endX; x++) {
+<<<<<<< HEAD
+=======
+                // Calculate physical 1D array index (stride) for the 2D plane geometry
+>>>>>>> 8b42c64 (Added compare sceen and select compare color model)
                 // Every parsed pixel strictly maintains 4 specific byte channels: (R, G, B, A)
                 const index = (y * width + x) * 4;
 
@@ -119,7 +141,11 @@ export const calculate5x5Average = (
 
         // Failsafe for 0-dimension images or bizarre edge bugs to prevent divide-by-zero NaN vectors
         if (pixelCount === 0) {
+<<<<<<< HEAD
             console.log("No pixels found in bounds. RGB sums: ", sumR, sumG, sumB);
+=======
+            console.log("RGB values: ", sumR, sumG, sumB);
+>>>>>>> 8b42c64 (Added compare sceen and select compare color model)
             return { r: 0, g: 0, b: 0 };
         }
 

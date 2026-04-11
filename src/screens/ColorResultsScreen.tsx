@@ -165,7 +165,15 @@ export default function ColorResultsScreen({ route, navigation }: any) {
 
             <TouchableOpacity
               style={styles.compareButton}
-              onPress={() => {/* Task 10.1 */ }}
+              onPress={() => navigation.navigate('ColorCompare', {
+                sourceColor: {
+                  detectedColor,
+                  colorName: 'Quercitron', // Placeholder for Task 5.3
+                  photoUri,
+                  marker,
+                  displayDimensions
+                }
+              })}
             >
               <Text style={styles.compareButtonText}>Compare Color</Text>
             </TouchableOpacity>
