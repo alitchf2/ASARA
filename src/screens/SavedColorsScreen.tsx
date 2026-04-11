@@ -197,7 +197,7 @@ export default function SavedColorsScreen({ navigation }: any) {
       />
       <FlatList
         data={filteredColors}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => item.objectID || item.id || index.toString()}
         renderItem={({ item }) => (
           <ColorCard
             name={item.name}

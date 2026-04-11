@@ -84,7 +84,7 @@
     },
     "savedColorsFunction": {
       "build": true,
-      "description": "Handles fetching and saving of user color palettes",
+      "description": "Handles fetching and saving of user color palettes (DynamoDB API)",
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }

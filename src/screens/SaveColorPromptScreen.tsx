@@ -16,6 +16,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../styles/theme";
+import { post } from "aws-amplify/api";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -67,20 +68,38 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
 
   const rgb = hexToRgb(detectedColor);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) {
       setError("Name required");
       return;
     }
     
-    // Reset the navigation stack so the user cannot go back to the prompt/results
-    navigation.reset({
-      index: 0,
-      routes: [{ 
-        name: 'MainTabs', 
-        params: { screen: 'SavedColors' } 
-      }],
-    });
+    try {
+      // Send the color to our newly built DynamoDB API
+      await post({
+        apiName: "colorfindAPI",
+        path: "/users/me/savedColors",
+        options: {
+          body: {
+            name: name.trim(),
+            hex: detectedColor,
+            family: "Yellow", // Temp MVP Default
+          }
+        }
+      }).response;
+
+      // Reset the navigation stack so the user cannot go back to the prompt/results
+      navigation.reset({
+        index: 0,
+        routes: [{ 
+          name: 'MainTabs', 
+          params: { screen: 'SavedColors' } 
+        }],
+      });
+    } catch (err) {
+      console.error("Save Color Error:", err);
+      setError("Cloud sync failed. Please try again.");
+    }
   };
 
   return (

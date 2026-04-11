@@ -6,14 +6,19 @@ or in the "license" file accompanying this file. This file is distributed on an 
 See the License for the specific language governing permissions and limitations under the License.
 */
 
-
-
-
 const express = require('express')
 const bodyParser = require('body-parser')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const crypto = require("crypto");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
 
-// declare a new express app
+// DynamoDB connection
+const client = new DynamoDBClient({ region: process.env.REGION || "us-east-2" });
+const dynamo = DynamoDBDocumentClient.from(client);
+const env = process.env.ENV || "dev";
+const TABLE_NAME = `colorfind-objects-${env}`;
+
 const app = express()
 app.use(bodyParser.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
@@ -25,54 +30,57 @@ app.use(function (req, res, next) {
   next()
 });
 
-
 /**********************
- * get method *
+ * GET method *
  **********************/
-
-app.get('/users/me/savedColors', function (req, res) {
+app.get('/users/me/savedColors', async function (req, res) {
   try {
-    const userID = req.apiGateway.event.requestContext.identity.cognitoIdentityId;  // cognito identity id
+    const userID = req.apiGateway.event.requestContext.identity.cognitoIdentityId; // Safe Handshake
 
+    // Ask DynamoDB for saved colors
+    const data = await dynamo.send(new QueryCommand({
+      TableName: TABLE_NAME,
+      KeyConditionExpression: "userID = :u",
+      ExpressionAttributeValues: { ":u": userID }
+    }));
 
-    // Mock database to be changed later
-    const mockColors = [
-      { id: "1", userID: userID, name: "Ocean Blue", family: "Blue", hex: "#0077FF", createdAt: "2024-04-01T12:00:00Z" },
-      { id: "2", userID: userID, name: "Sunset Orange", family: "Orange", hex: "#FF7700", createdAt: "2024-04-02T13:00:00Z" },
-      { id: "3", userID: userID, name: "Forest Green", family: "Green", hex: "#228B22", createdAt: "2024-04-03T14:00:00Z" },
-      { id: "4", userID: userID, name: "Royal Purple", family: "Purple", hex: "#7851A9", createdAt: "2024-04-04T15:00:00Z" },
-      { id: "5", userID: userID, name: "Cloud White", family: "White", hex: "#F5F5F5", createdAt: "2024-04-05T16:00:00Z" }
-    ];
+    let items = data.Items || [];
+    items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    console.log("-> DynamoDB Query Success! Number of items found:", items.length);
+    res.json(items); 
 
-    console.log("Serving mock colors for user:", userID);
-    res.json(mockColors); //shows mock saved colors
   } catch (error) {
     console.error("GET Colors Error:", error);
     res.status(500).json({ error: "Failed to fetch saved colors", details: error.message });
   }
 });
 
-
 /****************************
-* post method *
+* POST method *
 ****************************/
-
-app.post('/users/me/savedColors', function (req, res) {
+app.post('/users/me/savedColors', async function (req, res) {
   try {
     const userID = req.apiGateway.event.requestContext.identity.cognitoIdentityId;
     const colorData = req.body;
 
-    // instead of writing data to dynamoDB, we will pretend it succeeded
-    const fakeSaved = {
-      id: "999",
+    const newColor = {
       userID: userID,
+      objectID: crypto.randomUUID(),
       ...colorData,
       createdAt: new Date().toISOString()
     };
 
-    res.json({ success: "Mock color saved", color: fakeSaved });
+    await dynamo.send(new PutCommand({
+      TableName: TABLE_NAME,
+      Item: newColor
+    }));
+
+    res.json({ success: "Color saved", color: newColor });
+
   } catch (error) {
-    res.status(500).json({ error: "Failed to save color", details: error });
+    console.log("POST Colors Error:", error);
+    res.status(500).json({ error: "Failed to save color", details: error.message });
   }
 });
 
@@ -80,7 +88,4 @@ app.listen(3000, function () {
   console.log("App started")
 });
 
-// Export the app object. When executing the application locally this does nothing. However,
-// to port it to AWS Lambda we will create a wrapper around that will load the app from
-// this file
-module.exports = app
+module.exports = app;

@@ -1,6 +1,10 @@
 [
   {
-    "Action": [],
-    "Resource": []
+    "Action": [
+      "dynamodb:Scan"
+    ],
+    "Resource": [
+      "arn:aws:dynamodb:*:*:table/colorfind-colors-master-dev"
+    ]
   }
 ]
