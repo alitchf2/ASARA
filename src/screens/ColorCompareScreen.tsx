@@ -13,6 +13,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../styles/theme";
 import { ImmersiveHeader } from "../components/ImmersiveHeader";
 import { ColorSelectionModal } from "../components/ColorSelectionModal";
+import { CompareSlider } from "../components/CompareSlider";
+import { ColorMetricsContainer } from "../components/ColorMetricsContainer";
+import { 
+  parseLABString, 
+  hexToLab, 
+  hexToRgb, 
+  formatLABString, 
+  formatRGBString 
+} from "../utils/colorUtils";
 import { SavedColor } from "../types/color";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -58,6 +67,20 @@ export default function ColorCompareScreen({ route, navigation }: any) {
     setCompareColor(color);
     // Task 10.3: Comparison calculations would be triggered here
   };
+
+  // Dynamic Metrics for Source Color
+  const sourceRGB = useMemo(() => hexToRgb(sourceColor.detectedColor || "#E5A100"), [sourceColor.detectedColor]);
+  const sourceLAB = useMemo(() => hexToLab(sourceColor.detectedColor || "#E5A100"), [sourceColor.detectedColor]);
+  
+  // Data for sliders & display
+  const sourceData = sourceLAB;
+  const compareData = useMemo(() => parseLABString(compareColor?.lab), [compareColor]);
+
+  const sourceRGBStr = formatRGBString(sourceRGB);
+  const sourceLABStr = formatLABString(sourceLAB);
+  
+  const compareRGBStr = compareColor?.rgb || "-";
+  const compareLABStr = compareColor?.lab || "-";
 
   return (
     <View style={styles.container}>
@@ -111,22 +134,12 @@ export default function ColorCompareScreen({ route, navigation }: any) {
                 <Text style={styles.colorFamily}>Yellow</Text>
               </View>
 
-              <View style={styles.metricsContainer}>
-                <View style={styles.metricRow}>
-                  <Text style={styles.metricLabel}>HEX</Text>
-                  <Text style={styles.metricValue}>{sourceColor.detectedColor}</Text>
-                </View>
-
-                <View style={styles.metricRow}>
-                  <Text style={styles.metricLabel}>RGB</Text>
-                  <Text style={styles.metricValue}>229 161 0</Text>
-                </View>
-
-                <View style={styles.metricRow}>
-                  <Text style={styles.metricLabel}>LAB</Text>
-                  <Text style={styles.metricValue}>68.4 12.1 61.8</Text>
-                </View>
-              </View>
+              <ColorMetricsContainer 
+                hex={sourceColor.detectedColor || "#E5A100"}
+                rgb={sourceRGBStr}
+                lab={sourceLABStr}
+                variant="compact"
+              />
             </View>
           </View>
 
@@ -145,29 +158,19 @@ export default function ColorCompareScreen({ route, navigation }: any) {
                   />
                 </View>
                 
-                <View style={[styles.swatch, { backgroundColor: compareColor.hex }]} />
+                  <View style={[styles.swatch, styles.swatchCircle, { backgroundColor: compareColor.hex }]} />
                 
                 <View style={styles.cardInfo}>
                   <Text style={styles.colorName} numberOfLines={1}>{compareColor.name}</Text>
                   <Text style={styles.colorFamily}>{compareColor.family}</Text>
                 </View>
 
-                <View style={styles.metricsContainer}>
-                  <View style={styles.metricRow}>
-                    <Text style={styles.metricLabel}>HEX</Text>
-                    <Text style={styles.metricValue}>{compareColor.hex.toUpperCase()}</Text>
-                  </View>
-
-                  <View style={styles.metricRow}>
-                    <Text style={styles.metricLabel}>RGB</Text>
-                    <Text style={styles.metricValue}>-</Text>
-                  </View>
-
-                  <View style={styles.metricRow}>
-                    <Text style={styles.metricLabel}>LAB</Text>
-                    <Text style={styles.metricValue}>-</Text>
-                  </View>
-                </View>
+                <ColorMetricsContainer 
+                  hex={compareColor.hex}
+                  rgb={compareRGBStr}
+                  lab={compareLABStr}
+                  variant="compact"
+                />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity 
@@ -182,6 +185,53 @@ export default function ColorCompareScreen({ route, navigation }: any) {
         </View>
 
         {/* Hidden comparison details (addressed in future task) */}
+        <View style={styles.comparisonVisuals}>
+          <Text style={styles.sectionTitle}>Visual Comparison</Text>
+          
+          <CompareSlider 
+            label="Lightness (L)"
+            sourceValue={sourceData.l}
+            compareValue={compareData.chroma !== 0 ? compareData.l : null}
+            min={0}
+            max={100}
+            gradientColors={['#000000', '#FFFFFF']}
+            sourceHex={sourceColor.detectedColor}
+            compareHex={compareColor?.hex}
+          />
+
+          <CompareSlider 
+            label="Red ↔ Green (A)"
+            sourceValue={sourceData.a}
+            compareValue={compareData.chroma !== 0 ? compareData.a : null}
+            min={-128}
+            max={127}
+            gradientColors={['#00FF00', '#808080', '#FF0000']}
+            sourceHex={sourceColor.detectedColor}
+            compareHex={compareColor?.hex}
+          />
+
+          <CompareSlider 
+            label="Yellow ↔ Blue (B)"
+            sourceValue={sourceData.b}
+            compareValue={compareData.chroma !== 0 ? compareData.b : null}
+            min={-128}
+            max={127}
+            gradientColors={['#0000FF', '#808080', '#FFFF00']}
+            sourceHex={sourceColor.detectedColor}
+            compareHex={compareColor?.hex}
+          />
+
+          <CompareSlider 
+            label="Saturation / Chroma"
+            sourceValue={sourceData.chroma}
+            compareValue={compareData.chroma !== 0 ? compareData.chroma : null}
+            min={0}
+            max={180}
+            gradientColors={['#808080', '#FF00FF']}
+            sourceHex={sourceColor.detectedColor}
+            compareHex={compareColor?.hex}
+          />
+        </View>
       </ScrollView>
 
       <ColorSelectionModal 
@@ -252,6 +302,9 @@ const styles = StyleSheet.create({
     elevation: 3,
     marginBottom: 20,
   },
+  swatchCircle: {
+    borderRadius: 40,
+  },
   thumbnailContainer: {
     width: "100%",
     borderRadius: 12,
@@ -302,13 +355,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#888",
   },
-  metricsContainer: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 12,
-    width: '100%',
-    padding: 10,
-    marginBottom: 15,
-  },
   metricRow: {
     paddingVertical: 6,
     borderBottomWidth: 1,
@@ -333,5 +379,17 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     marginHorizontal: 10,
     alignSelf: 'center',
+  },
+  comparisonVisuals: {
+    paddingHorizontal: 20,
+    marginTop: 10,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: theme.colors.companyBlack,
+    letterSpacing: 1,
+    marginBottom: 20,
+    textTransform: 'uppercase',
   },
 });

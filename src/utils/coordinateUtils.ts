@@ -1,4 +1,4 @@
-import { LayoutChangeEvent } from 'react-native';
+import { LayoutRectangle } from "react-native";
 
 /**
  * Coordinate Utilities for ASARA Color Identification

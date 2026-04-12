@@ -11,7 +11,19 @@ import {
 } from 'react-native';
 import { theme } from '../styles/theme';
 import { ImmersiveHeader } from '../components/ImmersiveHeader';
-import { generateComplementaryTheme, generateAnalogousTheme, generateTriadicTheme, generateMonochromaticTheme } from '../utils/colorThemes';
+import { ColorMetricsContainer } from '../components/ColorMetricsContainer';
+import { 
+  hexToRgb, 
+  hexToLab, 
+  formatRGBString, 
+  formatLABString 
+} from '../utils/colorUtils';
+import { 
+  generateComplementaryTheme, 
+  generateAnalogousTheme, 
+  generateTriadicTheme, 
+  generateMonochromaticTheme 
+} from '../utils/colorThemes';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -54,6 +66,12 @@ export default function ColorResultsScreen({ route, navigation }: any) {
   const analogousTheme = generateAnalogousTheme(detectedColor);
   const triadicTheme = generateTriadicTheme(detectedColor);
   const monochromaticTheme = generateMonochromaticTheme(detectedColor);
+
+  // Dynamic Metrics Calculation
+  const rgbObj = hexToRgb(detectedColor);
+  const labObj = hexToLab(detectedColor);
+  const rgbString = formatRGBString(rgbObj);
+  const labString = formatLABString(labObj);
 
   return (
     <View style={styles.container}>
@@ -108,22 +126,12 @@ export default function ColorResultsScreen({ route, navigation }: any) {
           </View>
 
           {/* Metrics Section */}
-          <View style={styles.metricsContainer}>
-            <View style={styles.metricRow}>
-              <Text style={styles.metricLabel}>HEX</Text>
-              <Text style={styles.metricValue}>#E5A100</Text>
-            </View>
-
-            <View style={styles.metricRow}>
-              <Text style={styles.metricLabel}>RGB</Text>
-              <Text style={styles.metricValue}>R: 229  G: 161  B: 0</Text>
-            </View>
-
-            <View style={styles.metricRow}>
-              <Text style={styles.metricLabel}>LAB</Text>
-              <Text style={styles.metricValue}>L: 68.4  A: 12.1  B: 61.8</Text>
-            </View>
-          </View>
+          <ColorMetricsContainer 
+            hex={detectedColor}
+            rgb={rgbString}
+            lab={labString}
+            containerStyle={{ marginBottom: 30 }}
+          />
 
           {/* Action Buttons */}
           <View style={styles.buttonContainer}>
