@@ -41,17 +41,76 @@ app.get('/colors/detect/*', function(req, res) {
 });
 
 /****************************
-* Example post method *
+* Static Memory Color Match Method *
 ****************************/
 
-app.post('/colors/detect', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
-});
+const colorsData = require('./colors.json');
+const ALL_COLORS = colorsData.Items || [];
 
-app.post('/colors/detect/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+function calculateRgbDistance(r1, g1, b1, r2, g2, b2) {
+  return Math.sqrt(
+    Math.pow(r1 - r2, 2) + 
+    Math.pow(g1 - g2, 2) + 
+    Math.pow(b1 - b2, 2)
+  );
+}
+
+app.post('/colors/detect/match', async function(req, res) {
+  try {
+    const { hexColor } = req.body;
+    if (!hexColor) {
+      return res.status(400).json({ error: 'hexColor is required' });
+    }
+    
+    const targetRgb = hexToRgb(hexColor);
+    if (!targetRgb) {
+      return res.status(400).json({ error: 'Invalid hex format' });
+    }
+    
+    let closestColor = null;
+    let minDistance = Infinity;
+    
+    for (const item of ALL_COLORS) {
+      if (!item.rgb || !item.rgb.M) continue;
+      
+      const r = Number(item.rgb.M.r?.N);
+      const b = Number(item.rgb.M.b?.N);
+      const g = Number(item.rgb.M.g?.N);
+      
+      if (isNaN(r) || isNaN(g) || isNaN(b)) continue;
+      
+      const distance = calculateRgbDistance(targetRgb.r, targetRgb.g, targetRgb.b, r, g, b);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestColor = {
+            colorID: item.colorID?.S,
+            hex: item.hex?.S,
+            detailedColorName: item.detailedColorName?.S,
+            familyColorName: item.familyColorName?.S,
+            rgb: { r, g, b },
+            lab: item.lab?.M ? {
+                l: Number(item.lab.M.l?.N),
+                a: Number(item.lab.M.a?.N),
+                b: Number(item.lab.M.b?.N)
+            } : null
+        };
+      }
+    }
+    
+    res.json({ success: true, closestColor });
+  } catch (err) {
+    console.error("Match error:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /****************************

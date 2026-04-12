@@ -9,7 +9,23 @@
             "Arn"
           ],
           "category": "function",
+          "resourceName": "detectColorFunction"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
           "resourceName": "UpdateUserProfile"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "savedColorsFunction"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -60,6 +76,17 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "detectColorFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "savedColorsFunction": {
+      "build": true,
+      "description": "Handles fetching and saving of user color palettes",
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
@@ -92,6 +119,38 @@
         {
           "category": "function",
           "resourceName": "colorfind43640cdb43640cdbPreSignup"
+        }
+      ]
+    },
+    "AMPLIFY_function_detectColorFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "detectColorFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_detectColorFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "detectColorFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_savedColorsFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "savedColorsFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_savedColorsFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "savedColorsFunction"
         }
       ]
     }

@@ -7,6 +7,7 @@ import { envProd } from "./env.prod";
  * EXPO_PUBLIC_APP_ENV=dev
  * EXPO_PUBLIC_APP_ENV=prod
  */
+
 const raw = process.env.EXPO_PUBLIC_APP_ENV;
 
 const envName: AppEnvName = raw === "prod" ? "prod" : "dev";

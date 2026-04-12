@@ -13,20 +13,67 @@ import { SelectionMarker } from '../components/SelectionMarker';
 import { FullImageBackground } from '../components/FullImageBackground';
 import { ImmersiveHeader } from '../components/ImmersiveHeader';
 import { ImmersiveFooter } from '../components/ImmersiveFooter';
+import { post } from 'aws-amplify/api';
+
+import * as FileSystem from 'expo-file-system/legacy';
+import { calculate5x5Average } from '../utils/colorExtraction';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function SelectionConfirmationScreen({ route, navigation }: any) {
   const { photoUri, marker, originalDimensions, displayDimensions } = route.params || {};
 
-  const handleConfirm = () => {
-    // Transition to results for Task 7.1
-    navigation.navigate('ColorResults', { 
-      photoUri, 
-      marker,
-      displayDimensions,
-      originalDimensions
-    });
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
+  const handleConfirm = async () => {
+    if (!marker || !originalDimensions || !displayDimensions || !photoUri) {
+      console.log("Skipping process: Missing dimension or marker data");
+      return;
+    }
+    
+    try {
+      setIsProcessing(true);
+      
+      // Native Hardware-accelerated Resize scales 12 million pixels drastically down natively!
+      const manipResult = await manipulateAsync(
+        photoUri,
+        [{ resize: { width: 800 } }], 
+        { base64: true, format: SaveFormat.JPEG, compress: 0.8 }
+      );
+      
+      const base64Data = manipResult.base64!;
+
+      const rgb = calculate5x5Average(base64Data, marker.x, marker.y, displayDimensions);
+      
+      const toHex = (c: any) => {
+        const val = Math.max(0, Math.min(255, Math.round(Number(c)) || 0));
+        return val.toString(16).padStart(2, '0');
+      };
+      const hexColor = `#${toHex(rgb?.r)}${toHex(rgb?.g)}${toHex(rgb?.b)}`.toUpperCase();
+
+      const restOperation = post({
+        apiName: 'colorfindAPI',
+        path: '/colors/detect/match',
+        options: { body: { hexColor } }
+      });
+      const response = await restOperation.response;
+      const data = await response.body.json() as any;
+      const matchedColor = data.closestColor || null;
+
+      navigation.navigate('ColorResults', { 
+        photoUri, 
+        marker,
+        displayDimensions,
+        originalDimensions,
+        detectedColor: hexColor,
+        matchedColor
+      });
+    } catch (err) {
+      console.error("Match processing failed:", err);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleReselect = () => {
@@ -58,15 +105,17 @@ export default function SelectionConfirmationScreen({ route, navigation }: any) 
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={styles.confirmButton}
+              style={[styles.confirmButton, isProcessing && { opacity: 0.7 }]}
               onPress={handleConfirm}
+              disabled={isProcessing}
             >
-              <Text style={styles.buttonText}>Confirm Selection</Text>
+              <Text style={styles.buttonText}>{isProcessing ? 'Processing Color...' : 'Confirm Selection'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.reselectButton}
               onPress={handleReselect}
+              disabled={isProcessing}
             >
               <Text style={styles.reselectText}>Reselect</Text>
             </TouchableOpacity>

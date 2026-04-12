@@ -6,87 +6,83 @@ or in the "license" file accompanying this file. This file is distributed on an 
 See the License for the specific language governing permissions and limitations under the License.
 */
 
-
-
-
 const express = require('express')
 const bodyParser = require('body-parser')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const crypto = require("crypto");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
 
-// declare a new express app
+// DynamoDB connection
+const client = new DynamoDBClient({ region: process.env.REGION || "us-east-2" });
+const dynamo = DynamoDBDocumentClient.from(client);
+const env = process.env.ENV || "dev";
+const TABLE_NAME = `colorfind-objects-${env}`;
+
 const app = express()
 app.use(bodyParser.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Headers", "*")
   next()
 });
 
-
 /**********************
- * Example get method *
+ * GET method *
  **********************/
+app.get('/users/me/savedColors', async function (req, res) {
+  try {
+    const userID = req.apiGateway.event.requestContext.identity.cognitoIdentityId; // Safe Handshake
 
-app.get('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
-});
+    // Ask DynamoDB for saved colors
+    const data = await dynamo.send(new QueryCommand({
+      TableName: TABLE_NAME,
+      KeyConditionExpression: "userID = :u",
+      ExpressionAttributeValues: { ":u": userID }
+    }));
 
-app.get('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
-});
+    console.log(`Fetched ${data.Items.length} colors for user: ${userID}`);
+    res.json(data.Items || []); 
 
-/****************************
-* Example post method *
-****************************/
-
-app.post('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
-});
-
-app.post('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
+  } catch (error) {
+    console.error("GET Colors Error:", error);
+    res.status(500).json({ error: "Failed to fetch saved colors", details: error.message });
+  }
 });
 
 /****************************
-* Example put method *
+* POST method *
 ****************************/
+app.post('/users/me/savedColors', async function (req, res) {
+  try {
+    const userID = req.apiGateway.event.requestContext.identity.cognitoIdentityId;
+    const colorData = req.body;
 
-app.put('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
+    const newColor = {
+      userID: userID,
+      objectID: crypto.randomUUID(),
+      ...colorData,
+      createdAt: new Date().toISOString()
+    };
+
+    await dynamo.send(new PutCommand({
+      TableName: TABLE_NAME,
+      Item: newColor
+    }));
+
+    res.json({ success: "Color saved", color: newColor });
+
+  } catch (error) {
+    console.log("POST Colors Error:", error);
+    res.status(500).json({ error: "Failed to save color", details: error.message });
+  }
 });
 
-app.put('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
+app.listen(3000, function () {
+  console.log("App started")
 });
 
-/****************************
-* Example delete method *
-****************************/
-
-app.delete('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
-});
-
-app.delete('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
-});
-
-app.listen(3000, function() {
-    console.log("App started")
-});
-
-// Export the app object. When executing the application local this does nothing. However,
-// to port it to AWS Lambda we will create a wrapper around that will load the app from
-// this file
-module.exports = app
+module.exports = app;

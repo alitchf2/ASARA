@@ -24,7 +24,18 @@ export default function ObjectSelectionScreen({ route, navigation }: any) {
   const { photoUri } = route.params || {};
   const [marker, setMarker] = useState<{ x: number, y: number } | null>(null);
   const [imageLayout, setImageLayout] = useState<{ width: number, height: number } | null>(null);
+  const [originalDimensions, setOriginalDimensions] = useState<{ width: number, height: number } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (photoUri) {
+      Image.getSize(photoUri, (width, height) => {
+        setOriginalDimensions({ width, height });
+      }, (error) => {
+        console.error("Failed to get image size for test:", error);
+      });
+    }
+  }, [photoUri]);
 
   const handlePress = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
@@ -38,6 +49,7 @@ export default function ObjectSelectionScreen({ route, navigation }: any) {
       photoUri,
       marker,
       displayDimensions: imageLayout,
+      originalDimensions
     });
   };
 
