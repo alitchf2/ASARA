@@ -10,7 +10,19 @@ import {
 } from 'react-native';
 import { theme } from '../styles/theme';
 import { ImmersiveHeader } from '../components/ImmersiveHeader';
-import { generateComplementaryTheme, generateAnalogousTheme, generateTriadicTheme, generateMonochromaticTheme } from '../utils/colorThemes';
+import { ColorMetricsContainer } from '../components/ColorMetricsContainer';
+import { 
+  hexToRgb, 
+  hexToLab, 
+  formatRGBString, 
+  formatLABString 
+} from '../utils/colorUtils';
+import { 
+  generateComplementaryTheme, 
+  generateAnalogousTheme, 
+  generateTriadicTheme, 
+  generateMonochromaticTheme 
+} from '../utils/colorThemes';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -70,6 +82,12 @@ export default function ColorResultsScreen({ route, navigation }: any) {
   const triadicTheme = generateTriadicTheme(detectedColor);
   const monochromaticTheme = generateMonochromaticTheme(detectedColor);
 
+  // Dynamic Metrics Calculation
+  const rgbObj = hexToRgb(detectedColor);
+  const labObj = hexToLab(detectedColor);
+  const rgbString = formatRGBString(rgbObj);
+  const labString = formatLABString(labObj);
+
   return (
     <View style={styles.container}>
       <ImmersiveHeader 
@@ -125,6 +143,7 @@ export default function ColorResultsScreen({ route, navigation }: any) {
           </View>
 
           {/* Metrics Section */}
+<<<<<<< HEAD
           <View style={styles.metricsContainer}>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>HEX</Text>
@@ -147,6 +166,14 @@ export default function ColorResultsScreen({ route, navigation }: any) {
               </Text>
             </View>
           </View>
+=======
+          <ColorMetricsContainer 
+            hex={detectedColor}
+            rgb={rgbString}
+            lab={labString}
+            containerStyle={{ marginBottom: 30 }}
+          />
+>>>>>>> 8b28296 (Added compare screen and sliders)
 
           {/* Action Buttons */}
           <View style={styles.buttonContainer}>

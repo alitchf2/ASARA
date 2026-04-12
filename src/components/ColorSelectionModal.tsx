@@ -12,7 +12,7 @@ import {
   Animated,
   PanResponder,
   ScrollView,
-  Image
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../styles/theme';
