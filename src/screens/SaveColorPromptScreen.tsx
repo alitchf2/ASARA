@@ -75,7 +75,38 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
     }
     
     try {
-      // Send the color to our newly built DynamoDB API
+      setError(""); // Clear previous errors
+      
+      // STEP 1: Get a secure upload ticket
+      console.log("-> Fetching S3 Upload URL...");
+      const urlResponse = await post({
+        apiName: "colorfindAPI",
+        path: "/users/me/savedColors/upload-url",
+        options: {
+          body: { fileType: 'image/jpeg' }
+        }
+      }).response;
+      
+      const urlData = (await urlResponse.body.json()) as any;
+      const { uploadUrl, s3Key } = urlData;
+      
+      // STEP 2: Upload image directly to S3
+      console.log("-> Uploading image to S3...", s3Key);
+      const fetchResponse = await fetch(photoUri);
+      const photoBlob = await fetchResponse.blob();
+      
+      const uploadResult = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: photoBlob,
+        headers: {
+          'Content-Type': 'image/jpeg',
+        },
+      });
+
+      if (!uploadResult.ok) throw new Error("S3 Upload Failed");
+
+      // STEP 3: Save color record to DynamoDB with imageS3Key
+      console.log("-> Saving color metadata to DynamoDB...");
       await post({
         apiName: "colorfindAPI",
         path: "/users/me/savedColors",
@@ -84,11 +115,14 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
             name: name.trim(),
             hex: detectedColor,
             family: "Yellow", // Temp MVP Default
+            imageS3Key: s3Key,
           }
         }
       }).response;
 
-      // Reset the navigation stack so the user cannot go back to the prompt/results
+      console.log("-> Save Complete!");
+
+      // Reset the navigation stack
       navigation.reset({
         index: 0,
         routes: [{ 
@@ -96,9 +130,9 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
           params: { screen: 'SavedColors' } 
         }],
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Save Color Error:", err);
-      setError("Cloud sync failed. Please try again.");
+      setError("Cloud sync failed. Please check your connection.");
     }
   };
 

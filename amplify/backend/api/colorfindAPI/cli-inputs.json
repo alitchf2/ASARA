@@ -33,6 +33,19 @@
           "delete"
         ]
       }
+    },
+    "/users/me/savedColors/upload-url": {
+      "name": "/users/me/savedColors/upload-url",
+      "lambdaFunction": "savedColorsFunction",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
     }
   }
 }
