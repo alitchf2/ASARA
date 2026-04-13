@@ -13,14 +13,19 @@ import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../styles/theme";
 import { ImmersiveHeader } from "../components/ImmersiveHeader";
 import { ColorSelectionModal } from "../components/ColorSelectionModal";
+import { FeedbackModal } from "../components/FeedbackModal";
+import { generateComparisonSummary } from "../utils/colorSummary";
 import { CompareSlider } from "../components/CompareSlider";
 import { ColorMetricsContainer } from "../components/ColorMetricsContainer";
-import { 
-  parseLABString, 
-  hexToLab, 
-  hexToRgb, 
-  formatLABString, 
-  formatRGBString 
+import { AnimatedCircularProgress } from "../components/AnimatedCircularProgress";
+import {
+  parseLABString,
+  hexToLab,
+  hexToRgb,
+  formatLABString,
+  formatRGBString,
+  calculateComparisonMetrics,
+  ComparisonMetrics
 } from "../utils/colorUtils";
 import { SavedColor } from "../types/color";
 
@@ -29,14 +34,15 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 export default function ColorCompareScreen({ route, navigation }: any) {
   const { sourceColor } = route.params || {};
   const [isSelectionModalVisible, setIsSelectionModalVisible] = React.useState(false);
+  const [isInfoModalVisible, setIsInfoModalVisible] = React.useState(false);
   const [compareColor, setCompareColor] = React.useState<SavedColor | null>(null);
-  
+
   // Constants for "THE Thumbnail" (matched to Results page logic)
   const THUMB_SIZE = Math.min(160, (SCREEN_WIDTH - 60) / 2);
 
   const offsets = useMemo(() => {
     if (!sourceColor.marker || !sourceColor.displayDimensions) return null;
-    
+
     const { x, y } = sourceColor.marker;
     const containerWidth = sourceColor.displayDimensions.width;
     const containerHeight = sourceColor.displayDimensions.height;
@@ -71,22 +77,39 @@ export default function ColorCompareScreen({ route, navigation }: any) {
   // Dynamic Metrics for Source Color
   const sourceRGB = useMemo(() => hexToRgb(sourceColor.detectedColor || "#E5A100"), [sourceColor.detectedColor]);
   const sourceLAB = useMemo(() => hexToLab(sourceColor.detectedColor || "#E5A100"), [sourceColor.detectedColor]);
-  
+
   // Data for sliders & display
   const sourceData = sourceLAB;
   const compareData = useMemo(() => parseLABString(compareColor?.lab), [compareColor]);
 
+  // Integrated Comparison Metrics (Task 10.3)
+  const metrics = useMemo(() => {
+    if (!compareColor) return null;
+    return calculateComparisonMetrics(sourceLAB, compareData);
+  }, [sourceLAB, compareData, compareColor]);
+
+  const summaryText = useMemo(() => {
+    if (!compareColor || !metrics) {
+      return "Select a color from your library to see a detailed visual and technical comparison.";
+    }
+    return generateComparisonSummary(
+      metrics,
+      sourceColor.colorName || "The original color",
+      compareColor.name
+    );
+  }, [metrics, compareColor, sourceColor.colorName]);
+
   const sourceRGBStr = formatRGBString(sourceRGB);
   const sourceLABStr = formatLABString(sourceLAB);
-  
+
   const compareRGBStr = compareColor?.rgb || "-";
   const compareLABStr = compareColor?.lab || "-";
 
   return (
     <View style={styles.container}>
-      <ImmersiveHeader 
-        title="Compare Colors" 
-        onBack={() => navigation.goBack()} 
+      <ImmersiveHeader
+        title="Compare Colors"
+        onBack={() => navigation.goBack()}
       />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -99,8 +122,8 @@ export default function ColorCompareScreen({ route, navigation }: any) {
               <View style={[styles.thumbnailContainer, { width: THUMB_SIZE, height: THUMB_SIZE }]}>
                 {offsets ? (
                   <View style={styles.clippingBox}>
-                    <Image 
-                      source={{ uri: sourceColor.photoUri }} 
+                    <Image
+                      source={{ uri: sourceColor.photoUri }}
                       style={[
                         styles.zoomedImage,
                         {
@@ -126,15 +149,15 @@ export default function ColorCompareScreen({ route, navigation }: any) {
                   <Image source={{ uri: sourceColor.photoUri }} style={styles.thumbnail} resizeMode="cover" />
                 )}
               </View>
-              
+
               <View style={[styles.swatch, { backgroundColor: sourceColor.detectedColor || "#E5A100" }]} />
-              
+
               <View style={styles.cardInfo}>
                 <Text style={styles.colorName} numberOfLines={1}>{sourceColor.colorName || "Original"}</Text>
                 <Text style={styles.colorFamily}>Yellow</Text>
               </View>
 
-              <ColorMetricsContainer 
+              <ColorMetricsContainer
                 hex={sourceColor.detectedColor || "#E5A100"}
                 rgb={sourceRGBStr}
                 lab={sourceLABStr}
@@ -151,21 +174,21 @@ export default function ColorCompareScreen({ route, navigation }: any) {
             {compareColor ? (
               <TouchableOpacity style={styles.card} onPress={() => setIsSelectionModalVisible(true)}>
                 <View style={[styles.thumbnailContainer, { width: THUMB_SIZE, height: THUMB_SIZE }]}>
-                  <Image 
-                    source={typeof compareColor.imageUri === 'string' ? { uri: compareColor.imageUri } : compareColor.imageUri} 
-                    style={styles.thumbnail} 
-                    resizeMode="contain" 
+                  <Image
+                    source={typeof compareColor.imageUri === 'string' ? { uri: compareColor.imageUri } : compareColor.imageUri}
+                    style={styles.thumbnail}
+                    resizeMode="contain"
                   />
                 </View>
-                
-                  <View style={[styles.swatch, styles.swatchCircle, { backgroundColor: compareColor.hex }]} />
-                
+
+                <View style={[styles.swatch, styles.swatchCircle, { backgroundColor: compareColor.hex }]} />
+
                 <View style={styles.cardInfo}>
                   <Text style={styles.colorName} numberOfLines={1}>{compareColor.name}</Text>
                   <Text style={styles.colorFamily}>{compareColor.family}</Text>
                 </View>
 
-                <ColorMetricsContainer 
+                <ColorMetricsContainer
                   hex={compareColor.hex}
                   rgb={compareRGBStr}
                   lab={compareLABStr}
@@ -173,7 +196,7 @@ export default function ColorCompareScreen({ route, navigation }: any) {
                 />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.placeholderCard, { width: THUMB_SIZE, height: THUMB_SIZE }]}
                 onPress={() => setIsSelectionModalVisible(true)}
               >
@@ -184,14 +207,42 @@ export default function ColorCompareScreen({ route, navigation }: any) {
           </View>
         </View>
 
-        {/* Hidden comparison details (addressed in future task) */}
+        {/* Compare Summary (Tasks 10.5 & 10.8) */}
+        <View style={styles.summarySection}>
+          <TouchableOpacity
+            style={styles.sectionHeaderRow}
+            onPress={() => setIsInfoModalVisible(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sectionTitle}>Compare Summary</Text>
+            <Ionicons name="information-circle-outline" size={16} color="#AAA" style={styles.infoIcon} />
+          </TouchableOpacity>
+          <View style={styles.summaryBox}>
+            <View style={styles.summaryScoreLeft}>
+              <AnimatedCircularProgress
+                percentage={metrics ? metrics.similarityPercent : 0}
+                size={68}
+                strokeWidth={3}
+                color={theme.colors.companyOrange}
+                label="MATCH"
+              />
+            </View>
+            <View style={styles.summaryContentRight}>
+              <Text style={styles.summaryText}>
+                {summaryText}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Visual Comparison (Sliders) */}
         <View style={styles.comparisonVisuals}>
           <Text style={styles.sectionTitle}>Visual Comparison</Text>
-          
-          <CompareSlider 
+
+          <CompareSlider
             label="Lightness (L)"
             sourceValue={sourceData.l}
-            compareValue={compareData.chroma !== 0 ? compareData.l : null}
+            compareValue={metrics ? metrics.lightnessCompare : null}
             min={0}
             max={100}
             gradientColors={['#000000', '#FFFFFF']}
@@ -199,10 +250,10 @@ export default function ColorCompareScreen({ route, navigation }: any) {
             compareHex={compareColor?.hex}
           />
 
-          <CompareSlider 
+          <CompareSlider
             label="Red ↔ Green (A)"
             sourceValue={sourceData.a}
-            compareValue={compareData.chroma !== 0 ? compareData.a : null}
+            compareValue={metrics ? metrics.aCompare : null}
             min={-128}
             max={127}
             gradientColors={['#00FF00', '#808080', '#FF0000']}
@@ -210,10 +261,10 @@ export default function ColorCompareScreen({ route, navigation }: any) {
             compareHex={compareColor?.hex}
           />
 
-          <CompareSlider 
+          <CompareSlider
             label="Yellow ↔ Blue (B)"
             sourceValue={sourceData.b}
-            compareValue={compareData.chroma !== 0 ? compareData.b : null}
+            compareValue={metrics ? metrics.bCompare : null}
             min={-128}
             max={127}
             gradientColors={['#0000FF', '#808080', '#FFFF00']}
@@ -221,10 +272,10 @@ export default function ColorCompareScreen({ route, navigation }: any) {
             compareHex={compareColor?.hex}
           />
 
-          <CompareSlider 
+          <CompareSlider
             label="Saturation / Chroma"
             sourceValue={sourceData.chroma}
-            compareValue={compareData.chroma !== 0 ? compareData.chroma : null}
+            compareValue={metrics ? metrics.chromaCompare : null}
             min={0}
             max={180}
             gradientColors={['#808080', '#FF00FF']}
@@ -234,10 +285,19 @@ export default function ColorCompareScreen({ route, navigation }: any) {
         </View>
       </ScrollView>
 
-      <ColorSelectionModal 
+      <ColorSelectionModal
         isVisible={isSelectionModalVisible}
         onClose={() => setIsSelectionModalVisible(false)}
         onSelect={handleSelectCompareColor}
+      />
+
+      <FeedbackModal
+        visible={isInfoModalVisible}
+        title="Comparison Science"
+        subtitle="ASARA uses the CIE2000 DeltaE formula, the industry standard for perceptual color matching. This advanced math accounts for the non-linear way human eyes see differences in lightness, hue, and saturation. A Match Score of 100% means the colors are mathematically identical, while a score of 98% or higher is considered a perfect match to the naked eye."
+        iconName="analytics-outline"
+        buttonTitle="Got it"
+        onButtonPress={() => setIsInfoModalVisible(false)}
       />
     </View>
   );
@@ -290,9 +350,9 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   swatch: {
-    width: 80, 
+    width: 80,
     height: 80,
-    borderRadius: 8, 
+    borderRadius: 8,
     borderWidth: 0,
     backgroundColor: "white",
     shadowColor: "#000",
@@ -380,16 +440,74 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     alignSelf: 'center',
   },
-  comparisonVisuals: {
+  scoreSection: {
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  scoreValue: {
+    fontSize: 72,
+    fontWeight: '800',
+    color: theme.colors.companyBlack,
+    letterSpacing: -2,
+  },
+  scoreLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#AAA',
+    letterSpacing: 2,
+    marginTop: -8,
+  },
+  summarySection: {
     paddingHorizontal: 20,
     marginTop: 10,
+    marginBottom: 10,
+  },
+  summaryBox: {
+    backgroundColor: '#F9F9F9',
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  summaryScoreLeft: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingRight: 18,
+    borderRightWidth: 1,
+    borderRightColor: '#E0E0E0',
+  },
+  summaryContentRight: {
+    flex: 1,
+    paddingLeft: 18,
+  },
+  summaryText: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#444',
+    fontWeight: '500',
+  },
+  comparisonVisuals: {
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "800",
     color: theme.colors.companyBlack,
     letterSpacing: 1,
-    marginBottom: 20,
+    marginBottom: 15,
     textTransform: 'uppercase',
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  infoIcon: {
+    marginLeft: 6,
+    marginTop: -15, // Alignment offset for the title's margin
   },
 });
