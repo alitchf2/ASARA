@@ -42,15 +42,15 @@ export const CompareSlider: React.FC<CompareSliderProps> = ({
         <View style={styles.valuesRow}>
           <Text style={[styles.valueText, { color: theme.colors.textMuted }]}>
             Δ: {compareValue !== undefined && compareValue !== null 
-              ? (compareValue - sourceValue > 0 ? "+" : "") + (compareValue - sourceValue).toFixed(1)
-              : "0.0"}
+              ? (compareValue - sourceValue > 0 ? "+" : "") + (compareValue - sourceValue).toFixed(2)
+              : "0.00"}
           </Text>
         </View>
       </View>
 
       <View style={styles.trackContainer}>
         <LinearGradient
-          colors={gradientColors}
+          colors={gradientColors as any}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={styles.track}

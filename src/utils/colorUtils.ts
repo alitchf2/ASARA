@@ -16,6 +16,19 @@ export interface LAB {
   chroma: number;
 }
 
+export interface ComparisonMetrics {
+  deltaE: number;
+  lightnessSource: number;
+  lightnessCompare: number;
+  aSource: number;
+  aCompare: number;
+  bSource: number;
+  bCompare: number;
+  chromaSource: number;
+  chromaCompare: number;
+  similarityPercent: number;
+}
+
 /**
  * Parses a standard LAB string "L, A, B" into an object with Chroma.
  */
@@ -100,4 +113,93 @@ export const hexToLab = (hex: string): LAB => {
  */
 export const formatLABString = (lab: LAB): string => {
   return `${lab.l.toFixed(1)}, ${lab.a.toFixed(1)}, ${lab.b.toFixed(1)}`;
+};
+
+/**
+ * Calculates the color difference between two LAB colors using the CIE2000 formula.
+ * (Task 6.4)
+ */
+export const calculateDeltaE2000 = (lab1: LAB, lab2: LAB): number => {
+  const L1 = lab1.l;
+  const a1 = lab1.a;
+  const b1 = lab1.b;
+  const L2 = lab2.l;
+  const a2 = lab2.a;
+  const b2 = lab2.b;
+
+  const avgL = (L1 + L2) / 2;
+  const C1 = Math.sqrt(a1 * a1 + b1 * b1);
+  const C2 = Math.sqrt(a2 * a2 + b2 * b2);
+  const avgC = (C1 + C2) / 2;
+
+  const G = 0.5 * (1 - Math.sqrt(Math.pow(avgC, 7) / (Math.pow(avgC, 7) + Math.pow(25, 7))));
+
+  const a1p = a1 * (1 + G);
+  const a2p = a2 * (1 + G);
+
+  const C1p = Math.sqrt(a1p * a1p + b1 * b1);
+  const C2p = Math.sqrt(a2p * a2p + b2 * b2);
+
+  const avgCp = (C1p + C2p) / 2;
+
+  const h1p = (Math.atan2(b1, a1p) * 180 / Math.PI + 360) % 360;
+  const h2p = (Math.atan2(b2, a2p) * 180 / Math.PI + 360) % 360;
+
+  let deltaHp;
+  if (Math.abs(h1p - h2p) <= 180) {
+    deltaHp = h2p - h1p;
+  } else if (h2p <= h1p) {
+    deltaHp = h2p - h1p + 360;
+  } else {
+    deltaHp = h2p - h1p - 360;
+  }
+
+  const avgHp = Math.abs(h1p - h2p) > 180 ? (h1p + h2p + 360) / 2 : (h1p + h2p) / 2;
+
+  const T = 1 - 0.17 * Math.cos((avgHp - 30) * Math.PI / 180) +
+            0.24 * Math.cos((2 * avgHp) * Math.PI / 180) +
+            0.32 * Math.cos((3 * avgHp + 6) * Math.PI / 180) -
+            0.20 * Math.cos((4 * avgHp - 63) * Math.PI / 180);
+
+  const deltaLp = L2 - L1;
+  const deltaCp = C2p - C1p;
+  const deltaHPp = 2 * Math.sqrt(C1p * C2p) * Math.sin((deltaHp / 2) * Math.PI / 180);
+
+  const Sl = 1 + (0.015 * Math.pow(avgL - 50, 2)) / Math.sqrt(20 + Math.pow(avgL - 50, 2));
+  const Sc = 1 + 0.045 * avgCp;
+  const Sh = 1 + 0.015 * avgCp * T;
+
+  const deltaTheta = 30 * Math.exp(-Math.pow((avgHp - 275) / 25, 2));
+  const Rc = 2 * Math.sqrt(Math.pow(avgCp, 7) / (Math.pow(avgCp, 7) + Math.pow(25, 7)));
+  const Rt = -Math.sin((2 * deltaTheta) * Math.PI / 180) * Rc;
+
+  const deltaE = Math.sqrt(
+    Math.pow(deltaLp / Sl, 2) +
+    Math.pow(deltaCp / Sc, 2) +
+    Math.pow(deltaHPp / Sh, 2) +
+    Rt * (deltaCp / Sc) * (deltaHPp / Sh)
+  );
+
+  return deltaE;
+};
+
+/**
+ * Computes all comparison metrics between two colors.
+ * (Task 10.3)
+ */
+export const calculateComparisonMetrics = (source: LAB, compare: LAB): ComparisonMetrics => {
+  const dE = calculateDeltaE2000(source, compare);
+  
+  return {
+    deltaE: dE,
+    lightnessSource: source.l,
+    lightnessCompare: compare.l,
+    aSource: source.a,
+    aCompare: compare.a,
+    bSource: source.b,
+    bCompare: compare.b,
+    chromaSource: source.chroma,
+    chromaCompare: compare.chroma,
+    similarityPercent: Math.max(0, 100 - (dE * 2)),
+  };
 };
