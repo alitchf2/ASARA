@@ -11,43 +11,28 @@ import {
 import { theme } from '../styles/theme';
 import { ImmersiveHeader } from '../components/ImmersiveHeader';
 import { ColorMetricsContainer } from '../components/ColorMetricsContainer';
-import { 
-  hexToRgb, 
-  hexToLab, 
-  formatRGBString, 
-  formatLABString 
+import {
+  hexToRgb,
+  hexToLab,
+  formatRGBString,
+  formatLABString
 } from '../utils/colorUtils';
-import { 
-  generateComplementaryTheme, 
-  generateAnalogousTheme, 
-  generateTriadicTheme, 
-  generateMonochromaticTheme 
+import {
+  generateComplementaryTheme,
+  generateAnalogousTheme,
+  generateTriadicTheme,
+  generateMonochromaticTheme
 } from '../utils/colorThemes';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function ColorResultsScreen({ route, navigation }: any) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 348fc3f (Revert "added basic color compare screen (task 10.1)")
-  const { 
-    photoUri, 
-    detectedColor = '#E5A100', 
-    marker, 
-<<<<<<< HEAD
-    displayDimensions,
-    matchedColor 
-=======
   const {
     photoUri,
     detectedColor = '#E5A100',
     marker,
-    displayDimensions
->>>>>>> 77a7b42 (added basic color compare screen (task 10.1))
-=======
-    displayDimensions 
->>>>>>> 348fc3f (Revert "added basic color compare screen (task 10.1)")
+    displayDimensions,
+    matchedColor
   } = route.params || {};
 
   const THUMB_SIZE = 200;
@@ -90,9 +75,9 @@ export default function ColorResultsScreen({ route, navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <ImmersiveHeader 
-        title="Color Results" 
-        onBack={() => navigation.goBack()} 
+      <ImmersiveHeader
+        title="Color Results"
+        onBack={() => navigation.goBack()}
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -113,11 +98,11 @@ export default function ColorResultsScreen({ route, navigation }: any) {
               resizeMode="cover"
             />
             {/* Precise Selection Marker */}
-            <View 
+            <View
               style={[
-                styles.miniMarker, 
+                styles.miniMarker,
                 { left: offsets.markerX - 10, top: offsets.markerY - 10 }
-              ]} 
+              ]}
               pointerEvents="none"
             >
               <View style={styles.miniCenter} />
@@ -143,7 +128,6 @@ export default function ColorResultsScreen({ route, navigation }: any) {
           </View>
 
           {/* Metrics Section */}
-<<<<<<< HEAD
           <View style={styles.metricsContainer}>
             <View style={styles.metricRow}>
               <Text style={styles.metricLabel}>HEX</Text>
@@ -166,14 +150,12 @@ export default function ColorResultsScreen({ route, navigation }: any) {
               </Text>
             </View>
           </View>
-=======
-          <ColorMetricsContainer 
+          <ColorMetricsContainer
             hex={detectedColor}
             rgb={rgbString}
             lab={labString}
             containerStyle={{ marginBottom: 30 }}
           />
->>>>>>> 8b28296 (Added compare screen and sliders)
 
           {/* Action Buttons */}
           <View style={styles.buttonContainer}>
@@ -210,11 +192,11 @@ export default function ColorResultsScreen({ route, navigation }: any) {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Color Themes</Text>
             </View>
-            
+
             <View style={styles.themeRowContainer}>
               <Text style={styles.themeLabel}>Complementary</Text>
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.swatchRow}
               >
@@ -229,8 +211,8 @@ export default function ColorResultsScreen({ route, navigation }: any) {
 
             <View style={styles.themeRowContainer}>
               <Text style={styles.themeLabel}>Analogous</Text>
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.swatchRow}
               >
@@ -245,8 +227,8 @@ export default function ColorResultsScreen({ route, navigation }: any) {
 
             <View style={styles.themeRowContainer}>
               <Text style={styles.themeLabel}>Triadic</Text>
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.swatchRow}
               >
@@ -261,8 +243,8 @@ export default function ColorResultsScreen({ route, navigation }: any) {
 
             <View style={styles.themeRowContainer}>
               <Text style={styles.themeLabel}>Monochromatic</Text>
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.swatchRow}
               >
