@@ -154,7 +154,7 @@ export default function ColorCompareScreen({ route, navigation }: any) {
 
               <View style={styles.cardInfo}>
                 <Text style={styles.colorName} numberOfLines={1}>{sourceColor.colorName || "Original"}</Text>
-                <Text style={styles.colorFamily}>Yellow</Text>
+                <Text style={styles.colorFamily}>{sourceColor.family || "Color"}</Text>
               </View>
 
               <ColorMetricsContainer
@@ -251,7 +251,7 @@ export default function ColorCompareScreen({ route, navigation }: any) {
           />
 
           <CompareSlider
-            label="Red ↔ Green (A)"
+            label="Green ↔ Red (A)"
             sourceValue={sourceData.a}
             compareValue={metrics ? metrics.aCompare : null}
             min={-128}
@@ -262,7 +262,7 @@ export default function ColorCompareScreen({ route, navigation }: any) {
           />
 
           <CompareSlider
-            label="Yellow ↔ Blue (B)"
+            label="Blue ↔ Yellow (B)"
             sourceValue={sourceData.b}
             compareValue={metrics ? metrics.bCompare : null}
             min={-128}

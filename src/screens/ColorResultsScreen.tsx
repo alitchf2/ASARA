@@ -67,11 +67,25 @@ export default function ColorResultsScreen({ route, navigation }: any) {
   const triadicTheme = generateTriadicTheme(detectedColor);
   const monochromaticTheme = generateMonochromaticTheme(detectedColor);
 
-  // Dynamic Metrics Calculation
-  const rgbObj = hexToRgb(detectedColor);
-  const labObj = hexToLab(detectedColor);
-  const rgbString = formatRGBString(rgbObj);
-  const labString = formatLABString(labObj);
+  // Determine standard library metrics or fall back to detected
+  const finalHex = matchedColor?.hex ? (matchedColor.hex.startsWith('#') ? matchedColor.hex : `#${matchedColor.hex}`) : detectedColor;
+
+  // Use DB-provided metrics if they exist, otherwise calculate from the finalHex (Source of Truth)
+  const finalRgbObj = matchedColor?.rgb ? {
+    r: matchedColor.rgb.r !== undefined && matchedColor.rgb.r !== null ? matchedColor.rgb.r : hexToRgb(finalHex).r,
+    g: matchedColor.rgb.g !== undefined && matchedColor.rgb.g !== null ? matchedColor.rgb.g : hexToRgb(finalHex).g,
+    b: matchedColor.rgb.b !== undefined && matchedColor.rgb.b !== null ? matchedColor.rgb.b : hexToRgb(finalHex).b,
+  } : hexToRgb(finalHex);
+
+  const finalLabObj = matchedColor?.lab ? {
+    l: matchedColor.lab.l !== undefined && matchedColor.lab.l !== null ? matchedColor.lab.l : hexToLab(finalHex).l,
+    a: matchedColor.lab.a !== undefined && matchedColor.lab.a !== null ? matchedColor.lab.a : hexToLab(finalHex).a,
+    b: matchedColor.lab.b !== undefined && matchedColor.lab.b !== null ? matchedColor.lab.b : hexToLab(finalHex).b,
+    chroma: matchedColor.lab.chroma !== undefined && matchedColor.lab.chroma !== null ? matchedColor.lab.chroma : hexToLab(finalHex).chroma,
+  } : hexToLab(finalHex);
+
+  const finalRgbString = formatRGBString(finalRgbObj);
+  const finalLabString = formatLABString(finalLabObj);
 
   return (
     <View style={styles.container}>
@@ -116,7 +130,7 @@ export default function ColorResultsScreen({ route, navigation }: any) {
             <View
               style={[
                 styles.swatch,
-                { backgroundColor: detectedColor }
+                { backgroundColor: finalHex }
               ]}
             />
             <View style={styles.nameContainer}>
@@ -127,33 +141,11 @@ export default function ColorResultsScreen({ route, navigation }: any) {
             </View>
           </View>
 
-          {/* Metrics Section */}
-          <View style={styles.metricsContainer}>
-            <View style={styles.metricRow}>
-              <Text style={styles.metricLabel}>HEX</Text>
-              <Text style={styles.metricValue}>
-                {(matchedColor?.hex ? `#${matchedColor.hex}` : detectedColor)?.toUpperCase()}
-              </Text>
-            </View>
-
-            <View style={styles.metricRow}>
-              <Text style={styles.metricLabel}>RGB</Text>
-              <Text style={styles.metricValue}>
-                R: {matchedColor?.rgb?.r || '?'}  G: {matchedColor?.rgb?.g || '?'}  B: {matchedColor?.rgb?.b || '?'}
-              </Text>
-            </View>
-
-            <View style={styles.metricRow}>
-              <Text style={styles.metricLabel}>LAB</Text>
-              <Text style={styles.metricValue}>
-                L: {matchedColor?.lab?.l || '?'}  A: {matchedColor?.lab?.a || '?'}  B: {matchedColor?.lab?.b || '?'}
-              </Text>
-            </View>
-          </View>
+          {/* Unified Metrics Section */}
           <ColorMetricsContainer
-            hex={detectedColor}
-            rgb={rgbString}
-            lab={labString}
+            hex={finalHex}
+            rgb={finalRgbString}
+            lab={finalLabString}
             containerStyle={{ marginBottom: 30 }}
           />
 
@@ -162,8 +154,11 @@ export default function ColorResultsScreen({ route, navigation }: any) {
             <TouchableOpacity
               style={styles.primaryButton}
               onPress={() => navigation.navigate('SaveColorPrompt', {
-                detectedColor,
-                colorName: matchedColor?.name || matchedColor?.colorName || 'Unknown Match', // Placeholder for Task 5.3
+                detectedColor: finalHex,
+                colorName: matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match',
+                family: matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color',
+                rgbString: finalRgbString,
+                labString: finalLabString,
                 photoUri,
                 marker,
                 displayDimensions
@@ -176,8 +171,9 @@ export default function ColorResultsScreen({ route, navigation }: any) {
               style={styles.compareButton}
               onPress={() => navigation.navigate('ColorCompare', {
                 sourceColor: {
-                  detectedColor,
-                  colorName: 'Quercitron', // Placeholder for Task 5.3
+                  detectedColor: finalHex,
+                  colorName: matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match',
+                  family: matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color',
                   photoUri,
                   marker,
                   displayDimensions
