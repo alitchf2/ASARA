@@ -160,6 +160,17 @@
                   "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/colorfind-objects-${env}/index/*"
                 }
               ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject"
+              ],
+              "Resource": [
+                "arn:aws:s3:::colorfind-images-dev8b035-dev/*",
+                "arn:aws:s3:::colorfind-images-devede92-prod/*"
+              ]
             }
           ]
         }
