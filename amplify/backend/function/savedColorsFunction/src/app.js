@@ -6,137 +6,87 @@ or in the "license" file accompanying this file. This file is distributed on an 
 See the License for the specific language governing permissions and limitations under the License.
 */
 
+
+
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
-const crypto = require("crypto");
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, QueryCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
-const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
-// AWS connection
-const region = process.env.REGION || "us-east-2";
-const client = new DynamoDBClient({ region });
-const dynamo = DynamoDBDocumentClient.from(client);
-const s3 = new S3Client({ region });
-
-const env = process.env.ENV || "dev";
-const TABLE_NAME = `colorfind-objects-${env}`;
-// Use the exact bucket names provided (handling the Amplify unique hashes)
-const BUCKET_NAME = env === "prod" 
-  ? "colorfind-images-devede92-prod" 
-  : "colorfind-images-dev8b035-dev";
-
+// declare a new express app
 const app = express()
 app.use(bodyParser.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Headers", "*")
   next()
 });
 
+
 /**********************
- * GET method *
+ * Example get method *
  **********************/
-app.get('/users/me/savedColors', async function (req, res) {
-  try {
-    const userID = req.apiGateway.event.requestContext.identity.cognitoIdentityId; // Safe Handshake
 
-    // Ask DynamoDB for saved colors
-    const data = await dynamo.send(new QueryCommand({
-      TableName: TABLE_NAME,
-      KeyConditionExpression: "userID = :u",
-      ExpressionAttributeValues: { ":u": userID }
-    }));
+app.get('/colors/saved', function(req, res) {
+  // Add your code here
+  res.json({success: 'get call succeed!', url: req.url});
+});
 
-    let items = data.Items || [];
-    
-    // Generate secure View URLs for every image (stays on Lambda server, fast math)
-    const itemsWithUrls = await Promise.all(items.map(async (item) => {
-      if (item.imageS3Key) {
-        const command = new GetObjectCommand({
-          Bucket: BUCKET_NAME,
-          Key: item.imageS3Key,
-        });
-        // Generate a 60-minute expiring link
-        const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
-        return { ...item, imageUri: signedUrl };
-      }
-      return item;
-    }));
-
-    itemsWithUrls.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    console.log("-> DynamoDB Query Success", itemsWithUrls.length);
-    res.json(itemsWithUrls);
-
-  } catch (error) {
-    console.error("GET Colors Error:", error);
-    res.status(500).json({ error: "Failed to fetch saved colors", details: error.message });
-  }
+app.get('/colors/saved/*', function(req, res) {
+  // Add your code here
+  res.json({success: 'get call succeed!', url: req.url});
 });
 
 /****************************
-* POST method *
+* Example post method *
 ****************************/
-app.post('/users/me/savedColors', async function (req, res) {
-  try {
-    const userID = req.apiGateway.event.requestContext.identity.cognitoIdentityId;
-    const colorData = req.body;
 
-    const newColor = {
-      userID: userID,
-      objectID: crypto.randomUUID(),
-      ...colorData,
-      createdAt: new Date().toISOString()
-    };
+app.post('/colors/saved', function(req, res) {
+  // Add your code here
+  res.json({success: 'post call succeed!', url: req.url, body: req.body})
+});
 
-    await dynamo.send(new PutCommand({
-      TableName: TABLE_NAME,
-      Item: newColor
-    }));
-
-    res.json({ success: "Color saved", color: newColor });
-
-  } catch (error) {
-    console.log("POST Colors Error:", error);
-    res.status(500).json({ error: "Failed to save color", details: error.message });
-  }
+app.post('/colors/saved/*', function(req, res) {
+  // Add your code here
+  res.json({success: 'post call succeed!', url: req.url, body: req.body})
 });
 
 /****************************
-* S3 Upload URL method *
+* Example put method *
 ****************************/
-app.post('/users/me/savedColors/upload-url', async function (req, res) {
-  try {
-    const userID = req.apiGateway.event.requestContext.identity.cognitoIdentityId;
-    const { fileType } = req.body; // e.g., 'image/jpeg'
-    
-    const objectID = crypto.randomUUID();
-    const s3Key = `public/${userID}/${objectID}.jpg`;
 
-    const command = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: s3Key,
-      ContentType: fileType || 'image/jpeg'
-    });
-
-    const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 }); // 5 minute window
-
-    res.json({ uploadUrl, s3Key });
-
-  } catch (error) {
-    console.error("S3 Upload URL Error:", error);
-    res.status(500).json({ error: "Failed to generate upload URL", details: error.message });
-  }
+app.put('/colors/saved', function(req, res) {
+  // Add your code here
+  res.json({success: 'put call succeed!', url: req.url, body: req.body})
 });
 
-app.listen(3000, function () {
-  console.log("App started")
+app.put('/colors/saved/*', function(req, res) {
+  // Add your code here
+  res.json({success: 'put call succeed!', url: req.url, body: req.body})
 });
 
-module.exports = app;
+/****************************
+* Example delete method *
+****************************/
+
+app.delete('/colors/saved', function(req, res) {
+  // Add your code here
+  res.json({success: 'delete call succeed!', url: req.url});
+});
+
+app.delete('/colors/saved/*', function(req, res) {
+  // Add your code here
+  res.json({success: 'delete call succeed!', url: req.url});
+});
+
+app.listen(3000, function() {
+    console.log("App started")
+});
+
+// Export the app object. When executing the application local this does nothing. However,
+// to port it to AWS Lambda we will create a wrapper around that will load the app from
+// this file
+module.exports = app

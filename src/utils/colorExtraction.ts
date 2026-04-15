@@ -51,13 +51,13 @@ export const calculate5x5Average = (
 
             const isSwapped = (rawAspect > 1 && displayAspect < 1) || (rawAspect < 1 && displayAspect > 1);
             if (isSwapped) {
-                 displayIW = IH;
-                 displayIH = IW;
+                displayIW = IH;
+                displayIH = IW;
             }
 
             // Calculate 'resizeMode="cover"' scaling factor
             const scale = Math.max(CW / displayIW, CH / displayIH);
-            
+
             // Calculate what physical display dimension the image would take if unrestricted
             const scaledImageWidth = displayIW * scale;
             const scaledImageHeight = displayIH * scale;
@@ -78,7 +78,7 @@ export const calculate5x5Average = (
                 // If Orientation was swapped inside React Native via EXIF mapping,
                 // this performs a generic 90-degree mapping correction (assuming primary CCW/CW standards)
                 finalTapX = logicalRawY;
-                finalTapY = IW - logicalRawX; 
+                finalTapY = IW - logicalRawX;
                 // Quick bound check for typical 90deg opposite
                 if (finalTapY < 0 || finalTapY > height) { finalTapY = logicalRawX; }
             } else {
@@ -107,6 +107,7 @@ export const calculate5x5Average = (
         // Iterate identically across the 25 spatial points
         for (let y = startY; y <= endY; y++) {
             for (let x = startX; x <= endX; x++) {
+                // Calculate physical 1D array index (stride) for the 2D plane geometry
                 // Every parsed pixel strictly maintains 4 specific byte channels: (R, G, B, A)
                 const index = (y * width + x) * 4;
 

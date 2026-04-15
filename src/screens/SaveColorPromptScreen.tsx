@@ -16,6 +16,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../styles/theme";
+import { ColorMetricsContainer } from "../components/ColorMetricsContainer";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -25,7 +26,10 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
     detectedColor = '#E5A100', 
     marker, 
     displayDimensions,
-    colorName = "Quercitron"
+    colorName = "Unknown Match",
+    family = "Color",
+    rgbString,
+    labString
   } = route.params || {};
 
   const [name, setName] = useState(colorName);
@@ -55,17 +59,6 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
     };
   }, [marker, displayDimensions]);
 
-  // Color Value Calc (Dynamic for MVP)
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 229, g: 161, b: 0 };
-  };
-
-  const rgb = hexToRgb(detectedColor);
 
   const handleSave = () => {
     if (!name.trim()) {
@@ -133,29 +126,20 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
                     setName(text);
                     if (error) setError("");
                   }}
-                  autoFocus
                   placeholder="Enter name..."
                   autoCorrect={false}
                 />
-                <Text style={styles.familyName}>Yellow</Text>
+                <Text style={styles.familyName}>{family}</Text>
               </View>
             </View>
 
-            {/* Metrics Section */}
-            <View style={styles.metricsContainer}>
-              <View style={styles.metricRow}>
-                <Text style={styles.metricLabel}>HEX</Text>
-                <Text style={styles.metricValue}>{detectedColor.toUpperCase()}</Text>
-              </View>
-              <View style={styles.metricRow}>
-                <Text style={styles.metricLabel}>RGB</Text>
-                <Text style={styles.metricValue}>R: {rgb.r}  G: {rgb.g}  B: {rgb.b}</Text>
-              </View>
-              <View style={styles.metricRow}>
-                <Text style={styles.metricLabel}>LAB</Text>
-                <Text style={styles.metricValue}>L: 68.4  A: 12.1  B: 61.8</Text>
-              </View>
-            </View>
+            {/* Unified Metrics Section */}
+            <ColorMetricsContainer
+              hex={detectedColor}
+              rgb={rgbString || "0, 0, 0"}
+              lab={labString || "0, 0, 0"}
+              containerStyle={{ marginBottom: 30 }}
+            />
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
 

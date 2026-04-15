@@ -15,11 +15,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../styles/theme";
 import { ColorCard } from "../components/ColorCard";
+import { SAVED_COLORS } from "../utils/savedColors";
+import { SavedColor } from "../types/color";
 
 const { width } = Dimensions.get("window");
 
-// Core list of saved colors (Initially empty until Task 9.2)
-const SAVED_COLORS: any[] = [];
 
 const FAMILIES = ["All", "Red", "Yellow", "Blue", "Green", "Orange", "Purple", "Brown", "Gray", "Black", "White"];
 
@@ -129,7 +129,7 @@ export default function SavedColorsScreen({ navigation }: any) {
     }
   }, [isGuest, isFocused, navigation, showGuestModal]);
 
-  const filteredColors = SAVED_COLORS.filter(color => {
+  const filteredColors = SAVED_COLORS.filter((color: SavedColor) => {
     const matchesSearch = color.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFamily = selectedFamily === "All" || color.family === selectedFamily;
     return matchesSearch && matchesFamily;
