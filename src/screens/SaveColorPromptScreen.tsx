@@ -88,7 +88,17 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
         urlData = (await urlResponse.body.json()) as any;
         console.log("DEBUG: Step 1 success - s3Key:", urlData?.s3Key);
       } catch (e1: any) {
-        console.error("DEBUG: Step 1 FAILED:", e1);
+        console.error("DEBUG: Step 1 FAILED - name:", e1?.name);
+        console.error("DEBUG: Step 1 FAILED - message:", e1?.message);
+        console.error("DEBUG: Step 1 FAILED - underlyingError:", e1?.underlyingError);
+        // RestApiError exposes the HTTP response
+        if (e1?.response) {
+          console.error("DEBUG: Step 1 HTTP status:", e1.response.statusCode);
+          try {
+            const errBody = await e1.response.body.text();
+            console.error("DEBUG: Step 1 HTTP body:", errBody);
+          } catch {}
+        }
         throw new Error(`Upload Ticket Failed: ${e1.message || e1}`);
       }
       

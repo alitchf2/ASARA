@@ -23,6 +23,7 @@ import {
   generateTriadicTheme,
   generateMonochromaticTheme
 } from '../utils/colorThemes';
+import { useAuth } from '../contexts/AuthContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -34,6 +35,8 @@ export default function ColorResultsScreen({ route, navigation }: any) {
     displayDimensions,
     matchedColor
   } = route.params || {};
+
+  const { isGuest, showGuestModal } = useAuth();
 
   const THUMB_SIZE = 200;
 
@@ -86,6 +89,24 @@ export default function ColorResultsScreen({ route, navigation }: any) {
 
   const finalRgbString = formatRGBString(finalRgbObj);
   const finalLabString = formatLABString(finalLabObj);
+
+  // Guard: guests cannot save colors — show the guest modal instead of navigating
+  const handleSaveColorPress = () => {
+    if (isGuest) {
+      showGuestModal("Save Colors");
+      return;
+    }
+    navigation.navigate('SaveColorPrompt', {
+      detectedColor: finalHex,
+      colorName: matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match',
+      family: matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color',
+      rgbString: finalRgbString,
+      labString: finalLabString,
+      photoUri,
+      marker,
+      displayDimensions
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -153,16 +174,7 @@ export default function ColorResultsScreen({ route, navigation }: any) {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.primaryButton}
-              onPress={() => navigation.navigate('SaveColorPrompt', {
-                detectedColor: finalHex,
-                colorName: matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match',
-                family: matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color',
-                rgbString: finalRgbString,
-                labString: finalLabString,
-                photoUri,
-                marker,
-                displayDimensions
-              })}
+              onPress={handleSaveColorPress}
             >
               <Text style={styles.primaryButtonText}>Save Color</Text>
             </TouchableOpacity>

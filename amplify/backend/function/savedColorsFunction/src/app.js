@@ -46,6 +46,14 @@ function respond(statusCode, body) {
 }
 
 function getUserID(event) {
+  // SigV4/IAM auth via Cognito Identity Pool: the Cognito sub is embedded in
+  // cognitoAuthenticationProvider as "...POOL_ID:CognitoSignIn:USER_SUB"
+  const provider = event.requestContext?.identity?.cognitoAuthenticationProvider;
+  if (provider) {
+    const parts = provider.split(':CognitoSignIn:');
+    if (parts.length > 1) return parts[parts.length - 1].trim();
+  }
+  // Fallback: Cognito User Pool authorizer (if API auth is ever reconfigured)
   return event.requestContext?.authorizer?.claims?.sub || null;
 }
 
