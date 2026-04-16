@@ -1,92 +1,187 @@
 /*
-Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-    http://aws.amazon.com/apache2.0/
-or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and limitations under the License.
+  savedColorsFunction — app.js
+  Handles all /users/me/savedColors routes.
+
+  Routes:
+    GET  /users/me/savedColors              → List all colors for the signed-in user
+    POST /users/me/savedColors              → Save a new color record to DynamoDB
+    POST /users/me/savedColors/upload-url   → Generate a presigned S3 PUT URL for image upload
 */
 
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, QueryCommand, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { randomUUID } = require('crypto');
 
+// ── AWS Clients ────────────────────────────────────────────────────────────────
+const REGION = process.env.REGION || 'us-east-2';
+const ENV    = process.env.ENV    || 'dev';
 
+const dynamoClient = new DynamoDBClient({ region: REGION });
+const dynamo       = DynamoDBDocumentClient.from(dynamoClient);
+const s3           = new S3Client({ region: REGION });
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+// ── Resource Names ─────────────────────────────────────────────────────────────
+// DynamoDB table — partition key: userID (S), sort key: objectID (S)
+const TABLE_NAME  = `colorfind-objects-${ENV}`;
 
-// declare a new express app
-const app = express()
-app.use(bodyParser.json())
-app.use(awsServerlessExpressMiddleware.eventContext())
+// S3 bucket — dev has a hash suffix; prod does not
+// Falls back to env var IMAGES_BUCKET if set (useful for future envs)
+const IMAGES_BUCKET = process.env.IMAGES_BUCKET || (
+  ENV === 'prod'
+    ? 'colorfind-images-prod'
+    : 'colorfind-images-dev8b035-dev'
+);
 
-// Enable CORS for all methods
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "*")
-  next()
-});
+// ── Helpers ────────────────────────────────────────────────────────────────────
+const CORS_HEADERS = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': '*',
+};
 
+function respond(statusCode, body) {
+  return { statusCode, headers: CORS_HEADERS, body: JSON.stringify(body) };
+}
 
-/**********************
- * Example get method *
- **********************/
+function getUserID(event) {
+  return event.requestContext?.authorizer?.claims?.sub || null;
+}
 
-app.get('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
-});
+// ── Handler ────────────────────────────────────────────────────────────────────
+exports.handler = async (event) => {
+  try {
+  console.log('savedColorsFunction invoked:', JSON.stringify({
+    method: event.httpMethod,
+    path:   event.path,
+    user:   event.requestContext?.authorizer?.claims?.sub,
+  }));
 
-app.get('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
-});
+  const method = event.httpMethod;
+  const path   = event.path || '';
 
-/****************************
-* Example post method *
-****************************/
+  console.log(`DEBUG: Method=${method}, Path=${path}`);
 
-app.post('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
-});
+  // Allow CORS preflight
+  if (method === 'OPTIONS') return respond(200, {});
 
-app.post('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
-});
+  // ── POST /users/me/savedColors ─────────────────────────────────────────────
+  if (method === 'POST') {
+    const userID = getUserID(event);
+    if (!userID) return respond(401, { error: 'Unauthorized' });
 
-/****************************
-* Example put method *
-****************************/
+    let body = {};
+    try { body = JSON.parse(event.body || '{}'); } catch {
+      return respond(400, { error: 'Invalid JSON body' });
+    }
 
-app.put('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
-});
+    // --- Sub-Action: Generate Upload URL (Ticket) ---
+    if (body.action === 'getUploadUrl') {
+      console.log(`Generating upload ticket for user ${userID}`);
+      const fileType = body.fileType || 'image/jpeg';
+      const objectID = randomUUID(); // If randomUUID fails, we'll see it in logs
+      const s3Key    = `users/${userID}/${objectID}.jpg`;
 
-app.put('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
-});
+      const uploadUrl = await getSignedUrl(
+        s3,
+        new PutObjectCommand({
+          Bucket:      IMAGES_BUCKET,
+          Key:         s3Key,
+          ContentType: fileType,
+        }),
+        { expiresIn: 300 }
+      );
 
-/****************************
-* Example delete method *
-****************************/
+      return respond(200, { uploadUrl, s3Key, objectID });
+    }
 
-app.delete('/colors/saved', function(req, res) {
-  // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
-});
+    // --- Default Action: Save Color Profile ---
+    const { name, hex, family, imageS3Key } = body;
 
-app.delete('/colors/saved/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
-});
+    if (!name || !hex) {
+      return respond(400, { error: 'name and hex are required' });
+    }
 
-app.listen(3000, function() {
-    console.log("App started")
-});
+    const objectID  = randomUUID();
+    const createdAt = new Date().toISOString();
 
-// Export the app object. When executing the application local this does nothing. However,
-// to port it to AWS Lambda we will create a wrapper around that will load the app from
-// this file
-module.exports = app
+    const item = {
+      userID,
+      objectID,
+      name:       name.trim(),
+      hex:        hex.startsWith('#') ? hex : `#${hex}`,
+      family:     family || 'Unknown',
+      imageS3Key: imageS3Key || null,
+      createdAt,
+    };
+
+    await dynamo.send(new PutCommand({
+      TableName: TABLE_NAME,
+      Item:      item,
+    }));
+
+    console.log(`Saved color ${objectID} for user ${userID}`);
+    return respond(201, { success: true, objectID });
+  }
+
+  // ── GET /users/me/savedColors ──────────────────────────────────────────────
+  if (method === 'GET') {
+    const userID = getUserID(event);
+    if (!userID) return respond(401, { error: 'Unauthorized' });
+
+    // Query all items for this user (partition key = userID)
+    const result = await dynamo.send(new QueryCommand({
+      TableName:                TABLE_NAME,
+      KeyConditionExpression:   'userID = :uid',
+      ExpressionAttributeValues: { ':uid': userID },
+      ScanIndexForward:         false, // newest first (by sort key lexicographic order with UUID)
+    }));
+
+    const items = result.Items || [];
+
+    // For each item with an imageS3Key, generate a short-lived presigned GET URL
+    const colors = await Promise.all(
+      items.map(async (item) => {
+        let imageUri = null;
+
+        if (item.imageS3Key) {
+          try {
+            imageUri = await getSignedUrl(
+              s3,
+              new GetObjectCommand({
+                Bucket: IMAGES_BUCKET,
+                Key:    item.imageS3Key,
+              }),
+              { expiresIn: 3600 } // 1 hour
+            );
+          } catch (err) {
+            console.warn(`Failed to generate presigned URL for ${item.imageS3Key}:`, err.message);
+          }
+        }
+
+        return {
+          id:         item.objectID,
+          name:       item.name,
+          hex:        item.hex,
+          family:     item.family,
+          imageUri,
+          createdAt:  item.createdAt,
+        };
+      })
+    );
+
+    console.log(`Returning ${colors.length} colors for user ${userID}`);
+    return respond(200, colors);
+  }
+
+  return respond(405, { error: 'Method not allowed' });
+  } catch (err) {
+    console.error("UNHANDLED LAMBDA EXCEPTION:", err);
+    return respond(500, {
+      error: "Internal Server Error",
+      message: err.message,
+      stack: err.stack 
+    });
+  }
+};

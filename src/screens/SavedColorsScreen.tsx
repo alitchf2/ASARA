@@ -16,7 +16,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../styles/theme";
 import { ColorCard } from "../components/ColorCard";
-import { SAVED_COLORS } from "../utils/savedColors";
 import { SavedColor } from "../types/color";
 import { get } from 'aws-amplify/api';
 
@@ -129,18 +128,30 @@ export default function SavedColorsScreen({ navigation }: any) {
       setIsLoading(true);
       setError(null);
 
+      // Call the real API — Lambda now queries DynamoDB and returns presigned S3 image URLs
       const restOperation = get({
         apiName: 'colorfindAPI',
         path: '/users/me/savedColors'
       });
       const { body } = await restOperation.response;
-      const data = await body.json();
-      
-      console.log("Fetched colors successfully:", data);
-      setSavedColors(data as any[]);
+      const data = await body.json() as any[];
+
+      console.log(`Fetched ${data.length} colors from API`);
+      setSavedColors(data);
     } catch (err) {
-      console.error("DEBUG: Failed to fetch colors details:", JSON.stringify(err, null, 2));
-      setError("could not load your saved colors. Please try again later.");
+      console.error("API fetch failed, falling back to local storage:", err);
+
+      // Graceful fallback — show anything saved locally while offline
+      try {
+        const { getLocalSavedColors } = await import('../utils/savedColors');
+        const localColors = await getLocalSavedColors();
+        setSavedColors(localColors);
+        if (localColors.length === 0) {
+          setError("Could not reach the server. Check your connection and try again.");
+        }
+      } catch (localErr) {
+        setError("Could not load your saved colors. Please try again later.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -159,7 +170,7 @@ export default function SavedColorsScreen({ navigation }: any) {
     }
   }, [isGuest, isFocused, navigation, showGuestModal]);
 
-  const filteredColors = SAVED_COLORS.filter((color: SavedColor) => {
+  const filteredColors = savedColors.filter((color: SavedColor) => {
     const matchesSearch = color.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFamily = selectedFamily === "All" || color.family === selectedFamily;
     return matchesSearch && matchesFamily;

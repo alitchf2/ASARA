@@ -68,11 +68,11 @@
         },
         "detectColorFunction": {
           "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
-          "s3Key": "amplify-builds/detectColorFunction-732b69564453746d4667-build.zip"
+          "s3Key": "amplify-builds/detectColorFunction-4f7678644742522f4955-build.zip"
         },
         "savedColorsFunction": {
           "deploymentBucketName": "amplify-colorfind-dev-8b035-deployment",
-          "s3Key": "amplify-builds/savedColorsFunction-51505a5449646250566d-build.zip"
+          "s3Key": "amplify-builds/savedColorsFunction-6e50572f543357386a2f-build.zip"
         }
       },
       "api": {

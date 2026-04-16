@@ -1,92 +1,107 @@
-/*
-Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-    http://aws.amazon.com/apache2.0/
-or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and limitations under the License.
-*/
+/* detectColorFunction/src/app.js */
+const colorsData = require('./colors.json'); 
 
+const CORS_HEADERS = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': '*',
+};
 
+function respond(statusCode, body) {
+  return { statusCode, headers: CORS_HEADERS, body: JSON.stringify(body) };
+}
 
+function hexToRgb(hex) {
+  const cleanHex = (hex || '').replace('#', '');
+  if (cleanHex.length !== 6) return null;
+  return {
+    r: parseInt(cleanHex.substring(0, 2), 16),
+    g: parseInt(cleanHex.substring(2, 4), 16),
+    b: parseInt(cleanHex.substring(4, 6), 16),
+  };
+}
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+let colorsList = [];
 
-// declare a new express app
-const app = express()
-app.use(bodyParser.json())
-app.use(awsServerlessExpressMiddleware.eventContext())
+// Parse the DynamoDB dumped Items into a flatter structure on Lambda cold start
+function getColorsList() {
+  if (colorsList.length > 0) return colorsList;
+  if (colorsData.Items) {
+    colorsList = colorsData.Items.map(item => {
+      const r = item.rgb?.M?.r?.N;
+      const g = item.rgb?.M?.g?.N;
+      const b = item.rgb?.M?.b?.N;
 
-// Enable CORS for all methods
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "*")
-  next()
-});
+      return {
+        hex: item.hex?.S || '',
+        name: item.detailedColorName?.S || item.colorName?.S || '',
+        family: item.familyColorName?.S || '',
+        id: item.colorID?.S || '',
+        r: r ? parseInt(r, 10) : 0,
+        g: g ? parseInt(g, 10) : 0,
+        b: b ? parseInt(b, 10) : 0,
+      };
+    }).filter(c => c.hex !== '');
+  }
+  return colorsList;
+}
 
+exports.handler = async (event) => {
+  try {
+    const list = getColorsList();
+    const method = event.httpMethod;
+    const path = event.path || '';
 
-/**********************
- * Example get method *
- **********************/
-
-app.get('/colors/detect', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
-});
-
-app.get('/colors/detect/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
-});
-
-/****************************
-* Example post method *
-****************************/
-
-app.post('/colors/detect', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
-});
-
-app.post('/colors/detect/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
-});
-
-/****************************
-* Example put method *
-****************************/
-
-app.put('/colors/detect', function(req, res) {
-  // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
-});
-
-app.put('/colors/detect/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
-});
-
-/****************************
-* Example delete method *
-****************************/
-
-app.delete('/colors/detect', function(req, res) {
-  // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
-});
-
-app.delete('/colors/detect/*', function(req, res) {
-  // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
-});
-
-app.listen(3000, function() {
-    console.log("App started")
-});
-
-// Export the app object. When executing the application local this does nothing. However,
-// to port it to AWS Lambda we will create a wrapper around that will load the app from
-// this file
-module.exports = app
+    // Allow CORS preflight
+    if (method === 'OPTIONS') return respond(200, {});
+    
+    if (method === 'POST') {
+      let body;
+      try { 
+        body = JSON.parse(event.body || '{}'); 
+      } catch { 
+        body = {}; 
+      }
+      
+      const targetHex = body.hexColor;
+      if (!targetHex) {
+        return respond(400, { error: "hexColor is required in the JSON body" });
+      }
+      
+      const targetRgb = hexToRgb(targetHex);
+      if (!targetRgb) {
+        return respond(400, { error: "invalid hexColor format. Expected #RRGGBB" });
+      }
+      
+      let closestColor = null;
+      let minDistance = Infinity;
+      
+      // Calculate Euclidean distance in O(n)
+      for (let i = 0; i < list.length; i++) {
+        const c = list[i];
+        const dr = c.r - targetRgb.r;
+        const dg = c.g - targetRgb.g;
+        const db = c.b - targetRgb.b;
+        
+        const distSq = dr*dr + dg*dg + db*db;
+        if (distSq < minDistance) {
+          minDistance = distSq;
+          closestColor = c;
+        }
+      }
+      
+      return respond(200, {
+        closestColor: closestColor ? {
+          hex: closestColor.hex,
+          name: closestColor.name,
+          family: closestColor.family
+        } : null
+      });
+    }
+    
+    return respond(404, { error: "Not Found" });
+  } catch (err) {
+    console.error("detectColorFunction ERROR:", err);
+    return respond(500, { error: err.message, stack: err.stack });
+  }
+};

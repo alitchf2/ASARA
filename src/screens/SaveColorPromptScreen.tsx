@@ -69,52 +69,79 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
     
     try {
       setError(""); // Clear previous errors
+      console.log("DEBUG: handleSave started");
       
       // STEP 1: Get a secure upload ticket
-      console.log("-> Fetching S3 Upload URL...");
-      const urlResponse = await post({
-        apiName: "colorfindAPI",
-        path: "/users/me/savedColors/upload-url",
-        options: {
-          body: { fileType: 'image/jpeg' }
-        }
-      }).response;
+      console.log("DEBUG: Step 1 - Fetching S3 Upload URL from /users/me/savedColors (root)");
+      let urlData;
+      try {
+        const urlResponse = await post({
+          apiName: "colorfindAPI",
+          path: "/users/me/savedColors",
+          options: {
+            body: { 
+              action: 'getUploadUrl',
+              fileType: 'image/jpeg' 
+            }
+          }
+        }).response;
+        urlData = (await urlResponse.body.json()) as any;
+        console.log("DEBUG: Step 1 success - s3Key:", urlData?.s3Key);
+      } catch (e1: any) {
+        console.error("DEBUG: Step 1 FAILED:", e1);
+        throw new Error(`Upload Ticket Failed: ${e1.message || e1}`);
+      }
       
-      const urlData = (await urlResponse.body.json()) as any;
       const { uploadUrl, s3Key } = urlData;
       
       // STEP 2: Upload image directly to S3
-      console.log("-> Uploading image to S3...", s3Key);
-      const fetchResponse = await fetch(photoUri);
-      const photoBlob = await fetchResponse.blob();
-      
-      const uploadResult = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: photoBlob,
-        headers: {
-          'Content-Type': 'image/jpeg',
-        },
-      });
+      console.log("DEBUG: Step 2 - Uploading photo to S3:", s3Key);
+      try {
+        const fetchResponse = await fetch(photoUri);
+        const photoBlob = await fetchResponse.blob();
+        
+        const uploadResult = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: photoBlob,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        });
 
-      if (!uploadResult.ok) throw new Error("S3 Upload Failed");
+        if (!uploadResult.ok) {
+          const errorText = await uploadResult.text();
+          console.error("DEBUG: S3 PUT failed status:", uploadResult.status, errorText);
+          throw new Error(`S3 Upload Failed (${uploadResult.status}): ${errorText}`);
+        }
+        console.log("DEBUG: Step 2 success - Image uploaded to S3");
+      } catch (e2: any) {
+        console.error("DEBUG: Step 2 FAILED:", e2);
+        throw new Error(`Image Upload Failed: ${e2.message || e2}`);
+      }
 
       // STEP 3: Save color record to DynamoDB with imageS3Key
-      console.log("-> Saving color metadata to DynamoDB...");
-      await post({
-        apiName: "colorfindAPI",
-        path: "/users/me/savedColors",
-        options: {
-          body: {
-            name: name.trim(),
-            hex: detectedColor,
-            family: "Yellow", // Temp MVP Default
-            imageS3Key: s3Key,
+      console.log("DEBUG: Step 3 - Saving metadata to DynamoDB at /users/me/savedColors");
+      try {
+        await post({
+          apiName: "colorfindAPI",
+          path: "/users/me/savedColors",
+          options: {
+            body: {
+              name: name.trim(),
+              hex: detectedColor,
+              family: family,
+              imageS3Key: s3Key,
+            }
           }
-        }
-      }).response;
+        }).response;
+        console.log("DEBUG: Step 3 success - DynamoDB record saved");
+      } catch (e3: any) {
+        console.error("DEBUG: Step 3 FAILED:", e3);
+        throw new Error(`Database Save Failed: ${e3.message || e3}`);
+      }
 
-      console.log("-> Save Complete!");
-
+      console.log("DEBUG: handleSave ALL SUCCESS");
+      
       // Reset the navigation stack
       navigation.reset({
         index: 0,
@@ -124,8 +151,8 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
         }],
       });
     } catch (err: any) {
-      console.error("Save Color Error:", err);
-      setError("Cloud sync failed. Please check your connection.");
+      console.error("DEBUG: TOP LEVEL SAVE ERROR:", err);
+      setError(err.message || "Cloud sync failed. Please check your connection.");
     }
   };
 
@@ -147,7 +174,7 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
           <View style={styles.thumbnailOuter}>
             <View style={styles.thumbnailContainer}>
               <Image
-                source={{ uri: photoUri }}
+                source={typeof photoUri === 'string' ? { uri: photoUri } : photoUri}
                 style={[
                   styles.previewImage,
                   {

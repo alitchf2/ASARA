@@ -99,7 +99,7 @@ export default function ColorResultsScreen({ route, navigation }: any) {
         <View style={styles.thumbnailOuter}>
           <View style={styles.thumbnailContainer}>
             <Image
-              source={{ uri: photoUri }}
+              source={typeof photoUri === 'string' ? { uri: photoUri } : photoUri}
               style={[
                 styles.previewImage,
                 {
