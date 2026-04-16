@@ -30,8 +30,14 @@ exports.handler = async (event) => {
 
     if (method !== "PUT") return respond(405, { error: "Method not allowed" });
 
-    // ── Extract userID from verified Cognito JWT claims ───────────────────────
-    const userID = event.requestContext?.authorizer?.claims?.sub;
+    // ── Extract userID from Cognito identity ──────────────────────────────────
+    // API uses SigV4/IAM auth via Identity Pool. The Cognito sub is embedded in
+    // cognitoAuthenticationProvider: "...POOL_ID:CognitoSignIn:USER_SUB"
+    const _provider = event.requestContext?.identity?.cognitoAuthenticationProvider;
+    const _parts = _provider?.split(':CognitoSignIn:') ?? [];
+    const userID = _parts.length > 1
+        ? _parts[_parts.length - 1].trim()
+        : (event.requestContext?.authorizer?.claims?.sub ?? null);
     if (!userID) return respond(401, { error: "Unauthorized" });
 
     // ── Parse and validate body ───────────────────────────────────────────────

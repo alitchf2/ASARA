@@ -123,7 +123,7 @@ export default function ColorCompareScreen({ route, navigation }: any) {
                 {offsets ? (
                   <View style={styles.clippingBox}>
                     <Image
-                      source={{ uri: sourceColor.photoUri }}
+                      source={typeof sourceColor.photoUri === 'string' ? { uri: sourceColor.photoUri } : sourceColor.photoUri}
                       style={[
                         styles.zoomedImage,
                         {
@@ -146,7 +146,7 @@ export default function ColorCompareScreen({ route, navigation }: any) {
                     </View>
                   </View>
                 ) : (
-                  <Image source={{ uri: sourceColor.photoUri }} style={styles.thumbnail} resizeMode="cover" />
+                  <Image source={typeof sourceColor.photoUri === 'string' ? { uri: sourceColor.photoUri } : sourceColor.photoUri} style={styles.thumbnail} resizeMode="cover" />
                 )}
               </View>
 

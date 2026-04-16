@@ -37,6 +37,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFamily, setSelectedFamily] = useState("All");
   const [selectedColor, setSelectedColor] = useState<SavedColor | null>(null);
+  const [allColors, setAllColors] = useState<SavedColor[]>(SAVED_COLORS);
   
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
@@ -77,6 +78,13 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
         tension: 50,
         friction: 10
       }).start();
+
+      // Load local MVP saved colors
+      import('../utils/savedColors').then(({ getLocalSavedColors }) => {
+        getLocalSavedColors().then(localColors => {
+          setAllColors([...localColors, ...SAVED_COLORS]);
+        });
+      });
     }
   }, [isVisible]);
 
@@ -96,7 +104,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
   };
 
   const isFiltered = searchQuery !== "" || selectedFamily !== "All";
-  const isEmptyLibrary = SAVED_COLORS.length === 0;
+  const isEmptyLibrary = allColors.length === 0;
 
   const emptyTitle = isFiltered 
     ? `No results ${selectedFamily !== "All" ? `in ${selectedFamily}` : ""}`
@@ -106,13 +114,13 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
     : "Capture a color and save it to build your personalized palette collection.";
 
   const filteredColors = useMemo(() => {
-    return SAVED_COLORS.filter(color => {
+    return allColors.filter(color => {
       const matchesSearch = color.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            color.family.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFamily = selectedFamily === "All" || color.family === selectedFamily;
       return matchesSearch && matchesFamily;
     });
-  }, [searchQuery, selectedFamily]);
+  }, [allColors, searchQuery, selectedFamily]);
 
   const renderItem = ({ item }: { item: SavedColor }) => {
     const isSelected = selectedColor?.id === item.id;

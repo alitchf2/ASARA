@@ -50,3 +50,32 @@ export const SAVED_COLORS: SavedColor[] = [
     lab: "97.45, -4.24, 22.01"
   }
 ];
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const STORAGE_KEY = '@colorfind_local_colors';
+
+export const getLocalSavedColors = async (): Promise<SavedColor[]> => {
+  try {
+    const data = await AsyncStorage.getItem(STORAGE_KEY);
+    if (data) {
+      return JSON.parse(data);
+    }
+  } catch (e) {
+    console.error("DEBUG: Failed to fetch local colors", e);
+  }
+  return [];
+};
+
+export const saveColorLocally = async (color: Omit<SavedColor, 'id'>) => {
+  try {
+    const existing = await getLocalSavedColors();
+    const newColor: SavedColor = {
+      ...color,
+      id: Date.now().toString()
+    };
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([newColor, ...existing]));
+  } catch (e) {
+    console.error("DEBUG: Failed to save color locally", e);
+  }
+};

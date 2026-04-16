@@ -1,6 +1,25 @@
 [
   {
-    "Action": [],
-    "Resource": []
+    "Action": [
+      "dynamodb:PutItem",
+      "dynamodb:GetItem",
+      "dynamodb:Query",
+      "dynamodb:DeleteItem",
+      "dynamodb:UpdateItem"
+    ],
+    "Resource": [
+      "arn:aws:dynamodb:us-east-2:*:table/colorfind-objects-dev",
+      "arn:aws:dynamodb:us-east-2:*:table/colorfind-objects-dev/index/*"
+    ]
+  },
+  {
+    "Action": [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ],
+    "Resource": [
+      "arn:aws:s3:::colorfind-images-dev8b035-dev/*"
+    ]
   }
 ]
