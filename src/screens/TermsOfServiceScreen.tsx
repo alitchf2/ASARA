@@ -12,185 +12,106 @@ import { globalStyles } from "../styles/globalStyles";
 import { theme } from "../styles/theme";
 
 export default function TermsOfServiceScreen({ navigation }: any) {
-    return (
-      <ScrollView>
-        <SafeAreaView style={globalStyles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
-                    <Ionicons name="arrow-back" size={28} color="#2B2A2A" />
-                </TouchableOpacity>
-            </View>
-
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 12,
-            marginBottom: 8,
-          }}
+  return (
+    <SafeAreaView style={globalStyles.container} edges={['top', 'bottom']}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          As-Is & As-Available
-        </Text>
+          <Ionicons name="arrow-back" size={28} color={theme.colors.companyBlack} />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView 
+        style={styles.scrollContainer} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.mainTitle}>Terms & Privacy</Text>
+
+        {/* Section 1: Terms of Service */}
+        <Text style={styles.sectionTitle}>1. Terms of Service</Text>
+
+        <Text style={styles.subHeader}>App Provided "As-Is"</Text>
         <Text style={styles.paragraph}>
-          The App is provided on an "as-is" and "as-available" basis without
-          warranties of any kind.
+          ASARA is provided as a tool for color identification and inspiration. 
+          The app is provided on an "as-is" basis, and we cannot guarantee 100% 
+          color accuracy. This app should not be used for professional, 
+          industrial, or safety-critical applications where exact color matching 
+          is required.
         </Text>
 
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-        >
-          Lawful Use Only
-        </Text>
+        <Text style={styles.subHeader}>Lawful Use Only</Text>
         <Text style={styles.paragraph}>
-          You agree not to use the App for any unlawful purpose or in any way
-          that interrupts, damages, or impairs the service.
+          By using ASARA, you agree not to use the app for any unlawful purpose 
+          or in any way that might damage, disable, or impair our services.
         </Text>
 
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-        >
-          Content Ownership & License
-        </Text>
+        <Text style={styles.subHeader}>Image Ownership & Storage</Text>
         <Text style={styles.paragraph}>
-          You retain full ownership of all images and content you submit to the
-          App. However, by using the App, you grant ASARA a limited license to
-          store, process, and transmit your images solely for the purpose of
-          identifying colors and providing the service to you.
+          You retain full ownership of every image you capture or upload. 
+          By using the app, you grant ASARA a limited license to store and 
+          process these images strictly to provide the color identification 
+          features and your personal library.
         </Text>
 
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-        >
-          Changes to Terms
-        </Text>
+        <Text style={styles.subHeader}>Updates to These Terms</Text>
         <Text style={styles.paragraph}>
-          ASARA reserves the right to modify these Terms at any time. Continued
-          use of the App constitutes acceptance of any updated Terms.
+          ASARA may update these terms at any time. If you continue to use 
+          the app after terms are updated, it means you accept the new terms.
         </Text>
 
-        {/* Privacy Policy Section */}
+        {/* Section 2: Privacy Policy */}
         <Text style={styles.sectionTitle}>2. Privacy Policy</Text>
 
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 12,
-            marginBottom: 8,
-          }}
-        >
-          Information We Collect
-        </Text>
+        <Text style={styles.subHeader}>What We Collect</Text>
         <View style={styles.bulletListRow}>
-          <Text style={styles.bulletPoint}>-</Text>
+          <Text style={styles.bulletPoint}>•</Text>
           <Text style={styles.bulletText}>
-            Username: To associate your account and saved colors.
+            <Text style={{ fontWeight: 'bold' }}>Username:</Text> To identify your account and your saved color library.
           </Text>
         </View>
         <View style={styles.bulletListRow}>
-          <Text style={styles.bulletPoint}>-</Text>
+          <Text style={styles.bulletPoint}>•</Text>
           <Text style={styles.bulletText}>
-            Saved Colors & Images: For your personal library and history.
+            <Text style={{ fontWeight: 'bold' }}>Saved Colors & Images:</Text> Any colors and cropped images you explicitly choose to save to your library.
           </Text>
         </View>
         <View style={styles.bulletListRow}>
-          <Text style={styles.bulletPoint}>-</Text>
+          <Text style={styles.bulletPoint}>•</Text>
           <Text style={styles.bulletText}>
-            Anonymous Analytics: To improve App performance and user experience.
+            <Text style={{ fontWeight: 'bold' }}>Usage Analytics:</Text> Anonymous data about how the app is used, which helps us make it better.
           </Text>
         </View>
 
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-        >
-          Information We Do NOT Collect
-        </Text>
+        <Text style={styles.subHeader}>What We DO NOT Collect</Text>
         <Text style={styles.paragraph}>
-          We do not collect or store your email address, real name, device
-          identifiers, precise location data, or biometric data.
+          We value your privacy. We do not collect your email address, real name, 
+          device identifiers, location data, or biometric information.
         </Text>
 
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-        >
-          How We Use Your Data
-        </Text>
+        <Text style={styles.subHeader}>How Your Data is Used</Text>
         <Text style={styles.paragraph}>
-          Your data is used strictly for color identification, maintaining your
-          personal library of saved colors, and anonymous analytics for app
-          improvement.
+          Your data is used only to provide the app’s features, like identifying 
+          colors and maintaining your personal collection. We never sell your 
+          data to third parties, and we don't share it for advertising purposes.
         </Text>
 
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-        >
-          Image Privacy & Security
-        </Text>
+        <Text style={styles.subHeader}>Image Privacy</Text>
         <Text style={styles.paragraph}>
-          Images uploaded to the App are securely isolated in private storage
-          (AWS S3) and are accessible only by you. We prioritize the security of
-          your user-submitted content.
+          The images you save are stored privately in AWS S3 storage. These 
+          images are isolated and accessible only to your specific account.
         </Text>
 
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: theme.colors.companyBlack,
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-        >
-          Data Deletion
-        </Text>
+        <Text style={styles.subHeader}>Deleting Your Data</Text>
         <Text style={styles.paragraph}>
-          Upon deleting your account, all associated data, including your saved
-          colors and images, will be immediately and completely deleted from our
-          servers.
+          If you choose to delete your account, we will permanently and 
+          immediately remove all of your data, including your saved colors 
+          and images, from our servers.
         </Text>
-    </SafeAreaView>
       </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -226,6 +147,13 @@ const styles = StyleSheet.create({
     color: theme.colors.companyBlack,
     marginTop: 24,
     marginBottom: 12,
+  },
+  subHeader: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: theme.colors.companyBlack,
+    marginTop: 16,
+    marginBottom: 8,
   },
   paragraph: {
     fontSize: 16,

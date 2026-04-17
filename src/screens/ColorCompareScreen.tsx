@@ -15,7 +15,7 @@ import { ImmersiveHeader } from "../components/ImmersiveHeader";
 import { ColorSelectionModal } from "../components/ColorSelectionModal";
 import { FeedbackModal } from "../components/FeedbackModal";
 import { generateComparisonSummary } from "../utils/colorSummary";
-import { CompareSlider } from "../components/CompareSlider";
+import { LABSliders } from "../components/LABSliders";
 import { ColorMetricsContainer } from "../components/ColorMetricsContainer";
 import { AnimatedCircularProgress } from "../components/AnimatedCircularProgress";
 import {
@@ -80,7 +80,11 @@ export default function ColorCompareScreen({ route, navigation }: any) {
 
   // Data for sliders & display
   const sourceData = sourceLAB;
-  const compareData = useMemo(() => parseLABString(compareColor?.lab), [compareColor]);
+  const compareData = useMemo(() => {
+    if (compareColor?.lab) return parseLABString(compareColor.lab);
+    if (compareColor?.hex) return hexToLab(compareColor.hex);
+    return { l: 0, a: 0, b: 0, chroma: 0 };
+  }, [compareColor]);
 
   // Integrated Comparison Metrics (Task 10.3)
   const metrics = useMemo(() => {
@@ -102,8 +106,8 @@ export default function ColorCompareScreen({ route, navigation }: any) {
   const sourceRGBStr = formatRGBString(sourceRGB);
   const sourceLABStr = formatLABString(sourceLAB);
 
-  const compareRGBStr = compareColor?.rgb || "-";
-  const compareLABStr = compareColor?.lab || "-";
+  const compareRGBStr = compareColor?.rgb || (compareColor?.hex ? formatRGBString(hexToRgb(compareColor.hex)) : "-");
+  const compareLABStr = compareColor?.lab || (compareColor?.hex ? formatLABString(hexToLab(compareColor.hex)) : "-");
 
   return (
     <View style={styles.container}>
@@ -237,49 +241,11 @@ export default function ColorCompareScreen({ route, navigation }: any) {
 
         {/* Visual Comparison (Sliders) */}
         <View style={styles.comparisonVisuals}>
-          <Text style={styles.sectionTitle}>Visual Comparison</Text>
-
-          <CompareSlider
-            label="Lightness (L)"
-            sourceValue={sourceData.l}
-            compareValue={metrics ? metrics.lightnessCompare : null}
-            min={0}
-            max={100}
-            gradientColors={['#000000', '#FFFFFF']}
-            sourceHex={sourceColor.detectedColor}
-            compareHex={compareColor?.hex}
-          />
-
-          <CompareSlider
-            label="Green ↔ Red (A)"
-            sourceValue={sourceData.a}
-            compareValue={metrics ? metrics.aCompare : null}
-            min={-128}
-            max={127}
-            gradientColors={['#00FF00', '#808080', '#FF0000']}
-            sourceHex={sourceColor.detectedColor}
-            compareHex={compareColor?.hex}
-          />
-
-          <CompareSlider
-            label="Blue ↔ Yellow (B)"
-            sourceValue={sourceData.b}
-            compareValue={metrics ? metrics.bCompare : null}
-            min={-128}
-            max={127}
-            gradientColors={['#0000FF', '#808080', '#FFFF00']}
-            sourceHex={sourceColor.detectedColor}
-            compareHex={compareColor?.hex}
-          />
-
-          <CompareSlider
-            label="Saturation / Chroma"
-            sourceValue={sourceData.chroma}
-            compareValue={metrics ? metrics.chromaCompare : null}
-            min={0}
-            max={180}
-            gradientColors={['#808080', '#FF00FF']}
-            sourceHex={sourceColor.detectedColor}
+          <LABSliders 
+            title="Visual Comparison"
+            lab={sourceData}
+            hex={sourceColor.detectedColor}
+            compareLab={compareColor ? compareData : null}
             compareHex={compareColor?.hex}
           />
         </View>

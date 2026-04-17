@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../styles/theme';
@@ -25,6 +26,12 @@ export default function SelectionConfirmationScreen({ route, navigation }: any) 
   const { photoUri, marker, originalDimensions, displayDimensions } = route.params || {};
 
   const [isProcessing, setIsProcessing] = React.useState(false);
+
+  useEffect(() => {
+    navigation.setOptions({
+      gestureEnabled: !isProcessing,
+    });
+  }, [isProcessing, navigation]);
 
   const handleConfirm = async () => {
     if (!marker || !originalDimensions || !displayDimensions || !photoUri) {
@@ -94,6 +101,7 @@ export default function SelectionConfirmationScreen({ route, navigation }: any) 
         <ImmersiveHeader 
           title="Confirm Selection" 
           onBack={() => navigation.goBack()} 
+          disabled={isProcessing}
         />
 
         <View style={styles.flexSpacer} pointerEvents="none" />
@@ -113,7 +121,7 @@ export default function SelectionConfirmationScreen({ route, navigation }: any) 
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.reselectButton}
+              style={[styles.reselectButton, isProcessing && { opacity: 0.5 }]}
               onPress={handleReselect}
               disabled={isProcessing}
             >
@@ -122,6 +130,13 @@ export default function SelectionConfirmationScreen({ route, navigation }: any) 
           </View>
         </ImmersiveFooter>
       </View>
+
+      {/* Loading Overlay */}
+      {isProcessing && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={theme.colors.companyOrange} />
+        </View>
+      )}
     </FullImageBackground>
   );
 }
@@ -189,5 +204,12 @@ const styles = StyleSheet.create({
     color: theme.colors.companyOrange,
     fontSize: 17,
     fontWeight: '600',
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
   },
 });

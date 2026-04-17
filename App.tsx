@@ -117,7 +117,7 @@ export default function App() {
   if (!authChecked) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F2F2' }}>
-        <ActivityIndicator size="large" color="#5A7ACD" />
+        <ActivityIndicator size="large" color="#FEB05D" />
       </View>
     );
   }
