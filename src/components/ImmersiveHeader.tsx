@@ -7,21 +7,23 @@ import { theme } from '../styles/theme';
 interface ImmersiveHeaderProps {
   title: string;
   onBack: () => void;
+  disabled?: boolean;
 }
 
 /**
  * Standard Frosted Header for immersive screens.
  * Handles safe-area insets and 60px height standards.
  */
-export const ImmersiveHeader: React.FC<ImmersiveHeaderProps> = ({ title, onBack }) => {
+export const ImmersiveHeader: React.FC<ImmersiveHeaderProps> = ({ title, onBack, disabled = false }) => {
   const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.header, { height: 60 + insets.top, paddingTop: insets.top }]}>
       <TouchableOpacity 
-        style={styles.backButton}
+        style={[styles.backButton, disabled && { opacity: 0.5 }]}
         onPress={onBack}
         activeOpacity={0.7}
+        disabled={disabled}
       >
         <Ionicons name="arrow-back" size={28} color={theme.colors.companyBlack} />
       </TouchableOpacity>

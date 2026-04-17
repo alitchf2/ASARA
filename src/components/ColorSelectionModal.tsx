@@ -17,8 +17,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../styles/theme';
 import { ColorCard } from './ColorCard';
-import { SAVED_COLORS } from '../utils/savedColors';
 import { SavedColor } from '../types/color';
+import { get } from 'aws-amplify/api';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const FAMILIES = ["All", "Red", "Yellow", "Blue", "Green", "Orange", "Purple", "Brown", "Gray", "Black", "White"];
@@ -37,7 +37,9 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFamily, setSelectedFamily] = useState("All");
   const [selectedColor, setSelectedColor] = useState<SavedColor | null>(null);
-  const [allColors, setAllColors] = useState<SavedColor[]>(SAVED_COLORS);
+  const [savedColors, setSavedColors] = useState<SavedColor[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
@@ -67,6 +69,37 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
     })
   ).current;
 
+  const fetchColors = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const restOperation = get({
+        apiName: 'colorfindAPI',
+        path: '/users/me/savedColors'
+      });
+      const { body } = await restOperation.response;
+      const data = await body.json() as SavedColor[];
+      
+      setSavedColors(data);
+    } catch (err) {
+      console.error("Selection Modal API fetch failed:", err);
+      // Fallback logic
+      try {
+        const { getLocalSavedColors } = await import('../utils/savedColors');
+        const localColors = await getLocalSavedColors();
+        setSavedColors(localColors);
+        if (localColors.length === 0) {
+          setError("Check your connection and try again.");
+        }
+      } catch (localErr) {
+        setError("Could not load your saved colors.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (isVisible) {
       setSearchQuery("");
@@ -79,12 +112,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
         friction: 10
       }).start();
 
-      // Load local MVP saved colors
-      import('../utils/savedColors').then(({ getLocalSavedColors }) => {
-        getLocalSavedColors().then(localColors => {
-          setAllColors([...localColors, ...SAVED_COLORS]);
-        });
-      });
+      fetchColors();
     }
   }, [isVisible]);
 
@@ -104,7 +132,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
   };
 
   const isFiltered = searchQuery !== "" || selectedFamily !== "All";
-  const isEmptyLibrary = allColors.length === 0;
+  const isEmptyLibrary = savedColors.length === 0;
 
   const emptyTitle = isFiltered 
     ? `No results ${selectedFamily !== "All" ? `in ${selectedFamily}` : ""}`
@@ -114,13 +142,12 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
     : "Capture a color and save it to build your personalized palette collection.";
 
   const filteredColors = useMemo(() => {
-    return allColors.filter(color => {
-      const matchesSearch = color.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           color.family.toLowerCase().includes(searchQuery.toLowerCase());
+    return savedColors.filter(color => {
+      const matchesSearch = color.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFamily = selectedFamily === "All" || color.family === selectedFamily;
       return matchesSearch && matchesFamily;
     });
-  }, [allColors, searchQuery, selectedFamily]);
+  }, [savedColors, searchQuery, selectedFamily]);
 
   const renderItem = ({ item }: { item: SavedColor }) => {
     const isSelected = selectedColor?.id === item.id;
@@ -130,6 +157,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
         <ColorCard 
           name={item.name} 
           family={item.family} 
+          hex={item.hex}
           imageUri={item.imageUri} 
           onPress={() => setSelectedColor(item)}
           isSelected={isSelected}
@@ -203,26 +231,39 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
             </ScrollView>
           </View>
 
-          <FlatList
-            data={filteredColors}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            columnWrapperStyle={styles.gridRow}
-            contentContainerStyle={styles.listContainer}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Ionicons 
-                  name={isFiltered ? "search-outline" : "bookmark-outline"} 
-                  size={80} 
-                  color={theme.colors.companyOrange} 
-                />
-                <Text style={styles.emptyTitle}>{emptyTitle}</Text>
-                <Text style={styles.emptySubtitle}>{emptySubtitle}</Text>
-              </View>
-            }
-          />
+          {isLoading ? (
+            <View style={styles.centerContainer}>
+              <ActivityIndicator size="large" color={theme.colors.companyOrange} />
+            </View>
+          ) : error ? (
+            <View style={styles.centerContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={fetchColors}>
+                <Text style={styles.retryText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredColors}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              numColumns={2}
+              columnWrapperStyle={styles.gridRow}
+              contentContainerStyle={styles.listContainer}
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Ionicons 
+                    name={isFiltered ? "search-outline" : "bookmark-outline"} 
+                    size={80} 
+                    color={theme.colors.companyOrange} 
+                  />
+                  <Text style={styles.emptyTitle}>{emptyTitle}</Text>
+                  <Text style={styles.emptySubtitle}>{emptySubtitle}</Text>
+                </View>
+              }
+            />
+          )}
 
           <View style={styles.footer}>
             <TouchableOpacity 
@@ -288,17 +329,25 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    height: 48,
-    paddingHorizontal: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 14,
+    height: 54,
+    paddingHorizontal: 15,
     marginHorizontal: 20,
-    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#EEE",
+    marginBottom: 20,
+    // Soft inner shadow effect
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 5,
+    elevation: 1,
   },
   searchIcon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   searchInput: {
     flex: 1,
@@ -310,17 +359,26 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   filterChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#F5F5F5",
-    marginRight: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
+    backgroundColor: "#FFF",
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: "#EEE",
+    // Soft shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   filterChipActive: {
     backgroundColor: theme.colors.companyBlue,
+    borderColor: theme.colors.companyBlue,
   },
   filterText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "600",
     color: "#666",
   },
@@ -377,5 +435,28 @@ const styles = StyleSheet.create({
     color: '#888',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 60,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: 'center',
+    paddingHorizontal: 40,
+  },
+  retryButton: {
+    backgroundColor: theme.colors.companyBlue,
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+    borderRadius: 25,
+  },
+  retryText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

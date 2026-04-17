@@ -12,7 +12,9 @@ import {
   Dimensions,
   Image,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
+import { useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../styles/theme";
@@ -37,6 +39,13 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
 
   const [name, setName] = useState(colorName);
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    navigation.setOptions({
+      gestureEnabled: !isSubmitting,
+    });
+  }, [isSubmitting, navigation]);
 
   const THUMB_SIZE = 200;
 
@@ -70,6 +79,7 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
     }
     
     try {
+      setIsSubmitting(true);
       setError(""); // Clear previous errors
       console.log("DEBUG: handleSave started");
       
@@ -181,6 +191,8 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
               hex: detectedColor,
               family: family,
               imageS3Key: s3Key,
+              rgb: rgbString,
+              lab: labString,
             }
           }
         }).response;
@@ -203,6 +215,8 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
     } catch (err: any) {
       console.error("DEBUG: TOP LEVEL SAVE ERROR:", err);
       setError(err.message || "Cloud sync failed. Please check your connection.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -213,7 +227,11 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
         style={{ flex: 1 }}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity 
+            onPress={() => navigation.goBack()} 
+            style={[styles.backButton, isSubmitting && { opacity: 0.5 }]}
+            disabled={isSubmitting}
+          >
             <Ionicons name="arrow-back" size={28} color={theme.colors.companyBlack} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Save Color</Text>
@@ -274,15 +292,28 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
             <TouchableOpacity
-              style={[styles.saveButton, !name.trim() && styles.saveButtonDisabled]}
+              style={[
+                styles.saveButton, 
+                (!name.trim() || isSubmitting) && styles.saveButtonDisabled,
+                isSubmitting && { opacity: 0.8 }
+              ]}
               onPress={handleSave}
-              disabled={!name.trim()}
+              disabled={!name.trim() || isSubmitting}
             >
-              <Text style={styles.saveButtonText}>Save Color</Text>
+              <Text style={styles.saveButtonText}>
+                {isSubmitting ? "Saving Color..." : "Save Color"}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Loading Overlay */}
+      {isSubmitting && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={theme.colors.companyOrange} />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -442,5 +473,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "800",
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
   },
 });

@@ -18,7 +18,8 @@ import {
   hexToRgb,
   hexToLab,
   formatRGBString,
-  formatLABString
+  formatLABString,
+  parseLABString
 } from '../utils/colorUtils';
 import {
   generateComplementaryTheme,
@@ -26,10 +27,13 @@ import {
   generateTriadicTheme,
   generateMonochromaticTheme
 } from '../utils/colorThemes';
+import { useAuth } from '../contexts/AuthContext';
+import { LABSliders } from '../components/LABSliders';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function SavedColorDetailScreen({ route, navigation }: any) {
+  const { isGuest, showGuestModal } = useAuth();
   const { color } = route.params || {};
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
@@ -91,7 +95,14 @@ export default function SavedColorDetailScreen({ route, navigation }: any) {
   const finalRgbString = savedRgb || formatRGBString(hexToRgb(finalHex));
   const finalLabString = savedLab || formatLABString(hexToLab(finalHex));
 
+  // Parse or calculate for the LAB sliders
+  const finalLabObj = savedLab ? parseLABString(savedLab) : hexToLab(finalHex);
+
   const handleCompareColor = () => {
+    if (isGuest) {
+      showGuestModal("Sign In to compare colors");
+      return;
+    }
     navigation.navigate('ColorCompare', {
       sourceColor: {
         detectedColor: finalHex,
@@ -185,6 +196,9 @@ export default function SavedColorDetailScreen({ route, navigation }: any) {
               <Text style={styles.deleteButtonText}>Delete Color</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Visual Analysis Sliders */}
+          <LABSliders lab={finalLabObj} hex={finalHex} />
 
           <View style={styles.themesSection}>
             <View style={styles.sectionHeader}>

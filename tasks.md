@@ -1273,7 +1273,7 @@ Need to try this on more devices (esspecially android).
 - Family color name
 - HEX, RGB, LAB values
 - 'Compare Color' button
-- 'Delete Color' button (red/destructive styling)
+- 'Delete Color' button
 - Color Themes section (populated in task 7.6)
 **Current Status:** Not Started
 **Notes:** 

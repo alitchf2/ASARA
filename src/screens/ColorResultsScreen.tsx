@@ -24,6 +24,7 @@ import {
   generateMonochromaticTheme
 } from '../utils/colorThemes';
 import { useAuth } from '../contexts/AuthContext';
+import { LABSliders } from '../components/LABSliders';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -183,20 +184,29 @@ export default function ColorResultsScreen({ route, navigation }: any) {
 
             <TouchableOpacity
               style={styles.compareButton}
-              onPress={() => navigation.navigate('ColorCompare', {
-                sourceColor: {
-                  detectedColor: finalHex,
-                  colorName: matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match',
-                  family: matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color',
-                  photoUri,
-                  marker,
-                  displayDimensions
+              onPress={() => {
+                if (isGuest) {
+                  showGuestModal("Sign in to compare colors");
+                  return;
                 }
-              })}
+                navigation.navigate('ColorCompare', {
+                  sourceColor: {
+                    detectedColor: finalHex,
+                    colorName: matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match',
+                    family: matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color',
+                    photoUri,
+                    marker,
+                    displayDimensions
+                  }
+                });
+              }}
             >
               <Text style={styles.compareButtonText}>Compare Color</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Visual Analysis Sliders */}
+          <LABSliders lab={finalLabObj} hex={finalHex} />
 
           <View style={styles.themesSection}>
             <View style={styles.sectionHeader}>
