@@ -215,7 +215,11 @@ export default function SavedColorsScreen({ navigation }: any) {
             family={item.family}
             hex={item.hex}
             imageUri={item.imageUri}
-            onPress={() => { }} // Navigate to detail in Task 9.9
+            onPress={() => {
+              navigation.navigate('SavedColorDetail', {
+                color: item
+              });
+            }}
           />
         )}
         numColumns={2}

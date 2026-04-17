@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../styles/theme";
 import { ColorMetricsContainer } from "../components/ColorMetricsContainer";
 import { post } from "aws-amplify/api";
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -27,6 +28,7 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
     detectedColor = '#E5A100', 
     marker, 
     displayDimensions,
+    originalDimensions,
     colorName = "Unknown Match",
     family = "Color",
     rgbString,
@@ -105,9 +107,47 @@ export default function SaveColorPromptScreen({ route, navigation }: any) {
       const { uploadUrl, s3Key } = urlData;
       
       // STEP 2: Upload image directly to S3
-      console.log("DEBUG: Step 2 - Uploading photo to S3:", s3Key);
+      console.log("DEBUG: Step 2 - Preparing and uploading photo to S3:", s3Key);
       try {
-        const fetchResponse = await fetch(photoUri);
+        let uploadUri = photoUri;
+
+        // NEW: Crop to 600x600 centered around the marker
+        if (marker && displayDimensions && originalDimensions) {
+          try {
+            console.log("DEBUG: Cropping image before upload...");
+            const scale = originalDimensions.width / displayDimensions.width;
+            const thumbSizeOriginal = 200 * scale;
+
+            let originX = (marker.x * scale) - (thumbSizeOriginal / 2);
+            let originY = (marker.y * scale) - (thumbSizeOriginal / 2);
+
+            // Clamp to boundaries
+            originX = Math.max(0, Math.min(originalDimensions.width - thumbSizeOriginal, originX));
+            originY = Math.max(0, Math.min(originalDimensions.height - thumbSizeOriginal, originY));
+
+            const manipResult = await manipulateAsync(
+              photoUri,
+              [
+                { 
+                  crop: { 
+                    originX: Math.round(originX), 
+                    originY: Math.round(originY), 
+                    width: Math.round(thumbSizeOriginal), 
+                    height: Math.round(thumbSizeOriginal) 
+                  } 
+                },
+                { resize: { width: 600, height: 600 } }
+              ],
+              { format: SaveFormat.JPEG, compress: 0.8 }
+            );
+            uploadUri = manipResult.uri;
+            console.log("DEBUG: Crop successful:", uploadUri);
+          } catch (cropErr) {
+            console.error("DEBUG: Cropping failed, falling back to original:", cropErr);
+          }
+        }
+
+        const fetchResponse = await fetch(uploadUri);
         const photoBlob = await fetchResponse.blob();
         
         const uploadResult = await fetch(uploadUrl, {

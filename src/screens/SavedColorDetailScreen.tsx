@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,11 +7,13 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 import { theme } from '../styles/theme';
 import { ImmersiveHeader } from '../components/ImmersiveHeader';
 import { ColorMetricsContainer } from '../components/ColorMetricsContainer';
+import { ConfirmationModal } from '../components/ConfirmationModal';
 import {
   hexToRgb,
   hexToLab,
@@ -23,25 +26,38 @@ import {
   generateTriadicTheme,
   generateMonochromaticTheme
 } from '../utils/colorThemes';
-import { useAuth } from '../contexts/AuthContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export default function ColorResultsScreen({ route, navigation }: any) {
-  const {
-    photoUri,
-    detectedColor = '#E5A100',
-    marker,
-    displayDimensions,
-    originalDimensions,
-    matchedColor
-  } = route.params || {};
+export default function SavedColorDetailScreen({ route, navigation }: any) {
+  const { color } = route.params || {};
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
-  const { isGuest, showGuestModal } = useAuth();
+  if (!color) {
+    return (
+      <View style={styles.container}>
+        <ImmersiveHeader title="Color Details" onBack={() => navigation.goBack()} />
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Color data not found.</Text>
+        </View>
+      </View>
+    );
+  }
+
+  const {
+    imageUri: photoUri,
+    hex: finalHex,
+    name: colorName,
+    family,
+    rgb: savedRgb,
+    lab: savedLab,
+    marker,
+    displayDimensions
+  } = color;
 
   const THUMB_SIZE = 200;
 
-  // Calculate thumbnail offsets for centering
+  // Calculate thumbnail offsets for centering if marker exists
   const calculateOffsets = () => {
     if (!marker || !displayDimensions) return { left: 0, top: 0, markerX: 0, markerY: 0 };
 
@@ -66,54 +82,32 @@ export default function ColorResultsScreen({ route, navigation }: any) {
   };
 
   const offsets = calculateOffsets();
-  const complementaryTheme = generateComplementaryTheme(detectedColor);
-  const analogousTheme = generateAnalogousTheme(detectedColor);
-  const triadicTheme = generateTriadicTheme(detectedColor);
-  const monochromaticTheme = generateMonochromaticTheme(detectedColor);
+  const complementaryTheme = generateComplementaryTheme(finalHex);
+  const analogousTheme = generateAnalogousTheme(finalHex);
+  const triadicTheme = generateTriadicTheme(finalHex);
+  const monochromaticTheme = generateMonochromaticTheme(finalHex);
 
-  // Determine standard library metrics or fall back to detected
-  const finalHex = matchedColor?.hex ? (matchedColor.hex.startsWith('#') ? matchedColor.hex : `#${matchedColor.hex}`) : detectedColor;
+  // Fallback metrics if not saved
+  const finalRgbString = savedRgb || formatRGBString(hexToRgb(finalHex));
+  const finalLabString = savedLab || formatLABString(hexToLab(finalHex));
 
-  // Use DB-provided metrics if they exist, otherwise calculate from the finalHex (Source of Truth)
-  const finalRgbObj = matchedColor?.rgb ? {
-    r: matchedColor.rgb.r !== undefined && matchedColor.rgb.r !== null ? matchedColor.rgb.r : hexToRgb(finalHex).r,
-    g: matchedColor.rgb.g !== undefined && matchedColor.rgb.g !== null ? matchedColor.rgb.g : hexToRgb(finalHex).g,
-    b: matchedColor.rgb.b !== undefined && matchedColor.rgb.b !== null ? matchedColor.rgb.b : hexToRgb(finalHex).b,
-  } : hexToRgb(finalHex);
-
-  const finalLabObj = matchedColor?.lab ? {
-    l: matchedColor.lab.l !== undefined && matchedColor.lab.l !== null ? matchedColor.lab.l : hexToLab(finalHex).l,
-    a: matchedColor.lab.a !== undefined && matchedColor.lab.a !== null ? matchedColor.lab.a : hexToLab(finalHex).a,
-    b: matchedColor.lab.b !== undefined && matchedColor.lab.b !== null ? matchedColor.lab.b : hexToLab(finalHex).b,
-    chroma: matchedColor.lab.chroma !== undefined && matchedColor.lab.chroma !== null ? matchedColor.lab.chroma : hexToLab(finalHex).chroma,
-  } : hexToLab(finalHex);
-
-  const finalRgbString = formatRGBString(finalRgbObj);
-  const finalLabString = formatLABString(finalLabObj);
-
-  // Guard: guests cannot save colors — show the guest modal instead of navigating
-  const handleSaveColorPress = () => {
-    if (isGuest) {
-      showGuestModal("Save Colors");
-      return;
-    }
-    navigation.navigate('SaveColorPrompt', {
-      detectedColor: finalHex,
-      colorName: matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match',
-      family: matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color',
-      rgbString: finalRgbString,
-      labString: finalLabString,
-      photoUri,
-      marker,
-      displayDimensions,
-      originalDimensions
+  const handleCompareColor = () => {
+    navigation.navigate('ColorCompare', {
+      sourceColor: {
+        detectedColor: finalHex,
+        colorName: colorName,
+        family: family,
+        photoUri,
+        marker,
+        displayDimensions
+      }
     });
   };
 
   return (
     <View style={styles.container}>
       <ImmersiveHeader
-        title="Color Results"
+        title="Color Details"
         onBack={() => navigation.goBack()}
       />
 
@@ -125,25 +119,30 @@ export default function ColorResultsScreen({ route, navigation }: any) {
               source={typeof photoUri === 'string' ? { uri: photoUri } : photoUri}
               style={[
                 styles.previewImage,
-                {
+                marker ? {
                   width: displayDimensions?.width || SCREEN_WIDTH,
                   height: displayDimensions?.height || (SCREEN_WIDTH * 0.75),
                   left: offsets.left,
                   top: offsets.top,
+                } : {
+                  width: '100%',
+                  height: '100%',
                 }
               ]}
-              resizeMode="cover"
+              resizeMode={marker ? "cover" : "cover"}
             />
-            {/* Precise Selection Marker */}
-            <View
-              style={[
-                styles.miniMarker,
-                { left: offsets.markerX - 10, top: offsets.markerY - 10 }
-              ]}
-              pointerEvents="none"
-            >
-              <View style={styles.miniCenter} />
-            </View>
+            {marker && (
+              /* Precise Selection Marker */
+              <View
+                style={[
+                  styles.miniMarker,
+                  { left: offsets.markerX - 10, top: offsets.markerY - 10 }
+                ]}
+                pointerEvents="none"
+              >
+                <View style={styles.miniCenter} />
+              </View>
+            )}
           </View>
         </View>
 
@@ -157,10 +156,8 @@ export default function ColorResultsScreen({ route, navigation }: any) {
               ]}
             />
             <View style={styles.nameContainer}>
-              <Text style={styles.colorName}>
-                {matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match'}
-              </Text>
-              <Text style={styles.familyName}>{matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color'}</Text>
+              <Text style={styles.colorName}>{colorName}</Text>
+              <Text style={styles.familyName}>{family}</Text>
             </View>
           </View>
 
@@ -176,25 +173,16 @@ export default function ColorResultsScreen({ route, navigation }: any) {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.primaryButton}
-              onPress={handleSaveColorPress}
+              onPress={handleCompareColor}
             >
-              <Text style={styles.primaryButtonText}>Save Color</Text>
+              <Text style={styles.primaryButtonText}>Compare Color</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.compareButton}
-              onPress={() => navigation.navigate('ColorCompare', {
-                sourceColor: {
-                  detectedColor: finalHex,
-                  colorName: matchedColor?.detailedColorName || matchedColor?.name || matchedColor?.colorName || 'Unknown Match',
-                  family: matchedColor?.familyColorName || matchedColor?.familyName || matchedColor?.family || 'Color',
-                  photoUri,
-                  marker,
-                  displayDimensions
-                }
-              })}
+              style={styles.deleteButton}
+              onPress={() => setIsDeleteModalVisible(true)}
             >
-              <Text style={styles.compareButtonText}>Compare Color</Text>
+              <Text style={styles.deleteButtonText}>Delete Color</Text>
             </TouchableOpacity>
           </View>
 
@@ -269,6 +257,22 @@ export default function ColorResultsScreen({ route, navigation }: any) {
           </View>
         </View>
       </ScrollView>
+
+      <ConfirmationModal
+        visible={isDeleteModalVisible}
+        title="Delete Color"
+        subtitle="Are you sure you want to delete this saved color? This action cannot be undone."
+        iconName="trash-outline"
+        primaryButtonTitle="Delete"
+        primaryButtonVariant="primary"
+        onPrimaryAction={() => {
+          // TODO: Implement API deletion logic here (Task 9.9)
+          console.log("TODO: Implement deletion for color ID:", color.id);
+          setIsDeleteModalVisible(false);
+          navigation.goBack();
+        }}
+        onCancelAction={() => setIsDeleteModalVisible(false)}
+      />
     </View>
   );
 }
@@ -277,23 +281,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-  },
-  header: {
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  backButton: {
-    padding: 5,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginLeft: 10,
-    color: theme.colors.companyBlack,
   },
   thumbnailOuter: {
     width: SCREEN_WIDTH,
@@ -347,32 +334,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 2,
   },
-  metricsContainer: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 30,
-  },
-  metricRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
-  },
-  metricLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-    letterSpacing: 1,
-  },
-  metricValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.companyBlack,
-    fontFamily: 'System', // Use mono-space if possible, but System is safer
-  },
   buttonContainer: {
     flexDirection: 'row',
     gap: 12,
@@ -390,14 +351,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  compareButton: {
+  deleteButton: {
     backgroundColor: theme.colors.companyBlue,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     flex: 1,
   },
-  compareButtonText: {
+  deleteButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '700',
@@ -451,11 +412,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
-  placeholderText: {
-    color: theme.colors.textSecondary,
-    fontSize: 14,
-    fontStyle: 'italic',
-  },
   miniMarker: {
     position: 'absolute',
     width: 20,
@@ -471,5 +427,16 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     backgroundColor: theme.colors.companyOrange,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
   },
 });
