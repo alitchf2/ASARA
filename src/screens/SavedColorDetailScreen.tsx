@@ -188,13 +188,14 @@ export default function SavedColorDetailScreen({ route, navigation }: any) {
             >
               <Text style={styles.primaryButtonText}>Compare Color</Text>
             </TouchableOpacity>
-
+            {/*
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => setIsDeleteModalVisible(true)}
             >
               <Text style={styles.deleteButtonText}>Delete Color</Text>
             </TouchableOpacity>
+            */}
           </View>
 
           {/* Visual Analysis Sliders */}
