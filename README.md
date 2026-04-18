@@ -1,6 +1,6 @@
-# ColorFind Developer Guide
+# Colorfind Developer Guide
 
-This guide helps developers set up the **ColorFind** project locally.
+This guide helps developers set up the **Colorfind** project locally.
 
 ## Prerequisites
 
